@@ -51,10 +51,10 @@
         </dependency>
 
         <!-- Mysql Connector -->
-        <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.mysql</groupId>-->
+<!--            <artifactId>mysql-connector-j</artifactId>-->
+<!--        </dependency>-->
 <!--        &lt;!&ndash; Oracle &ndash;&gt;-->
 <!--        <dependency>-->
 <!--            <groupId>com.oracle.database.jdbc</groupId>-->
@@ -66,10 +66,10 @@
 <!--            <artifactId>orai18n</artifactId>-->
 <!--        </dependency>-->
 <!--        &lt;!&ndash; PostgreSql &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.postgresql</groupId>-->
-<!--            <artifactId>postgresql</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
 <!--        &lt;!&ndash; SqlServer &ndash;&gt;-->
 <!--        <dependency>-->
 <!--            <groupId>com.microsoft.sqlserver</groupId>-->
