@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 
 import java.util.concurrent.TimeUnit;
 
@@ -38,6 +39,7 @@ public class CacheConfiguration {
      * 自定义缓存管理器 整合spring-cache
      */
     @Bean
+    @Primary
     public CacheManager cacheManager() {
         return new PlusSpringCacheManager();
     }

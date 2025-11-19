@@ -43,6 +43,17 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.redis.om</groupId>
+            <artifactId>redis-om-spring</artifactId>
+        </dependency>
+
+        <!-- Jedis client for JedisConnectionFactory -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+        </dependency>
+
 <!--        &lt;!&ndash; redis序列化替代方案 比json快无数的跨语言二进制序列化 &ndash;&gt;-->
 <!--        <dependency>-->
 <!--            <groupId>org.apache.fury</groupId>-->
