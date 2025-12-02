@@ -46,7 +46,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public R<Void> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException e,
-                                                                HttpServletRequest request) {
+                                                       HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}',不支持'{}'请求", requestURI, e.getMethod());
         return R.fail(HttpStatus.HTTP_BAD_METHOD, e.getMessage());
