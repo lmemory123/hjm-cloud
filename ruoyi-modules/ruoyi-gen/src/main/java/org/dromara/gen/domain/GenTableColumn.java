@@ -104,6 +104,7 @@ public class GenTableColumn extends BaseEntity {
     /**
      * 字典类型
      */
+    @TableField(updateStrategy = FieldStrategy.ALWAYS, jdbcType = JdbcType.VARCHAR)
     private String dictType;
 
     /**
