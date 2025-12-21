@@ -1,7 +1,7 @@
 package org.dromara.common.sensitive.annotation;
 
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 import org.dromara.common.sensitive.core.SensitiveStrategy;
 import org.dromara.common.sensitive.handler.SensitiveHandler;
 
@@ -32,3 +32,4 @@ public @interface Sensitive {
      */
     String[] perms() default {};
 }
+

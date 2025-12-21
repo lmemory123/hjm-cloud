@@ -2,7 +2,8 @@ package org.dromara.gateway.handler;
 
 import org.dromara.gateway.utils.WebFluxUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
+import org.jspecify.annotations.NonNull;
+import org.springframework.boot.webflux.error.ErrorWebExceptionHandler;
 import org.springframework.cloud.gateway.support.NotFoundException;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -22,7 +23,7 @@ import reactor.core.publisher.Mono;
 public class GatewayExceptionHandler implements ErrorWebExceptionHandler {
 
     @Override
-    public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
+    public Mono<Void> handle(ServerWebExchange exchange, @NonNull Throwable ex) {
         ServerHttpResponse response = exchange.getResponse();
 
         if (exchange.getResponse().isCommitted()) {

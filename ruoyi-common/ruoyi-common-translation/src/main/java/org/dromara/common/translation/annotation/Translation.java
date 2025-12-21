@@ -1,7 +1,7 @@
 package org.dromara.common.translation.annotation;
 
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 import org.dromara.common.translation.core.handler.TranslationHandler;
 
 import java.lang.annotation.*;
@@ -37,3 +37,4 @@ public @interface Translation {
     String other() default "";
 
 }
+

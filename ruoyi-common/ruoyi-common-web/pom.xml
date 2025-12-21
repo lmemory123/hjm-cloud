@@ -26,18 +26,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                <exclusion>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                    <groupId>org.springframework.boot</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
-        <!-- web 容器使用 undertow 性能更强 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-undertow</artifactId>
-        </dependency>
+<!--        &lt;!&ndash; web 容器使用 undertow 性能更强 &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-undertow</artifactId>-->
+<!--        </dependency>-->
 
         <!-- SpringBoot Actuator -->
         <dependency>
@@ -52,23 +46,10 @@
         </dependency>
 
         <dependency>
-            <groupId>net.dreamlu</groupId>
-            <artifactId>mica-metrics</artifactId>
-            <version>2.7.6</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.dreamlu</groupId>
-                    <artifactId>mica-core</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-micrometer-metrics</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>net.dreamlu</groupId>
-            <artifactId>mica-core</artifactId>
-            <version>2.7.6</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 
 </project>

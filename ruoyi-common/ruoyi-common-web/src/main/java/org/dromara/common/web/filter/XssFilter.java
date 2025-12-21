@@ -3,6 +3,7 @@ package org.dromara.common.web.filter;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.web.config.properties.XssProperties;
@@ -47,7 +48,7 @@ public class XssFilter implements Filter {
         String prefix = StringUtils.blankToDefault(request.getHeader("X-Forwarded-Prefix"), "");
         // 从请求头获取gateway转发的服务前缀
         List<String> excludeUrls = properties.getExcludeUrls().stream()
-            .filter(x -> StringUtils.startsWith(x, prefix))
+            .filter(x -> Strings.CS.startsWith(x, prefix))
             .map(x -> x.replaceFirst(prefix, StringUtils.EMPTY))
             .toList();
         return StringUtils.matches(url, excludeUrls);

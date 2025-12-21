@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
+import org.apache.commons.lang3.Strings;
 import org.springframework.util.AntPathMatcher;
 
 import java.nio.charset.Charset;
@@ -333,7 +334,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     public static boolean startWithAnyIgnoreCase(CharSequence str, CharSequence... prefixs) {
         // 判断是否是以指定字符串开头
         for (CharSequence prefix : prefixs) {
-            if (StringUtils.startsWithIgnoreCase(str, prefix)) {
+            if (Strings.CI.startsWith(str, prefix)) {
                 return true;
             }
         }

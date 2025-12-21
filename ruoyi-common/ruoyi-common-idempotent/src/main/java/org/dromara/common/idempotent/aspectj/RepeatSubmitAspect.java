@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.SecureUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.Strings;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -62,7 +63,7 @@ public class RepeatSubmitAspect {
             KEY_CACHE.set(cacheRepeatKey);
         } else {
             String message = repeatSubmit.message();
-            if (StringUtils.startsWith(message, "{") && StringUtils.endsWith(message, "}")) {
+            if (Strings.CS.startsWith(message, "{") && Strings.CS.endsWith(message, "}")) {
                 message = MessageUtils.message(StringUtils.substring(message, 1, message.length() - 1));
             }
             throw new ServiceException(message);

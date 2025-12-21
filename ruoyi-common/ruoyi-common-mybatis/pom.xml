@@ -29,14 +29,13 @@
 
         <dependency>
             <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+            <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-jsqlparser</artifactId>
         </dependency>
-
         <!-- sql性能分析插件 -->
         <dependency>
             <groupId>p6spy</groupId>
@@ -46,10 +45,9 @@
         <!-- Dynamic DataSource -->
         <dependency>
             <groupId>com.baomidou</groupId>
-            <artifactId>dynamic-datasource-spring-boot3-starter</artifactId>
+            <artifactId>dynamic-datasource-spring-boot4-starter</artifactId>
             <version>${dynamic-ds.version}</version>
         </dependency>
-
         <!-- Mysql Connector -->
 <!--        <dependency>-->
 <!--            <groupId>com.mysql</groupId>-->

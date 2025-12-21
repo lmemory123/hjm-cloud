@@ -34,9 +34,11 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
+        <!--TODO 非正式版本 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
+            <version>4.0.0-M2</version>
         </dependency>
 
         <!--常用工具类 -->

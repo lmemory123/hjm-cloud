@@ -2,8 +2,8 @@ package org.dromara.workflow.common.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.exception.ServiceException;
-import org.dromara.common.core.utils.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -133,7 +133,7 @@ public enum TaskAssigneeEnum {
         }
         // $前缀表示默认办理人变量策略
         // #前缀表示spel办理人变量策略
-        return StringUtils.startsWith(value, "$") || StringUtils.startsWith(value, "#");
+        return Strings.CS.startsWith(value, "$") || Strings.CS.startsWith(value, "#");
     }
 
 }

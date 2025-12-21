@@ -75,6 +75,8 @@ spring:
       date-time: yyyy-MM-dd HH:mm:ss
   #jackson配置
   jackson:
+    # 迁移到 Jackson 3 后沿用 Jackson 2 默认行为
+    use-jackson2-defaults: true
     # 日期格式化
     date-format: yyyy-MM-dd HH:mm:ss
     serialization:
@@ -288,7 +290,7 @@ seata:
 # 多租户配置
 tenant:
   # 是否开启
-  enable: true
+  enable: false
   # 排除表
   excludes:
     - sys_menu

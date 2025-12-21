@@ -1,5 +1,6 @@
 package org.dromara.system;
 
+import com.alibaba.cloud.nacos.endpoint.NacosConfigEndpointAutoConfiguration;
 import com.redis.om.spring.annotations.EnableRedisDocumentRepositories;
 import com.redis.om.spring.annotations.EnableRedisEnhancedRepositories;
 import jakarta.annotation.Resource;
@@ -15,8 +16,10 @@ import org.springframework.core.env.Environment;
  * @author ruoyi
  */
 @EnableDubbo
-@EnableRedisEnhancedRepositories(basePackages = "org.dromara.system.*")
-@SpringBootApplication
+@EnableRedisEnhancedRepositories(basePackages = "org.dromara.*.*")
+@SpringBootApplication(exclude = {
+    NacosConfigEndpointAutoConfiguration.class, // 解决 Nacos 启动报错
+})
 public class RuoYiSystemApplication {
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(RuoYiSystemApplication.class);

@@ -1,5 +1,6 @@
 package org.dromara.common.core.factory;
 
+import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.utils.StringUtils;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.env.PropertiesPropertySource;
@@ -19,7 +20,7 @@ public class YmlPropertySourceFactory extends DefaultPropertySourceFactory {
     @Override
     public PropertySource<?> createPropertySource(String name, EncodedResource resource) throws IOException {
         String sourceName = resource.getResource().getFilename();
-        if (StringUtils.isNotBlank(sourceName) && StringUtils.endsWithAny(sourceName, ".yml", ".yaml")) {
+        if (StringUtils.isNotBlank(sourceName) && Strings.CS.endsWithAny(sourceName, ".yml", ".yaml")) {
             YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
             factory.setResources(resource.getResource());
             factory.afterPropertiesSet();

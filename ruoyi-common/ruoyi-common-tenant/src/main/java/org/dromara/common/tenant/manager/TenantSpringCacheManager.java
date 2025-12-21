@@ -2,6 +2,7 @@ package org.dromara.common.tenant.manager;
 
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.redis.manager.PlusSpringCacheManager;
@@ -24,14 +25,14 @@ public class TenantSpringCacheManager extends PlusSpringCacheManager {
         if (InterceptorIgnoreHelper.willIgnoreTenantLine("")) {
             return super.getCache(name);
         }
-        if (StringUtils.contains(name, GlobalConstants.GLOBAL_REDIS_KEY)) {
+        if (Strings.CS.contains(name, GlobalConstants.GLOBAL_REDIS_KEY)) {
             return super.getCache(name);
         }
         String tenantId = TenantHelper.getTenantId();
         if (StringUtils.isBlank(tenantId)) {
             log.error("无法获取有效的租户id -> Null");
         }
-        if (StringUtils.startsWith(name, tenantId)) {
+        if (Strings.CS.startsWith(name, tenantId)) {
             // 如果存在则直接返回
             return super.getCache(name);
         }

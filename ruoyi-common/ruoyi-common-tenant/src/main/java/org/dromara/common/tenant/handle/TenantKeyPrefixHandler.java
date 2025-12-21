@@ -2,6 +2,7 @@ package org.dromara.common.tenant.handle;
 
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.redis.handler.KeyPrefixHandler;
@@ -42,7 +43,7 @@ public class TenantKeyPrefixHandler extends KeyPrefixHandler {
             log.debug("无法获取有效的租户id -> Null");
             return super.map(name);
         }
-        if (StringUtils.startsWith(name, tenantId + "")) {
+        if (Strings.CS.startsWith(name, tenantId)) {
             // 如果存在则直接返回
             return super.map(name);
         }
@@ -73,7 +74,7 @@ public class TenantKeyPrefixHandler extends KeyPrefixHandler {
             log.debug("无法获取有效的租户id -> Null");
             return unmap;
         }
-        if (StringUtils.startsWith(unmap, tenantId + "")) {
+        if (Strings.CS.startsWith(unmap, tenantId + "")) {
             // 如果存在则删除
             return unmap.substring((tenantId + ":").length());
         }

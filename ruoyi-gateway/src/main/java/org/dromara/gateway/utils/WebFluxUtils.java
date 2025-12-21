@@ -1,6 +1,7 @@
 package org.dromara.gateway.utils;
 
 import cn.hutool.core.util.ObjectUtil;
+import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
@@ -51,7 +52,7 @@ public class WebFluxUtils {
      */
     public static boolean isJsonRequest(ServerWebExchange exchange) {
         String header = exchange.getRequest().getHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
-        return StringUtils.startsWithIgnoreCase(header, MediaType.APPLICATION_JSON_VALUE);
+        return Strings.CI.startsWith(header, MediaType.APPLICATION_JSON_VALUE);
     }
 
     /**

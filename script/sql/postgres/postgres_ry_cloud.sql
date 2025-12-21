@@ -1389,6 +1389,169 @@ comment on column test_demo.update_time is '更新时间';
 comment on column test_demo.update_by is '更新人';
 comment on column test_demo.del_flag is '删除标志';
 
+
+create table if not exists music
+(
+    id                int8            not null,
+
+    -- ==========================================
+    -- [1] 核心搜索与展示 (独立列)
+    -- ==========================================
+    title             varchar(255)    not null,
+
+    -- 外部原作者信息 (B站UP主/网易云歌手)
+    creator_name      varchar(100)    not null,
+    creator_link      varchar(500)    not null,
+
+    duration          int4            default 0,
+    bpm               int4,
+    publish_time      timestamp,
+
+    -- ==========================================
+    -- [2] 业务数据快照 (JSONB)
+    -- ==========================================
+
+    -- 原曲关联 (JSON数组)
+    -- 示例: [{"title": "Lemon", "author": "米津玄师", "link": "http...", "type": "Remix"}]
+    original_data     jsonb           default '[]'::jsonb,
+
+    -- 资源展示快照 (JSON对象)
+    -- 示例: {"audio": "http.../128k.mp3", "cover": "http.../small.webp"}
+    resource_data     jsonb           default '{}'::jsonb,
+
+    -- 标签快照 (JSON数组)
+    -- 示例: [{"id": 1, "name": "电子", "color": "#F00"}]
+    tags_snapshot     jsonb           default '[]'::jsonb,
+
+    -- 扩展字段 (歌词、备注、PV链接)
+    extend_data       jsonb           default '{}'::jsonb,
+
+    -- ==========================================
+    -- [3] 状态与统计
+    -- ==========================================
+    audit_status      int2            default 0,
+    play_count        int8            default 0,
+
+    -- ==========================================
+    -- [4] 系统审计字段 (本系统用户)
+    -- ==========================================
+    create_by         int8,           -- [新增] 创建人ID (本系统用户)
+    create_time       timestamp       default current_timestamp,
+    update_by         int8,           -- [新增] 修改人ID
+    update_time       timestamp       default current_timestamp,
+    del_flag          char(1)         default '0',
+
+    constraint "pk_music" primary key (id)
+);
+
+-- 索引
+create index idx_music_title on music(title);
+create index idx_music_creator on music(creator_name);
+create index idx_music_status on music(audit_status, publish_time desc);
+create index idx_music_create_by on music(create_by); -- 方便用户查"我上传的歌"
+
+-- 注释
+comment on table music is '音乐曲库主表';
+comment on column music.id is '主键ID (雪花算法)';
+comment on column music.title is '歌曲标题';
+comment on column music.creator_name is '外部原作者名称 (如: ilem)';
+comment on column music.creator_link is '外部原作者主页链接';
+comment on column music.duration is '时长(秒)';
+comment on column music.bpm is '节拍数(BPM)';
+comment on column music.publish_time is '发布时间(过审时间)';
+comment on column music.original_data is '原曲关联信息(JSON数组): title, author, link, type';
+comment on column music.resource_data is '资源展示快照(JSON对象): 存封面和试听音频的最佳链接';
+comment on column music.tags_snapshot is '标签展示快照(JSON数组): 存标签名和颜色，用于列表页渲染';
+comment on column music.extend_data is '扩展字段(JSON对象): 存歌词、备注、PV链接等';
+comment on column music.audit_status is '审核状态: 0待审 1通过 2拒绝 3下架';
+comment on column music.play_count is '播放量';
+comment on column music.create_by is '创建人ID (本系统注册用户的ID)';
+comment on column music.create_time is '提交时间';
+comment on column music.update_by is '更新人ID';
+comment on column music.update_time is '更新时间';
+comment on column music.del_flag is '逻辑删除: 0正常 1删除';
+
+create table if not exists music_resource
+(
+    id                int8            not null,
+    music_id          int8            not null,
+
+    res_type          varchar(20)     not null,
+    quality_tier      varchar(20),
+
+    url               varchar(1000)   not null,
+    source_type       varchar(20),
+
+    status            int2            default 0,
+    fail_count        int4            default 0,
+    last_check_time   timestamp,
+
+    create_time       timestamp       default current_timestamp,
+    constraint "pk_music_resource" primary key (id)
+);
+
+create index idx_res_music on music_resource(music_id);
+create index idx_res_check on music_resource(status, source_type);
+
+-- 注释
+comment on table music_resource is '音乐资源库存表 (用于运维监控)';
+comment on column music_resource.id is '主键ID';
+comment on column music_resource.music_id is '关联音乐ID';
+comment on column music_resource.res_type is '资源类型: audio(音频), cover(封面)';
+comment on column music_resource.quality_tier is '质量分级: 320k, 128k, 1200w, 200w';
+comment on column music_resource.url is '资源实际链接 (OSS或外链)';
+comment on column music_resource.source_type is '来源类型: oss, bilibili, youtube';
+comment on column music_resource.status is '健康状态: 0正常 1失效';
+comment on column music_resource.fail_count is '连续检测失败次数';
+comment on column music_resource.last_check_time is '最后检测时间';
+
+-- 标签主表
+create table if not exists tag
+(
+    id                int8            not null,
+    name              varchar(50)     not null,
+    type              varchar(20),
+    color             varchar(20),
+    constraint "pk_tag" primary key (id),
+    constraint "uk_tag_name" unique (name)
+);
+
+-- 标签关联表
+create table if not exists music_tag_rel
+(
+    music_id          int8            not null,
+    tag_id            int8            not null,
+    primary key (music_id, tag_id)
+);
+
+-- 注释
+comment on table tag is '标签字典表';
+comment on column tag.name is '标签名称';
+comment on column tag.type is '标签类型: style, mood, instrument';
+comment on column tag.color is '标签颜色(HEX)';
+
+comment on table music_tag_rel is '音乐标签关联表';
+
+create table if not exists music_audit_log
+(
+    id                int8            not null,
+    music_id          int8            not null,
+    action            int2            not null,
+    reason            varchar(500),
+    operator_id       int8,
+    create_time       timestamp       default current_timestamp,
+    constraint "pk_music_audit_log" primary key (id)
+);
+
+-- 注释
+comment on table music_audit_log is '音乐审核流水日志表';
+comment on column music_audit_log.action is '审核动作: 1通过 2拒绝 3下架';
+comment on column music_audit_log.reason is '拒绝或下架原因';
+comment on column music_audit_log.operator_id is '操作人ID (后台管理员ID)';
+comment on column music_audit_log.create_time is '操作时间';
+
+
+
 create table if not exists test_tree
 (
     id          int8,

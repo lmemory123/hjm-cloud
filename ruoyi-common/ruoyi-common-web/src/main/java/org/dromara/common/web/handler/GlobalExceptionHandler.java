@@ -2,7 +2,6 @@ package org.dromara.common.web.handler;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpStatus;
-import com.fasterxml.jackson.core.JsonParseException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import tools.jackson.core.exc.StreamReadException;
 
 import java.io.IOException;
 
@@ -194,8 +194,8 @@ public class GlobalExceptionHandler {
      * JSON 解析异常（Jackson 在处理 JSON 格式出错时抛出）
      * 可能是请求体格式非法，也可能是服务端反序列化失败
      */
-    @ExceptionHandler(JsonParseException.class)
-    public R<Void> handleJsonParseException(JsonParseException e, HttpServletRequest request) {
+    @ExceptionHandler(StreamReadException.class)
+    public R<Void> handleJsonParseException(StreamReadException e, HttpServletRequest request) {
         String requestURI = request.getRequestURI();
         log.error("请求地址'{}' 发生 JSON 解析异常: {}", requestURI, e.getMessage());
         return R.fail(HttpStatus.HTTP_BAD_REQUEST, "请求数据格式错误（JSON 解析失败）：" + e.getMessage());
@@ -211,3 +211,4 @@ public class GlobalExceptionHandler {
     }
 
 }
+

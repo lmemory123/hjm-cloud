@@ -1,9 +1,9 @@
 package org.dromara.auth;
 
+import com.alibaba.cloud.nacos.endpoint.NacosConfigEndpointAutoConfiguration;
 import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.metrics.buffering.BufferingApplicationStartup;
 
 /**
@@ -12,7 +12,9 @@ import org.springframework.boot.context.metrics.buffering.BufferingApplicationSt
  * @author ruoyi
  */
 @EnableDubbo
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+@SpringBootApplication(exclude = {
+    NacosConfigEndpointAutoConfiguration.class,
+})
 public class RuoYiAuthApplication {
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(RuoYiAuthApplication.class);

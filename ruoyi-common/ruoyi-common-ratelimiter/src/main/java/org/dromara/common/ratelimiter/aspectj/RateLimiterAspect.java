@@ -1,6 +1,7 @@
 package org.dromara.common.ratelimiter.aspectj;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.Strings;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -64,7 +65,7 @@ public class RateLimiterAspect {
             long number = RedisUtils.rateLimiter(combineKey, rateType, count, time, timeout);
             if (number == -1) {
                 String message = rateLimiter.message();
-                if (StringUtils.startsWith(message, "{") && StringUtils.endsWith(message, "}")) {
+                if (Strings.CS.startsWith(message, "{") && Strings.CS.endsWith(message, "}")) {
                     message = MessageUtils.message(StringUtils.substring(message, 1, message.length() - 1));
                 }
                 throw new ServiceException(message);
@@ -90,8 +91,8 @@ public class RateLimiterAspect {
                 new MethodBasedEvaluationContext(null, targetMethod, args, pnd);
             context.setBeanResolver(new BeanFactoryResolver(SpringUtils.getBeanFactory()));
             Expression expression;
-            if (StringUtils.startsWith(key, parserContext.getExpressionPrefix())
-                && StringUtils.endsWith(key, parserContext.getExpressionSuffix())) {
+            if (Strings.CS.startsWith(key, parserContext.getExpressionPrefix())
+                && Strings.CS.endsWith(key, parserContext.getExpressionSuffix())) {
                 expression = parser.parseExpression(key, parserContext);
             } else {
                 expression = parser.parseExpression(key);

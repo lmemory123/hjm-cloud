@@ -3,11 +3,13 @@ package org.dromara.gen.util;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.RegExUtils;
+import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.gen.config.GenConfig;
 import org.dromara.gen.constant.GenConstants;
 import org.dromara.gen.domain.GenTable;
 import org.dromara.gen.domain.GenTableColumn;
+
 
 import java.util.Arrays;
 
@@ -82,28 +84,28 @@ public class GenUtils {
         }
 
         // 查询字段类型
-        if (StringUtils.endsWithIgnoreCase(columnName, "name")) {
+        if (Strings.CI.endsWith(columnName, "name")) {
             column.setQueryType(GenConstants.QUERY_LIKE);
         }
         // 状态字段设置单选框
-        if (StringUtils.endsWithIgnoreCase(columnName, "status")) {
+        if (Strings.CI.endsWith(columnName, "status")) {
             column.setHtmlType(GenConstants.HTML_RADIO);
         }
         // 类型&性别字段设置下拉框
-        else if (StringUtils.endsWithIgnoreCase(columnName, "type")
-            || StringUtils.endsWithIgnoreCase(columnName, "sex")) {
+        else if (Strings.CI.endsWith(columnName, "type")
+            || Strings.CI.endsWith(columnName, "sex")) {
             column.setHtmlType(GenConstants.HTML_SELECT);
         }
         // 图片字段设置图片上传控件
-        else if (StringUtils.endsWithIgnoreCase(columnName, "image")) {
+        else if (Strings.CI.endsWith(columnName, "image")) {
             column.setHtmlType(GenConstants.HTML_IMAGE_UPLOAD);
         }
         // 文件字段设置文件上传控件
-        else if (StringUtils.endsWithIgnoreCase(columnName, "file")) {
+        else if (Strings.CI.endsWith(columnName, "file")) {
             column.setHtmlType(GenConstants.HTML_FILE_UPLOAD);
         }
         // 内容字段设置富文本控件
-        else if (StringUtils.endsWithIgnoreCase(columnName, "content")) {
+        else if (Strings.CI.endsWith(columnName, "content")) {
             column.setHtmlType(GenConstants.HTML_EDITOR);
         }
     }
@@ -195,7 +197,7 @@ public class GenUtils {
      * @return 截取后的列类型
      */
     public static String getDbType(String columnType) {
-        if (StringUtils.indexOf(columnType, "(") > 0) {
+        if (Strings.CS.indexOf(columnType, "(") > 0) {
             return StringUtils.substringBefore(columnType, "(");
         } else {
             return columnType;
@@ -209,7 +211,7 @@ public class GenUtils {
      * @return 截取后的列类型
      */
     public static Integer getColumnLength(String columnType) {
-        if (StringUtils.indexOf(columnType, "(") > 0) {
+        if (Strings.CS.indexOf(columnType, "(") > 0) {
             String length = StringUtils.substringBetween(columnType, "(", ")");
             return Integer.valueOf(length);
         } else {

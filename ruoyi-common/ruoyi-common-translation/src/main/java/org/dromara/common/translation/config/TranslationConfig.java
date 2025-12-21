@@ -1,6 +1,5 @@
 package org.dromara.common.translation.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.dromara.common.translation.annotation.TranslationType;
 import org.dromara.common.translation.core.TranslationInterface;
 import org.dromara.common.translation.core.handler.TranslationBeanSerializerModifier;
@@ -9,6 +8,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 import java.util.HashMap;
 import java.util.List;
@@ -42,9 +43,9 @@ public class TranslationConfig {
         }
         TranslationHandler.TRANSLATION_MAPPER.putAll(map);
         // 设置 Bean 序列化修改器
-        objectMapper.setSerializerFactory(
-            objectMapper.getSerializerFactory()
-                .withSerializerModifier(new TranslationBeanSerializerModifier()));
+        SimpleModule module = new SimpleModule();
+        module.setSerializerModifier(new TranslationBeanSerializerModifier());
+        objectMapper.rebuild().addModule(module);
     }
 
 }
