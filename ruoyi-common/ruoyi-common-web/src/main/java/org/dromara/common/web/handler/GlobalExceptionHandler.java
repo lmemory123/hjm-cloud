@@ -204,6 +204,16 @@ public class GlobalExceptionHandler {
 
 
     /**
+     * 方法参数校验异常 用于处理 @Validated 注解
+     */
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public R<Void> handlerMethodValidationException(HandlerMethodValidationException e) {
+        log.error(e.getMessage());
+        String message = StreamUtils.join(e.getAllErrors(), MessageSourceResolvable::getDefaultMessage, ", ");
+        return R.fail(message);
+    }
+
+    /**
      * JSON 解析异常（Jackson 在处理 JSON 格式出错时抛出）
      * 可能是请求体格式非法，也可能是服务端反序列化失败
      */
