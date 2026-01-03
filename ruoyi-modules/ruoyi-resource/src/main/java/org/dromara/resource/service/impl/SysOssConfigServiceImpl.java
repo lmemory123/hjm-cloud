@@ -3,10 +3,8 @@ package org.dromara.resource.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.CacheNames;
@@ -14,8 +12,8 @@ import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.ObjectUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
-import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.mybatisflex.core.page.PageQuery;
+import org.dromara.common.mybatisflex.core.page.TableDataInfo;
 import org.dromara.common.oss.constant.OssConstant;
 import org.dromara.common.redis.utils.CacheUtils;
 import org.dromara.common.redis.utils.RedisUtils;
@@ -49,7 +47,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
      */
     @Override
     public void init() {
-        List<SysOssConfig> list = baseMapper.selectList();
+        List<SysOssConfig> list = baseMapper.selectAll();
         // 加载OSS初始化配置
         for (SysOssConfig config : list) {
             String configKey = config.getConfigKey();
@@ -67,19 +65,25 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
 
     @Override
     public TableDataInfo<SysOssConfigVo> queryPageList(SysOssConfigBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<SysOssConfig> lqw = buildQueryWrapper(bo);
-        Page<SysOssConfigVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        QueryWrapper wrapper = buildQueryWrapper(bo);
+        Page<SysOssConfigVo> result = baseMapper.selectVoPage(pageQuery.build(), wrapper);
         return TableDataInfo.build(result);
     }
 
 
-    private LambdaQueryWrapper<SysOssConfig> buildQueryWrapper(SysOssConfigBo bo) {
-        LambdaQueryWrapper<SysOssConfig> lqw = Wrappers.lambdaQuery();
-        lqw.eq(StringUtils.isNotBlank(bo.getConfigKey()), SysOssConfig::getConfigKey, bo.getConfigKey());
-        lqw.like(StringUtils.isNotBlank(bo.getBucketName()), SysOssConfig::getBucketName, bo.getBucketName());
-        lqw.eq(StringUtils.isNotBlank(bo.getStatus()), SysOssConfig::getStatus, bo.getStatus());
-        lqw.orderByAsc(SysOssConfig::getOssConfigId);
-        return lqw;
+    private QueryWrapper buildQueryWrapper(SysOssConfigBo bo) {
+        QueryWrapper queryWrapper = QueryWrapper.create();
+        if (StringUtils.isNotBlank(bo.getConfigKey())) {
+            queryWrapper.and("config_key = ?", bo.getConfigKey());
+        }
+        if (StringUtils.isNotBlank(bo.getBucketName())) {
+            queryWrapper.and("bucket_name like ?", "%" + bo.getBucketName() + "%");
+        }
+        if (StringUtils.isNotBlank(bo.getStatus())) {
+            queryWrapper.and("status = ?", bo.getStatus());
+        }
+        queryWrapper.orderBy("oss_config_id", true);
+        return queryWrapper;
     }
 
     @Override
@@ -89,7 +93,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         boolean flag = baseMapper.insert(config) > 0;
         if (flag) {
             // 从数据库查询完整的数据做缓存
-            config = baseMapper.selectById(config.getOssConfigId());
+            config = baseMapper.selectOneById(config.getOssConfigId());
             CacheUtils.put(CacheNames.SYS_OSS_CONFIG, config.getConfigKey(), JsonUtils.toJsonString(config));
         }
         return flag;
@@ -99,16 +103,23 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
     public Boolean updateByBo(SysOssConfigBo bo) {
         SysOssConfig config = BeanUtil.toBean(bo, SysOssConfig.class);
         validEntityBeforeSave(config);
-        LambdaUpdateWrapper<SysOssConfig> luw = new LambdaUpdateWrapper<>();
-        luw.set(ObjectUtil.isNull(config.getPrefix()), SysOssConfig::getPrefix, "");
-        luw.set(ObjectUtil.isNull(config.getRegion()), SysOssConfig::getRegion, "");
-        luw.set(ObjectUtil.isNull(config.getExt1()), SysOssConfig::getExt1, "");
-        luw.set(ObjectUtil.isNull(config.getRemark()), SysOssConfig::getRemark, "");
-        luw.eq(SysOssConfig::getOssConfigId, config.getOssConfigId());
-        boolean flag = baseMapper.update(config, luw) > 0;
+        // 处理可能为null的字段
+        if (ObjectUtil.isNull(config.getPrefix())) {
+            config.setPrefix("");
+        }
+        if (ObjectUtil.isNull(config.getRegion())) {
+            config.setRegion("");
+        }
+        if (ObjectUtil.isNull(config.getExt1())) {
+            config.setExt1("");
+        }
+        if (ObjectUtil.isNull(config.getRemark())) {
+            config.setRemark("");
+        }
+        boolean flag = baseMapper.update(config) > 0;
         if (flag) {
             // 从数据库查询完整的数据做缓存
-            config = baseMapper.selectById(config.getOssConfigId());
+            config = baseMapper.selectOneById(config.getOssConfigId());
             CacheUtils.put(CacheNames.SYS_OSS_CONFIG, config.getConfigKey(), JsonUtils.toJsonString(config));
         }
         return flag;
@@ -132,10 +143,10 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         }
         List<SysOssConfig> list = CollUtil.newArrayList();
         for (Long configId : ids) {
-            SysOssConfig config = baseMapper.selectById(configId);
+            SysOssConfig config = baseMapper.selectOneById(configId);
             list.add(config);
         }
-        boolean flag = baseMapper.deleteByIds(ids) > 0;
+        boolean flag = baseMapper.deleteBatchByIds(ids) > 0;
         if (flag) {
             list.forEach(sysOssConfig ->
                 CacheUtils.evict(CacheNames.SYS_OSS_CONFIG, sysOssConfig.getConfigKey()));
@@ -148,9 +159,9 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
      */
     private boolean checkConfigKeyUnique(SysOssConfig sysOssConfig) {
         long ossConfigId = ObjectUtils.notNull(sysOssConfig.getOssConfigId(), -1L);
-        SysOssConfig info = baseMapper.selectOne(new LambdaQueryWrapper<SysOssConfig>()
-            .select(SysOssConfig::getOssConfigId, SysOssConfig::getConfigKey)
-            .eq(SysOssConfig::getConfigKey, sysOssConfig.getConfigKey()));
+        SysOssConfig info = baseMapper.selectOneByQuery(QueryWrapper.create()
+            .select("oss_config_id", "config_key")
+            .where("config_key = ?", sysOssConfig.getConfigKey()));
         if (ObjectUtil.isNotNull(info) && info.getOssConfigId() != ossConfigId) {
             return false;
         }
@@ -164,9 +175,9 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
     @Transactional(rollbackFor = Exception.class)
     public int updateOssConfigStatus(SysOssConfigBo bo) {
         SysOssConfig sysOssConfig = BeanUtil.toBean(bo, SysOssConfig.class);
-        int row = baseMapper.update(null, new LambdaUpdateWrapper<SysOssConfig>()
-            .set(SysOssConfig::getStatus, "1"));
-        row += baseMapper.updateById(sysOssConfig);
+        // 先将所有状态设为1(禁用)
+        int row = baseMapper.updateByQuery(new SysOssConfig() {{ setStatus("1"); }}, QueryWrapper.create());
+        row += baseMapper.update(sysOssConfig);
         if (row > 0) {
             RedisUtils.setCacheObject(OssConstant.DEFAULT_CONFIG_KEY, sysOssConfig.getConfigKey());
         }

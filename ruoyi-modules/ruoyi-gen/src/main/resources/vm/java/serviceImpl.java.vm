@@ -3,12 +3,11 @@ package ${packageName}.service.impl;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
 #if($table.crud)
-import org.dromara.common.mybatis.core.page.TableDataInfo;
-import org.dromara.common.mybatis.core.page.PageQuery;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.dromara.common.mybatisflex.core.page.TableDataInfo;
+import org.dromara.common.mybatisflex.core.page.PageQuery;
+import com.mybatisflex.core.paginate.Page;
 #end
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +20,8 @@ import ${packageName}.service.I${ClassName}Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
+
+import static ${packageName}.domain.table.${ClassName}TableDef.${table.tableName.toUpperCase()};
 
 /**
  * ${functionName}Service业务层处理
@@ -56,8 +57,8 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
      */
     @Override
     public TableDataInfo<${ClassName}Vo> queryPageList(${ClassName}Bo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<${ClassName}> lqw = buildQueryWrapper(bo);
-        Page<${ClassName}Vo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        QueryWrapper wrapper = buildQueryWrapper(bo);
+        Page<${ClassName}Vo> result = baseMapper.selectVoPage(pageQuery.build(), wrapper);
         return TableDataInfo.build(result);
     }
 #end
@@ -70,39 +71,57 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
      */
     @Override
     public List<${ClassName}Vo> queryList(${ClassName}Bo bo) {
-        LambdaQueryWrapper<${ClassName}> lqw = buildQueryWrapper(bo);
-        return baseMapper.selectVoList(lqw);
+        QueryWrapper wrapper = buildQueryWrapper(bo);
+        return baseMapper.selectVoList(wrapper);
     }
 
-    private LambdaQueryWrapper<${ClassName}> buildQueryWrapper(${ClassName}Bo bo) {
+    private QueryWrapper buildQueryWrapper(${ClassName}Bo bo) {
         Map<String, Object> params = bo.getParams();
-        LambdaQueryWrapper<${ClassName}> lqw = Wrappers.lambdaQuery();
+        QueryWrapper queryWrapper = QueryWrapper.create()
+            .where(
+#set($firstField = true)
 #foreach($column in $columns)
 #if($column.query)
 #set($queryType=$column.queryType)
 #set($javaField=$column.javaField)
 #set($javaType=$column.javaType)
-#set($columnName=$column.columnName)
+#set($columnName=$column.columnName.toUpperCase())
 #set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
-#set($mpMethod=$column.queryType.toLowerCase())
 #if($queryType != 'BETWEEN')
-#if($javaType == 'String')
-#set($condition='StringUtils.isNotBlank(bo.get'+$AttrName+'())')
+#if($firstField)
+#if($queryType == 'LIKE')
+                ${table.tableName.toUpperCase()}.${columnName}.like(bo.get${AttrName}())
 #else
-#set($condition='bo.get'+$AttrName+'() != null')
+                ${table.tableName.toUpperCase()}.${columnName}.eq(bo.get${AttrName}())
 #end
-        lqw.$mpMethod($condition, ${ClassName}::get$AttrName, bo.get$AttrName());
+#set($firstField = false)
 #else
-        lqw.between(params.get("begin$AttrName") != null && params.get("end$AttrName") != null,
-            ${ClassName}::get$AttrName ,params.get("begin$AttrName"), params.get("end$AttrName"));
+#if($queryType == 'LIKE')
+                .and(${table.tableName.toUpperCase()}.${columnName}.like(bo.get${AttrName}()))
+#else
+                .and(${table.tableName.toUpperCase()}.${columnName}.eq(bo.get${AttrName}()))
 #end
 #end
-#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+#end
+#end
+#end
+            )
+#foreach($column in $columns)
 #if($column.isPk==1)
-        lqw.orderByAsc(${ClassName}::get$AttrName);
+#set($pkColumnName=$column.columnName.toUpperCase())
+            .orderBy(${table.tableName.toUpperCase()}.${pkColumnName}.asc());
 #end
 #end
-        return lqw;
+#foreach($column in $columns)
+#if($column.query && $column.queryType == 'BETWEEN')
+#set($AttrName=$column.javaField.substring(0,1).toUpperCase() + ${column.javaField.substring(1)})
+#set($columnName=$column.columnName.toUpperCase())
+        if (params.get("begin$AttrName") != null && params.get("end$AttrName") != null) {
+            queryWrapper.and(${table.tableName.toUpperCase()}.${columnName}.between(params.get("begin$AttrName"), params.get("end$AttrName")));
+        }
+#end
+#end
+        return queryWrapper;
     }
 
     /**
@@ -133,7 +152,7 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
     public Boolean updateByBo(${ClassName}Bo bo) {
         ${ClassName} update = MapstructUtils.convert(bo, ${ClassName}.class);
         validEntityBeforeSave(update);
-        return baseMapper.updateById(update) > 0;
+        return baseMapper.update(update) > 0;
     }
 
     /**
@@ -155,6 +174,6 @@ public class ${ClassName}ServiceImpl implements I${ClassName}Service {
         if(isValid){
             //TODO 做一些业务上的校验,判断是否需要校验
         }
-        return baseMapper.deleteByIds(ids) > 0;
+        return baseMapper.deleteBatchByIds(ids) > 0;
     }
 }

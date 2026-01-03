@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 import org.dromara.common.core.constant.RegexConstants;
 import org.dromara.common.json.validate.JsonPattern;
 import org.dromara.common.json.validate.JsonType;
-import org.dromara.common.mybatis.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.BaseEntity;
 import org.dromara.system.domain.SysMenu;
 
 /**

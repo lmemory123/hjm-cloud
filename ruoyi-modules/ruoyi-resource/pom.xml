@@ -74,7 +74,7 @@
 
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>ruoyi-common-mybatis</artifactId>
+            <artifactId>hjm-mybatis-flex</artifactId>
         </dependency>
 
         <dependency>

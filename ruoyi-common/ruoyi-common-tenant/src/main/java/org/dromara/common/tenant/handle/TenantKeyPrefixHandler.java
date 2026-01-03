@@ -35,7 +35,7 @@ public class TenantKeyPrefixHandler extends KeyPrefixHandler {
         } catch (NoClassDefFoundError ignore) {
             // 有些服务不需要mp导致类不存在 忽略即可
         }
-        if (StringUtils.contains(name, GlobalConstants.GLOBAL_REDIS_KEY)) {
+        if (Strings.CS.contains(name, GlobalConstants.GLOBAL_REDIS_KEY)) {
             return super.map(name);
         }
         String tenantId = TenantHelper.getTenantId();
@@ -66,7 +66,7 @@ public class TenantKeyPrefixHandler extends KeyPrefixHandler {
         } catch (NoClassDefFoundError ignore) {
             // 有些服务不需要mp导致类不存在 忽略即可
         }
-        if (StringUtils.contains(name, GlobalConstants.GLOBAL_REDIS_KEY)) {
+        if (Strings.CS.contains(name, GlobalConstants.GLOBAL_REDIS_KEY)) {
             return unmap;
         }
         String tenantId = TenantHelper.getTenantId();

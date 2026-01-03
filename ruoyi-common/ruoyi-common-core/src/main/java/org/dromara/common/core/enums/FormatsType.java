@@ -2,7 +2,7 @@ package org.dromara.common.core.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.dromara.common.core.utils.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 /*
  * 日期格式
@@ -137,7 +137,7 @@ public enum FormatsType {
 
     public static FormatsType getFormatsType(String str) {
         for (FormatsType value : values()) {
-            if (StringUtils.contains(str, value.getTimeFormat())) {
+            if (Strings.CS.contains(str, value.getTimeFormat())) {
                 return value;
             }
         }

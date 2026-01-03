@@ -296,7 +296,7 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
             char c = str.charAt(i);
 
             // 检测进入 SpEL 表达式 #{...}
-            if (!inString && c == '#' && depth == 0 && checkNext(str, i, '{')) {
+            if (c == '#' && depth == 0 && checkNext(str, i)) {
                 depth++;
                 token.append("#{");
                 // 跳过 {
@@ -305,7 +305,7 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
             }
 
             // 在表达式中遇到 { 或 } 改变嵌套深度
-            if (!inString && depth > 0) {
+            if (depth > 0) {
                 if (c == '{') {
                     depth++;
                 } else if (c == '}') {
@@ -349,8 +349,8 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
         return result;
     }
 
-    private static boolean checkNext(String str, int index, char expected) {
-        return index + 1 < str.length() && str.charAt(index + 1) == expected;
+    private static boolean checkNext(String str, int index) {
+        return index + 1 < str.length() && str.charAt(index + 1) == '{';
     }
 
 }

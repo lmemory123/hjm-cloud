@@ -1,12 +1,12 @@
 package org.dromara.system.domain;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.mybatisflex.annotation.Column;
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.dromara.common.tenant.core.TenantEntity;
+import org.dromara.system.domain.base.SystemTenantEntity;
 
 /**
  * 角色表 sys_role
@@ -17,13 +17,13 @@ import org.dromara.common.tenant.core.TenantEntity;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName("sys_role")
-public class SysRole extends TenantEntity {
+@Table("sys_role")
+public class SysRole extends SystemTenantEntity {
 
     /**
      * 角色ID
      */
-    @TableId(value = "role_id")
+    @Id
     private Long roleId;
 
     /**
@@ -64,7 +64,7 @@ public class SysRole extends TenantEntity {
     /**
      * 删除标志（0代表存在 1代表删除）
      */
-    @TableLogic
+    @Column(isLogicDelete = true)
     private String delFlag;
 
     /**

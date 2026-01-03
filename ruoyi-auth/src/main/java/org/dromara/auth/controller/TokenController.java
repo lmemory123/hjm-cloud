@@ -11,6 +11,7 @@ import me.zhyd.oauth.model.AuthResponse;
 import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.request.AuthRequest;
 import me.zhyd.oauth.utils.AuthStateUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.dromara.auth.domain.vo.LoginTenantVo;
 import org.dromara.auth.domain.vo.LoginVo;
@@ -41,7 +42,7 @@ import org.dromara.system.api.domain.vo.RemoteClientVo;
 import org.dromara.system.api.domain.vo.RemoteTenantVo;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
@@ -91,7 +92,7 @@ public class TokenController {
         RemoteClientVo clientVo = remoteClientService.queryByClientId(clientId);
 
         // 查询不到 client 或 client 内不包含 grantType
-        if (ObjectUtil.isNull(clientVo) || !StringUtils.contains(clientVo.getGrantType(), grantType)) {
+        if (ObjectUtil.isNull(clientVo) || !Strings.CS.contains(clientVo.getGrantType(), grantType)) {
             log.info("客户端id: {} 认证类型：{} 异常!.", clientId, grantType);
             return R.fail(MessageUtils.message("auth.grant.type.error"));
         } else if (!SystemConstants.NORMAL.equals(clientVo.getStatus())) {
@@ -222,11 +223,11 @@ public class TokenController {
             // 这里从referer中取值是为了本地使用hosts添加虚拟域名，方便本地环境调试
             host = referer.split("//")[1].split("/")[0];
         } else {
-            host = new URL(request.getRequestURL().toString()).getHost();
+            host = URI.create(request.getRequestURL().toString()).getHost();
         }
         // 根据域名进行筛选
         List<TenantListVo> list = StreamUtils.filter(voList, vo ->
-            StringUtils.equalsIgnoreCase(vo.getDomain(), host));
+            Strings.CI.equals(vo.getDomain(), host));
         result.setVoList(CollUtil.isNotEmpty(list) ? list : voList);
         return R.ok(result);
     }

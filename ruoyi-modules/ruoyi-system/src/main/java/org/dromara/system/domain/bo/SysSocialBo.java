@@ -8,8 +8,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
-import org.dromara.common.tenant.core.TenantEntity;
 import org.dromara.system.domain.SysSocial;
+import org.dromara.system.domain.base.SystemTenantEntity;
 
 /**
  * 社会化关系业务对象 sys_social
@@ -20,7 +20,7 @@ import org.dromara.system.domain.SysSocial;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = SysSocial.class, reverseConvertGenerate = false)
-public class SysSocialBo extends TenantEntity {
+public class SysSocialBo extends SystemTenantEntity {
 
     /**
      * 主键

@@ -5,8 +5,6 @@ import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.annotation.JacksonStdImpl;
 import tools.jackson.databind.ser.jdk.NumberSerializer;
 
-import java.io.IOException;
-
 /**
  * 超出 JS 最大最小值 处理
  *

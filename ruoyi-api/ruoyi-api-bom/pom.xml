@@ -15,6 +15,7 @@
     </description>
 
     <properties>
+    <maven.compiler.release>17</maven.compiler.release>
         <revision>2.5.1</revision>
     </properties>
 

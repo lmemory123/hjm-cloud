@@ -2,7 +2,7 @@ package org.dromara.common.core.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.dromara.common.core.utils.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 /**
  * 用户类型
@@ -30,7 +30,7 @@ public enum UserType {
 
     public static UserType getUserType(String str) {
         for (UserType value : values()) {
-            if (StringUtils.contains(str, value.getUserType())) {
+            if (Strings.CS.contains(str, value.getUserType())) {
                 return value;
             }
         }

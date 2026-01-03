@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Locale;
 
+
 /**
  * 全局国际化处理
  *
@@ -25,9 +26,9 @@ public class WebI18nFilter implements WebFilter, Ordered {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String language = exchange.getRequest().getHeaders().getFirst("content-language");
         Locale locale = Locale.getDefault();
-        if (language != null && language.length() > 0) {
+        if (language != null && !language.isEmpty()) {
             String[] split = language.split("_");
-            locale = new Locale(split[0], split[1]);
+            locale = Locale.of(split[0], split[1]);
         }
         LocaleContextHolder.setLocaleContext(new SimpleLocaleContext(locale), true);
         return chain.filter(exchange);

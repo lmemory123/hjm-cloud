@@ -3,6 +3,7 @@ package org.dromara.system.controller.system;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.convert.Convert;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.utils.StringUtils;
@@ -97,7 +98,7 @@ public class SysDeptController extends BaseController {
             return R.fail("修改部门'" + dept.getDeptName() + "'失败，部门名称已存在");
         } else if (dept.getParentId().equals(deptId)) {
             return R.fail("修改部门'" + dept.getDeptName() + "'失败，上级部门不能是自己");
-        } else if (StringUtils.equals(SystemConstants.DISABLE, dept.getStatus())) {
+        } else if (Strings.CS.equals(SystemConstants.DISABLE, dept.getStatus())) {
             if (deptService.selectNormalChildrenDeptById(deptId) > 0) {
                 return R.fail("该部门包含未停用的子部门!");
             } else if (deptService.checkDeptExistUser(deptId)) {
@@ -116,7 +117,7 @@ public class SysDeptController extends BaseController {
     @Log(title = "部门管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{deptId}")
     public R<Void> remove(@PathVariable Long deptId) {
-        if (StringUtils.equals(SystemConstants.ROOT_DEPT_ANCESTORS, String.valueOf(deptId))) {
+        if (Strings.CS.equals(SystemConstants.ROOT_DEPT_ANCESTORS, String.valueOf(deptId))) {
             return R.warn("根部门不允许删除");
         }
         if (deptService.hasChildByDeptId(deptId)) {

@@ -1,0 +1,134 @@
+项目名称：哈基哈米重构计划
+文档类型：数据库架构设计方案 (PostgreSQL)
+设计时间：2025年
+一、核心设计理念
+资源与元数据分离：
+参考 Spotify 设计，将“歌曲信息”与“实际音频文件”拆分，支持多音质（128k/320k）和多来源（本地/外链）。
+读写分离与高并发：
+参考 Bilibili 模式，将高频变动的计数（播放/点赞/分享）从主表剥离到单独的统计表，防止锁死主数据查询。
+灵活存储 (JSONB)：
+利用 PostgreSQL 的 JSONB 特性存储“原曲关联”和“投稿草稿”，兼顾关系型数据库的严谨与 NoSQL 的灵活。
+可追溯审计：
+针对“哈气金”和“审核状态”采用流水账模式，确保每一笔资金变动和每一次上下架操作都有据可查。
+================================================================
+二、详细表结构设计
+用户与权限模块 (Identity & Access)
+描述：核心用户实体，不含统计数据。
+关键字段：
+id (UUID, 主键)
+nickname (VarChar): 昵称
+email (VarChar): 登录邮箱 (唯一索引)
+password_hash (VarChar): 密码哈希
+role (Enum): 角色 (user/admin/super)
+status (Enum): 状态 (active/banned)
+created_at (Timestamp): 注册时间
+描述：支持 OAuth 多平台绑定。
+关键字段：
+id (主键)
+user_id (外键 -> users)
+provider (Enum): 平台类型 (bilibili/qq/wechat)
+open_id (VarChar): 第三方唯一标识
+meta (JSONB): 存储原始回调数据
+描述：冷数据分离，减少主表压力。
+关键字段：
+user_id (主键, 外键)
+bio (Text): 个人简介
+social_links (JSONB): 社交链接集合 (如 {"bilibili": "...", "weibo": "..."})
+音乐核心模块 (Core Content)
+描述：核心内容索引表。
+关键字段：
+id (BigInt, 主键): 雪花算法生成的 ID
+title (VarChar): 歌曲标题
+uploader_id (外键 -> users): UP主
+cover_url (Text): 封面图地址
+duration (Int): 时长(秒)
+status (Enum): 状态 (draft/pending/published/rejected)
+published_at (Timestamp): 发布时间 (用于最新排序)
+meta_info (JSONB): 存储 BPM、调式等技术参数
+描述：物理文件存储，支持秒传。
+关键字段：
+id (主键)
+song_id (外键 -> songs)
+type (Enum): 资源类型 (local/external_url)
+url (Text): 文件地址或外链
+quality (Enum): 音质 (128k/320k/flac)
+md5 (VarChar): 文件指纹 (用于去重秒传)
+描述：独立的“原曲”实体。
+关键字段：
+id (主键)
+title (VarChar): 原曲名
+artist (VarChar): 原唱/作者
+source_type (Enum): 出处类型 (anime/game/meme)
+描述：多对多关联，解决“缝合怪”歌曲问题。
+关键字段：
+song_id (外键)
+original_song_id (外键)
+role (VarChar): 关联类型 (如：采样/Remix/翻唱)
+描述：高频热点表，独立更新。
+关键字段：
+song_id (主键, 外键)
+play_count (BigInt): 播放量
+like_count (Int): 点赞数
+collect_count (Int): 收藏数
+score (Float): 综合热度分
+互动与社区模块 (Interaction)
+描述：支持二级嵌套回复。
+关键字段：
+id (主键)
+song_id (外键)
+user_id (外键)
+content (Text): 内容
+root_id (外键): 指向顶级评论 ID (方便查询)
+parent_id (外键): 指向被回复的 ID
+描述：记录点赞、踩等行为。
+关键字段：
+id (主键)
+user_id (外键)
+target_id (BigInt): 目标对象 ID
+target_type (Enum): 目标类型 (song/comment)
+action (Enum): 动作 (like/dislike)
+约束: (user_id, target_id, target_type) 联合唯一
+运营与激励模块 (Admin & Gamification)
+描述：记录所有审核与下架操作。
+关键字段：
+id (主键)
+target_id (BigInt): 被操作对象 ID
+operator_id (外键 -> admin): 操作员
+action (Enum): 动作 (approve/reject/take_down)
+reason (Text): 理由
+snapshot (JSONB): 下架时的数据快照 (防止误删)
+描述：不可变财务流水表。
+关键字段：
+id (主键)
+user_id (外键)
+amount (Int): 变动金额 (+/-)
+reason_code (Enum): 变动原因 (upload_reward/system_grant)
+balance_after (Int): 变动后余额
+描述：记录历史榜单版本。
+关键字段：
+id (主键)
+chart_type (Enum): 榜单类型 (week/month)
+period_key (VarChar): 周期标识 (如 2025-W04)
+status (Enum): 状态 (calculating/published)
+描述：非结构化存储，支持分步保存。
+关键字段：
+id (主键)
+user_id (外键)
+content (JSONB): 前端表单的完整 JSON 数据
+================================================================
+三、关键业务流程实现
+分步投稿与草稿机制：
+前端定时将表单数据 POST 到后端，后端直接存入 drafts 表的 content 字段 (JSONB)。无论用户填了多少字段，数据库都不会报错，完美支持不完整数据的暂存。
+榜单生成与微调：
+(1) 系统定时任务计算 Top 100 数据。
+(2) 写入 chart_snapshots (状态为 calculating) 和 chart_items 表。
+(3) 管理员在后台微调排名或剔除刷量歌曲。
+(4) 管理员点击“发布”，状态改为 published，此时前端用户才可见。
+音频秒传与去重：
+用户上传前计算文件 MD5 -> 查询 song_resources 表 -> 若存在匹配 MD5，直接引用现有资源 ID，无需再次传输文件。
+================================================================
+四、参考来源
+GitHub - elinzer/SoundCloud (UGC 平台数据库设计模式)
+Medium - "Database Design for Spotify" (元数据关联逻辑)
+Bytebase - "Database Version Control Best Practice" (审计与版本控制)
+StackExchange - "Database design help for game levels" (积分激励系统设计)

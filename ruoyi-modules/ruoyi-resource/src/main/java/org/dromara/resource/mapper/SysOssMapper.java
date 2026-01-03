@@ -1,6 +1,6 @@
 package org.dromara.resource.mapper;
 
-import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
+import org.dromara.common.mybatisflex.core.mapper.BaseMapperPlus;
 import org.dromara.resource.domain.SysOss;
 import org.dromara.resource.domain.vo.SysOssVo;
 

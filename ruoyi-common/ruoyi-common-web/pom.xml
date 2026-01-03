@@ -25,7 +25,7 @@
         <!-- SpringBoot Web容器 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
 <!--        &lt;!&ndash; web 容器使用 undertow 性能更强 &ndash;&gt;-->
 <!--        <dependency>-->

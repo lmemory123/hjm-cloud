@@ -2,6 +2,7 @@ package org.dromara.resource.controller;
 
 
 import cn.hutool.core.util.RandomUtil;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.Constants;
@@ -9,17 +10,16 @@ import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
-import org.dromara.common.ratelimiter.annotation.RateLimiter;
-import org.dromara.common.web.core.BaseController;
 import org.dromara.common.mail.config.properties.MailProperties;
 import org.dromara.common.mail.utils.MailUtils;
+import org.dromara.common.ratelimiter.annotation.RateLimiter;
 import org.dromara.common.redis.utils.RedisUtils;
+import org.dromara.common.web.core.BaseController;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.constraints.NotBlank;
 import java.time.Duration;
 
 /**

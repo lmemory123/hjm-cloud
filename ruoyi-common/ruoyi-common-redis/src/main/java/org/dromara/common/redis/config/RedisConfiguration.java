@@ -2,8 +2,13 @@ package org.dromara.common.redis.config;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.esotericsoftware.kryo.serializers.TimeSerializers;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.SpringUtils;
@@ -14,7 +19,6 @@ import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
 import org.redisson.codec.CompositeCodec;
 import org.redisson.codec.TypedJsonJacksonCodec;
-import org.redisson.config.NameMapper;
 import org.redisson.spring.data.connection.RedissonConnectionFactory;
 import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +32,6 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import redis.clients.jedis.JedisPoolConfig;
-import tools.jackson.databind.DefaultTyping;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.ext.javatime.deser.LocalDateTimeDeserializer;
-import tools.jackson.databind.ext.javatime.ser.LocalDateTimeSerializer;
-import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
-import tools.jackson.databind.module.SimpleModule;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -57,41 +54,29 @@ public class RedisConfiguration {
     @Bean
     public RedissonAutoConfigurationCustomizer redissonCustomizer() {
         return config -> {
-            config.setNameMapper(new KeyPrefixHandler(redissonProperties.getKeyPrefix()));
-
-            SimpleModule module = new SimpleModule();
+            JavaTimeModule javaTimeModule = new JavaTimeModule();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            module.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(formatter));
-            module.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(formatter));
-            var typeValidator = BasicPolymorphicTypeValidator.builder()
-                .allowIfSubTypeIsArray()
-                .build();
-
-            ObjectMapper  om = JsonMapper.builder()
-                .addModule(module)
-                .changeDefaultVisibility(vc -> vc.withFieldVisibility(JsonAutoDetect.Visibility.ANY))
-                .defaultTimeZone(TimeZone.getDefault())
-                .activateDefaultTypingAsProperty(typeValidator, DefaultTyping.NON_FINAL, "@class")
-                .build();
-
-
-//            ObjectMapper om = new ObjectMapper();
-//            om.registerModule(javaTimeModule);
-//            om.setTimeZone(TimeZone.getDefault());
-//            om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-//            // 指定序列化输入的类型，类必须是非final修饰的。序列化时将对象全类名一起保存下来
-//            om.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
+            javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(formatter));
+            javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(formatter));
+            ObjectMapper om = new ObjectMapper();
+            om.registerModule(javaTimeModule);
+            om.setTimeZone(TimeZone.getDefault());
+            om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+            // 指定序列化输入的类型，类必须是非final修饰的。序列化时将对象全类名一起保存下来
+            om.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
 //            LoggerFactory.useSlf4jLogging(true);
 //            FuryCodec furyCodec = new FuryCodec();
 //            CompositeCodec codec = new CompositeCodec(StringCodec.INSTANCE, furyCodec, furyCodec);
-            TypedJsonJacksonCodec jsonCodec = new TypedJsonJacksonCodec(Object.class, om.getClass());
+            TypedJsonJacksonCodec jsonCodec = new TypedJsonJacksonCodec(Object.class, om);
             // 组合序列化 key 使用 String 内容使用通用 json 格式
             CompositeCodec codec = new CompositeCodec(StringCodec.INSTANCE, jsonCodec, jsonCodec);
+            KeyPrefixHandler nameMapper = new KeyPrefixHandler(redissonProperties.getKeyPrefix());
             config.setThreads(redissonProperties.getThreads())
                 .setNettyThreads(redissonProperties.getNettyThreads())
                 // 缓存 Lua 脚本 减少网络传输(redisson 大部分的功能都是基于 Lua 脚本实现)
                 .setUseScriptCache(true)
-                .setCodec(codec);
+                .setCodec(codec)
+                .setNameMapper(nameMapper);
             if (SpringUtils.isVirtual()) {
                 config.setNettyExecutor(new VirtualThreadTaskExecutor("redisson-"));
             }
@@ -112,7 +97,6 @@ public class RedisConfiguration {
             if (ObjectUtil.isNotNull(clusterServersConfig)) {
                 config.useClusterServers()
                     //设置redis key前缀
-
                     .setTimeout(clusterServersConfig.getTimeout())
                     .setClientName(clusterServersConfig.getClientName())
                     .setIdleConnectionTimeout(clusterServersConfig.getIdleConnectionTimeout())
@@ -221,4 +205,3 @@ public class RedisConfiguration {
      */
 
 }
-

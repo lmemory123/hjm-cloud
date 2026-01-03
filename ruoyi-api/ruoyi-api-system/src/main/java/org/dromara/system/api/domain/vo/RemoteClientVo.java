@@ -1,6 +1,7 @@
 package org.dromara.system.api.domain.vo;
 
 import lombok.Data;
+
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;

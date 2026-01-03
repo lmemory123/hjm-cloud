@@ -17,11 +17,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
-        <spring-boot.version>4.0.0</spring-boot.version>
+        <spring-boot.version>4.0.1</spring-boot.version>
         <spring-cloud.version>2025.1.0</spring-cloud.version>
         <spring-boot-admin.version>3.5.6</spring-boot-admin.version>
         <mybatis.version>3.5.19</mybatis.version>
         <mybatis-plus.version>3.5.15</mybatis-plus.version>
+        <mybatis-flex.version>1.11.5</mybatis-flex.version>
+        <jsqlparser.version>5.2</jsqlparser.version>
         <p6spy.version>3.9.1</p6spy.version>
         <dynamic-ds.version>4.5.0</dynamic-ds.version>
         <velocity.version>2.4.1</velocity.version>
@@ -33,28 +35,29 @@
         <redisson.version>4.0.0</redisson.version>
         <redis.om.version>2.0.1</redis.om.version>
         <lock4j.version>2.2.7</lock4j.version>
-        <snailjob.version>1.8.1</snailjob.version>
+        <snailjob.version>1.9.0</snailjob.version>
         <satoken.version>1.44.0</satoken.version>
         <lombok.version>1.18.42</lombok.version>
         <logstash.version>9.0</logstash.version>
         <easy-es.version>3.0.1</easy-es.version>
+        <elasticsearch-client.version>7.17.28</elasticsearch-client.version>
         <skywalking-toolkit.version>9.5.0</skywalking-toolkit.version>
         <bouncycastle.version>1.83</bouncycastle.version>
         <mapstruct-plus.version>1.5.0</mapstruct-plus.version>
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
-        <justauth.version>1.16.7</justauth.version>
+        <justauth.version>1.18.2</justauth.version>
         <!-- 离线IP地址定位库 -->
-        <ip2region.version>2.7.0</ip2region.version>
+        <ip2region.version>3.3.1</ip2region.version>
         <!-- 临时修复 fastjson 漏洞 -->
-        <fastjson.version>1.2.83</fastjson.version>
+        <fastjson.version>2.0.60</fastjson.version>
         <!-- OSS 配置 -->
         <aws.sdk.version>2.28.22</aws.sdk.version>
         <!-- SMS 配置 -->
         <sms4j.version>3.3.4</sms4j.version>
         <!-- 面向运行时的D-ORM依赖 -->
-        <anyline.version>8.7.2-20250603</anyline.version>
+        <anyline.version>8.7.3-20251210</anyline.version>
         <!-- 工作流配置 -->
-        <warm-flow.version>1.8.2</warm-flow.version>
+        <warm-flow.version>1.8.4</warm-flow.version>
         <!-- mq配置 -->
         <rocketmq.version>2.3.4</rocketmq.version>
 
@@ -191,6 +194,21 @@
                 <artifactId>mybatis-plus-annotation</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.mybatis-flex</groupId>
+                <artifactId>mybatis-flex-spring-boot4-starter</artifactId>
+                <version>${mybatis-flex.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.mybatis-flex</groupId>
+                <artifactId>mybatis-flex-processor</artifactId>
+                <version>${mybatis-flex.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.jsqlparser</groupId>
+                <artifactId>jsqlparser</artifactId>
+                <version>${jsqlparser.version}</version>
+            </dependency>
             <!-- sql性能分析插件 -->
             <dependency>
                 <groupId>p6spy</groupId>
@@ -200,7 +218,7 @@
 
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-annotations</artifactId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
                 <version>${swagger.core.version}</version>
             </dependency>
 
@@ -269,7 +287,7 @@
             <!-- 加密包引入 -->
             <dependency>
                 <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk15to18</artifactId>
+                <artifactId>bcprov-jdk18on</artifactId>
                 <version>${bouncycastle.version}</version>
             </dependency>
 
@@ -284,6 +302,18 @@
                 <groupId>org.dromara.easy-es</groupId>
                 <artifactId>easy-es-boot-starter</artifactId>
                 <version>${easy-es.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>co.elastic.clients</groupId>
+                <artifactId>elasticsearch-java</artifactId>
+                <version>${elasticsearch-client.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-client</artifactId>
+                <version>${elasticsearch-client.version}</version>
             </dependency>
 
             <!-- skywalking 整合 logback -->
@@ -326,7 +356,7 @@
 
             <!-- JustAuth 的依赖配置-->
             <dependency>
-                <groupId>me.zhyd.oauth</groupId>
+                <groupId>cn.herodotus.opensteward</groupId>
                 <artifactId>JustAuth</artifactId>
                 <version>${justauth.version}</version>
             </dependency>
@@ -339,8 +369,8 @@
             </dependency>
 
             <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
                 <version>${fastjson.version}</version>
             </dependency>
 
@@ -400,18 +430,24 @@
                 <artifactId>rewrite-maven-plugin</artifactId>
                 <version>6.26.0</version>
                 <configuration>
+                    <exportDatatables>true</exportDatatables>
                     <activeRecipes>
-                        <recipe>org.openrewrite.java.jackson.UpgradeJackson_2_3</recipe>
+                        <recipe>org.openrewrite.java.spring.boot4.UpgradeSpringBoot_4_0</recipe>
                     </activeRecipes>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.openrewrite.recipe</groupId>
+                        <artifactId>rewrite-spring</artifactId>
+                        <version>6.21.0</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <annotationProcessorPaths>
                         <path>
@@ -439,10 +475,16 @@
                             <artifactId>lombok-mapstruct-binding</artifactId>
                             <version>${mapstruct-plus.lombok.version}</version>
                         </path>
+                        <path>
+                            <groupId>com.mybatis-flex</groupId>
+                            <artifactId>mybatis-flex-processor</artifactId>
+                            <version>${mybatis-flex.version}</version>
+                        </path>
                     </annotationProcessorPaths>
                     <compilerArgs>
                         <arg>-parameters</arg>
                     </compilerArgs>
+          <release>${java.version}</release>
                 </configuration>
             </plugin>
             <!-- 单元测试使用 -->

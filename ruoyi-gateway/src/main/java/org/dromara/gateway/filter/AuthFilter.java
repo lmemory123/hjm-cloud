@@ -8,9 +8,9 @@ import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
 import cn.dev33.satoken.util.SaTokenConsts;
+import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.constant.HttpStatus;
 import org.dromara.common.core.utils.SpringUtils;
-import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.gateway.config.properties.IgnoreWhiteProperties;
 import org.springframework.context.annotation.Bean;
@@ -49,7 +49,7 @@ public class AuthFilter {
                         String headerCid = request.getHeaders().getFirst(LoginHelper.CLIENT_KEY);
                         String paramCid = request.getQueryParams().getFirst(LoginHelper.CLIENT_KEY);
                         String clientId = StpUtil.getExtra(LoginHelper.CLIENT_KEY).toString();
-                        if (!StringUtils.equalsAny(clientId, headerCid, paramCid)) {
+                        if (!Strings.CS.equalsAny(clientId, headerCid, paramCid)) {
                             // token 无效
                             throw NotLoginException.newInstance(StpUtil.getLoginType(),
                                 "-100", "客户端ID与Token不匹配",

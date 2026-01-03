@@ -1,13 +1,10 @@
 package org.dromara.system.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Constants;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.ibatis.annotations.Param;
-import org.dromara.common.mybatis.annotation.DataColumn;
-import org.dromara.common.mybatis.annotation.DataPermission;
-import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
+import org.dromara.common.mybatisflex.annotation.DataColumn;
+import org.dromara.common.mybatisflex.annotation.DataPermission;
+import org.dromara.common.mybatisflex.core.mapper.BaseMapperPlus;
 import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.vo.SysUserExportVo;
 import org.dromara.system.domain.vo.SysUserVo;
@@ -32,7 +29,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "create_by")
     })
-    default Page<SysUserVo> selectPageUserList(Page<SysUser> page, Wrapper<SysUser> queryWrapper) {
+    default Page<SysUserVo> selectPageUserList(Page<SysUser> page, QueryWrapper queryWrapper) {
         return this.selectVoPage(page, queryWrapper);
     }
 
@@ -46,7 +43,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "create_by")
     })
-    default List<SysUserVo> selectUserList(Wrapper<SysUser> queryWrapper) {
+    default List<SysUserVo> selectUserList(QueryWrapper queryWrapper) {
         return this.selectVoList(queryWrapper);
     }
 
@@ -60,7 +57,16 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
         @DataColumn(key = "deptName", value = "d.dept_id"),
         @DataColumn(key = "userName", value = "u.create_by")
     })
-    List<SysUserExportVo> selectUserExportList(@Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
+    default List<SysUserExportVo> selectUserExportList(QueryWrapper queryWrapper) {
+        queryWrapper
+            .select("u.user_id", "u.dept_id", "u.nick_name", "u.user_name", "u.email", "u.avatar", "u.phonenumber",
+                "u.sex", "u.status", "u.del_flag", "u.login_ip", "u.login_date", "u.create_by", "u.create_time",
+                "u.remark", "d.dept_name", "d.leader", "u1.user_name as leaderName")
+            .from("sys_user u")
+            .leftJoin("sys_dept d").on("u.dept_id = d.dept_id")
+            .leftJoin("sys_user u1").on("u1.user_id = d.leader");
+        return this.selectListByQueryAs(queryWrapper, SysUserExportVo.class);
+    }
 
     /**
      * 根据条件分页查询已配用户角色列表
@@ -73,7 +79,16 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
         @DataColumn(key = "deptName", value = "d.dept_id"),
         @DataColumn(key = "userName", value = "u.create_by")
     })
-    Page<SysUserVo> selectAllocatedList(@Param("page") Page<SysUser> page, @Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
+    default Page<SysUserVo> selectAllocatedList(Page<SysUser> page, QueryWrapper queryWrapper) {
+        queryWrapper
+            .select("distinct u.user_id", "u.dept_id", "u.user_name", "u.nick_name", "u.email", "u.phonenumber",
+                "u.status", "u.create_time")
+            .from("sys_user u")
+            .leftJoin("sys_dept d").on("u.dept_id = d.dept_id")
+            .leftJoin("sys_user_role sur").on("u.user_id = sur.user_id")
+            .leftJoin("sys_role r").on("r.role_id = sur.role_id");
+        return this.selectVoPage(page, queryWrapper);
+    }
 
     /**
      * 根据条件分页查询未分配用户角色列表
@@ -85,7 +100,16 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
         @DataColumn(key = "deptName", value = "d.dept_id"),
         @DataColumn(key = "userName", value = "u.create_by")
     })
-    Page<SysUserVo> selectUnallocatedList(@Param("page") Page<SysUser> page, @Param(Constants.WRAPPER) Wrapper<SysUser> queryWrapper);
+    default Page<SysUserVo> selectUnallocatedList(Page<SysUser> page, QueryWrapper queryWrapper) {
+        queryWrapper
+            .select("distinct u.user_id", "u.dept_id", "u.user_name", "u.nick_name", "u.email", "u.phonenumber",
+                "u.status", "u.create_time")
+            .from("sys_user u")
+            .leftJoin("sys_dept d").on("u.dept_id = d.dept_id")
+            .leftJoin("sys_user_role sur").on("u.user_id = sur.user_id")
+            .leftJoin("sys_role r").on("r.role_id = sur.role_id");
+        return this.selectVoPage(page, queryWrapper);
+    }
 
     /**
      * 根据用户ID统计用户数量
@@ -98,7 +122,7 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
         @DataColumn(key = "userName", value = "create_by")
     })
     default long countUserById(Long userId) {
-        return this.selectCount(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserId, userId));
+        return this.selectCountByQuery(QueryWrapper.create().eq(SysUser::getUserId, userId));
     }
 
     /**
@@ -108,12 +132,13 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
      * @param updateWrapper 更新条件封装器
      * @return 更新操作影响的行数
      */
-    @Override
     @DataPermission({
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "create_by")
     })
-    int update(@Param(Constants.ENTITY) SysUser user, @Param(Constants.WRAPPER) Wrapper<SysUser> updateWrapper);
+    default int updateByQueryWithPermission(SysUser user, QueryWrapper updateWrapper) {
+        return this.updateByQuery(user, updateWrapper);
+    }
 
     /**
      * 根据用户ID更新用户数据
@@ -121,11 +146,12 @@ public interface SysUserMapper extends BaseMapperPlus<SysUser, SysUserVo> {
      * @param user 要更新的用户实体
      * @return 更新操作影响的行数
      */
-    @Override
     @DataPermission({
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "create_by")
     })
-    int updateById(@Param(Constants.ENTITY) SysUser user);
+    default int updateById(SysUser user) {
+        return this.update(user);
+    }
 
 }

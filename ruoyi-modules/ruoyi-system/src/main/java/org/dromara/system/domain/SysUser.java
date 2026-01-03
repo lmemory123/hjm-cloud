@@ -1,11 +1,13 @@
 package org.dromara.system.domain;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.mybatisflex.annotation.Column;
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.constant.SystemConstants;
-import org.dromara.common.tenant.core.TenantEntity;
+import org.dromara.system.domain.base.SystemTenantEntity;
 
 import java.util.Date;
 
@@ -18,13 +20,13 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName("sys_user")
-public class SysUser extends TenantEntity {
+@Table("sys_user")
+public class SysUser extends SystemTenantEntity {
 
     /**
      * 用户ID
      */
-    @TableId(value = "user_id")
+    @Id
     private Long userId;
 
     /**
@@ -70,11 +72,6 @@ public class SysUser extends TenantEntity {
     /**
      * 密码
      */
-    @TableField(
-        insertStrategy = FieldStrategy.NOT_EMPTY,
-        updateStrategy = FieldStrategy.NOT_EMPTY,
-        whereStrategy = FieldStrategy.NOT_EMPTY
-    )
     private String password;
 
     /**
@@ -85,7 +82,7 @@ public class SysUser extends TenantEntity {
     /**
      * 删除标志（0代表存在 1代表删除）
      */
-    @TableLogic
+    @Column(isLogicDelete = true)
     private String delFlag;
 
     /**

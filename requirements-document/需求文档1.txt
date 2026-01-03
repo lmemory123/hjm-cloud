@@ -1,0 +1,293 @@
+# 前端页面部署计划
+
+# 哈基哈米前端页面实现文档
+
+## 一、文档目标
+
+为开发、设计与测试提供**完整、可落地**的页面清单与实现细节，确保：
+
+1. 所有需求文档（PRD）中的用户故事都有对应页面/组件；
+2. 路由、布局、状态管理、异常处理、性能优化一次说明到位；
+3. 多人协作时可按模块并行，减少沟通成本。
+
+技术前提：Next.js 14（App Router）+ TypeScript + TailwindCSS + Zustand + SWR。
+
+---
+
+## 二、全局约定
+
+| 项 | 规则 |
+| --- | --- |
+| 路由风格 | RESTful + 语义化，如 `/chart/week`，`/song/[id]` |
+| 布局分级 | ① 根布局：html/head/font；② 业务布局：Header+Footer+Nav；③ 子布局：后台双栏 |
+| 状态管理 | 客户端全局：Zustand（用户、播放、主题）；服务端状态：SWR；局部：useState |
+| 组件分级 | `ui/*`（原子）→ `composite/*`（分子）→ `feature/*`（业务）→ `page/*` |
+| 错误处理 | 页面级 `error.tsx` + 全局 `not-found.tsx` + API 异常统一封装 |
+| 性能 | ① 图片优先 WebP + priority 属性；② 虚拟滚动（列表>100）；③ 路由懒加载；④ 音频预加载 30s |
+| SEO | 服务端渲染 + generateMetadata + JSON-LD；动态 OG 图（@vercel/og） |
+| 无障碍 | 按钮 aria-label；键盘导航；色彩对比≥4.5:1 |
+| 主题 | 默认/system/light/dark 三模式，CSS 变量切换 |
+| 国际化 | 文案全抽离 `locales/zh-CN/*.json`，Key 按模块前缀，如 `common.play` |
+
+---
+
+## 三、页面总览（路由清单）
+
+| 编号 | 路由 | 页面名称 | 简述 | 状态* |
+| --- | --- | --- | --- | --- |
+| P01 | `/` | 首页 | 随机推荐+周榜入口+最新投稿 | ✅ |
+| P02 | `/song/[id]` | 歌曲详情 | 播放、收藏、评论、原曲、分享 | ✅ |
+| P03 | `/search` | 搜索结果 | 列表+筛选 sidebar | ✅ |
+| P04 | `/chart/week` | 哈基周金曲 | 本期+历届 | ✅ |
+| P05 | `/chart/month` | 本月榜单 | 无翻唱/AI 过滤 | ✅ |
+| P06 | `/upload` | 投稿页 | 分步向导+草稿箱 | ✅ |
+| P07 | `/user/[uid]` | 用户主页 | 投稿/收藏/获赞/哈气金 | ✅ |
+| P08 | `/me` | 我的中心 | 个人资料、播放历史、草稿、消息 | ✅ |
+| P09 | `/login` | 登录 | 邮箱+OAuth | ✅ |
+| P10 | `/register` | 注册 | 同登录页 Tab | ✅ |
+| P11 | `/404` | 未找到 | 全局 | ✅ |
+| P12 | `/500` | 异常 | 全局 | ✅ |
+| A01 | `/admin` | 后台入口 | Dashboard | ✅ |
+| A02 | `/admin/song` | 歌曲管理 | 批量审核、修改、下架 | ✅ |
+| A03 | `/admin/user` | 用户管理 | 封禁、角色、积分 | ✅ |
+| A04 | `/admin/chart` | 榜单运营 | 手动微调、发布 | ✅ |
+| A05 | `/admin/incentive` | 哈气金 | 活动创建、发放记录 | ✅ |
+| A06 | `/admin/stats` | 数据看板 | 图表、导出 | ✅ |
+|  |  |  |  |  |
+- 状态：✅ 本期实现，⏳ 二期，❌ 暂不上
+
+---
+
+## 四、页面原型 & 组件拆解
+
+### P01 首页 `/`
+
+```
+┌────────────────────────────┐
+│  Header (Nav+Search+User)  │
+├────────────────────────────┤
+│  Hero 轮播（本周金曲*3）    │
+│  ───────────────           │
+│  ▶ 随机推荐（10 首）↻      │
+│  ▶ 最新投稿（10 首）→更多  │
+│  ▶ 表情包入口              │
+│  ▶ 社群入口（QQ/频道）      │
+├────────────────────────────┤
+│  Footer                    │
+└────────────────────────────┘
+
+```
+
+**关键组件：**
+
+- `ui/Carousel` – 自动+手动，支持 SSR 首次渲染
+- `feature/RandomPlaylist` – 带“换一批”按钮，使用 SWR 缓存 1 min
+- `composite/SongCard` – 封面+标题+UP+播放按钮，懒加载 IntersectionObserver
+
+**SEO：** 动态标题“哈基哈米 – 这才是真正的哈基米 MUSIC！”；JSON-LD 首页 Website。
+
+---
+
+### P02 歌曲详情 `/song/[id]`
+
+```
+┌────────────────────────────┐
+│  Header                    │
+├────────────────────────────┤
+│  两栏：左 70% | 右 30%      │
+│  左：                       │
+│  - 封面+播放器（原生+底层条）│
+│  - 基本信息（标题/原曲/风格）│
+│  - 分享按钮（复制/微博/B 站）│
+│  - 评论区（分页 20）        │
+│  右：                       │
+│  - 作者卡片+关注            │
+│  - 原曲链接（外链跳转）      │
+│  - 相关推荐（协同过滤）      │
+└────────────────────────────┘
+
+```
+
+**播放器逻辑：**
+
+全局 `usePlayerStore`（Zustand）维护队列、当前索引、播放状态；音频地址通过 `/api/audio/[id]` 代理，支持 206 分段加载。
+
+**评论：**
+
+`composite/CommentThread` – 二级回复最多 2 层，支持举报+折叠。
+
+---
+
+### P03 搜索结果 `/search`
+
+url 结构：`/search?q=哈基&style=原教旨&isCover=false&sort=hot`
+
+```
+┌──────────────┬──────────────┐
+│  左侧筛选栏   │  右侧结果列表  │
+│  - 风格多选   │  SongCard*   │
+│  - 类型开关   │  骨架屏→CSR   │
+│  - 时间区间   │  分页（∞ scroll）│
+│  - 排序      │              │
+└──────────────┴──────────────┘
+
+```
+
+**实现：**
+
+- 首次 SSR 直出；翻页/筛选用 `shallow`+SWR，地址栏同步，可分享。
+- 无结果空态插图+提交通道。
+
+---
+
+### P04 哈基周金曲 `/chart/week`
+
+```
+- 顶部倒计时（下期还剩 XX 时 XX 分）
+- 榜单 Table（排名↑↓、封面、标题、播放量、趋势）
+- 播放全部（加入队列）
+- 历史归档下拉
+
+```
+
+**Table 列：**
+
+1. 排名（变化箭头）
+2. 封面 48px
+3. 标题 + UP
+4. 播放量
+5. 趋势（较上周）
+6. 操作（播放/收藏）
+
+**服务端：**
+
+生成静态页面（ISR），每周一 00:10 重新构建，保证 SEO。
+
+---
+
+### P06 投稿页 `/upload`（分步表单）
+
+步骤条：`①上传文件 → ②填写信息 → ③封面/标签 → ④预览提交`
+
+- **Step1：** 拖放区+本地上传；秒级秒传（MD5 校验）；格式限制 mp3/flac/m4a；大小<100 MB。
+- **Step2：** 原曲搜索弹窗（可模糊搜库内/外链添加）；自动抓元数据（Mutagen）。
+- **Step3：** 封面支持裁切（react-image-crop），标签选择器（限 5 个）。
+- **Step4：** 预览卡片+播放 30s；提交后跳转 `/me/drafts` 可再次编辑。
+
+**草稿：**
+
+自动保存 30s/次，localStorage+数据库双写；登录后合并。
+
+---
+
+### A02 后台歌曲管理 `/admin/song`
+
+```
+┌──────────────┬──────────────┐
+│  条件筛选     │  批量操作栏   │
+│  状态下拉     │  审核/下架/打标签│
+│  时间区间     │              │
+├──────────────┼──────────────┤
+│  Table (分页) │  右侧抽屉详情  │
+│  - 勾选列    │  快速修改    │
+│  - 排序      │              │
+└──────────────┴──────────────┘
+
+```
+
+**技术：**
+
+- React-Table v8 + 虚拟滚动（>1k 行）。
+- 抽屉表单使用 `react-hook-form` + zod 校验。
+- 批量操作走 `PATCH /api/admin/song/batch`，返回 jobId，轮询进度。
+
+---
+
+## 五、公共组件库（部分）
+
+| 名称 | 说明 |
+| --- | --- |
+| `ui/Button` | 大小/color/outline/icon/loading |
+| `ui/Input` | 支持 password/search/textarea |
+| `ui/Modal` | Portal+ESC 关闭+锁定滚动 |
+| `ui/Toast` | 通知栈，支持 success/warning/error |
+| `ui/Skeleton` | 通用占位，图片/文字/卡片 |
+| `composite/PlayerBar` | 底部固定，全局可控 |
+| `composite/SongCard` | 封面 16:9，播放 hover，三行信息 |
+| `composite/CommentItem` | 头像+内容+时间+点赞+回复 |
+| `feature/SearchBox` | 头部搜索，联想 6 条，键盘↑↓选择 |
+
+---
+
+## 六、状态管理细分
+
+### Zustand Store
+
+```tsx
+usePlayerStore
+  - queue: Song[]
+  - currentIndex: number
+  - status: 'idle'|'loading'|'playing'|'paused'
+  - volume: number
+  - repeat: 'off'|'one'|'all'
+  - actions: play, pause, next, prev, setQueue, updateVolume...
+
+useUserStore
+  - user: User | null
+  - token: string
+  - actions: login, logout, refresh
+
+useThemeStore
+  - mode: 'light'|'dark'|'system'
+  - actions: toggle, setSystem
+
+```
+
+### SWR Key 规范
+
+```
+/song/:id
+/search?q=&style=&sort=
+/chart/week?year=&week=
+/user/:uid/songs?page=
+/me/drafts
+/admin/songs?status=&page=
+
+```
+
+---
+
+## 七、异常与空态
+
+| 场景 | 组件 | 文案 |
+| --- | --- | --- |
+| 404 歌曲 | `NotFoundSong` | “歌曲飞走了，去首页看看~” |
+| 搜索无结果 | `EmptySearch` | “换点关键词？试试‘曼波’” |
+| 网络错误 | `NetworkError` | “网络异常，点击重试” |
+| 无权限 | `Forbidden` | “管理员才可进入，请联系加群” |
+
+---
+
+## 八、性能指标
+
+| 指标 | 目标 | 工具 |
+| --- | --- | --- |
+| FCP | <1.8 s | Lighthouse CI |
+| LCP | <2.5 s | Lighthouse CI |
+| TTI | <3.5 s | Lighthouse CI |
+| 首屏音频可播放 | <2 s | 自定义埋点 |
+| 路由切换 | <200 ms | Chrome UX Report |
+
+---
+
+## 九、交付物
+
+1. Storybook 地址（chromatic）
+2. 页面目录树：`/pages`, `/components`, `/hooks`, `/stores`, `/utils`
+3. 单元测试覆盖 ≥ 60%（Jest + RTL）
+4. 端到端测试：首页→搜索→播放→投稿（Cypress 3 条核心流）
+
+---
+
+> 本文档随迭代同步更新，版本号 v1.0
+>

@@ -53,8 +53,6 @@ CREATE TABLE IF NOT EXISTS music
     remark            varchar(1000),
 
     -- 系统审计字段
-    tenant_id         varchar(20)     DEFAULT '000000',
-    create_dept       int8,
     create_by         int8,
     create_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
     update_by         int8,
@@ -72,7 +70,6 @@ CREATE INDEX idx_music_status ON music(audit_status, publish_time DESC);
 CREATE INDEX idx_music_create_by ON music(create_by);
 CREATE INDEX idx_music_resource_status ON music(resource_status);
 CREATE INDEX idx_music_is_public ON music(is_public);
-CREATE INDEX idx_music_tenant ON music(tenant_id);
 
 -- 注释
 COMMENT ON TABLE music IS '音乐曲库主表';
@@ -87,12 +84,12 @@ COMMENT ON COLUMN music.producer_mark IS '全民制作人标签（JSON数组或�
 COMMENT ON COLUMN music.duration IS '时长(秒)';
 COMMENT ON COLUMN music.bpm IS '节拍数(BPM)';
 COMMENT ON COLUMN music.publish_time IS '发布时间(过审时间)';
-COMMENT ON COLUMN music.play_count IS '播放量';
-COMMENT ON COLUMN music.like_count IS '点赞量';
-COMMENT ON COLUMN music.collect_count IS '收藏量';
-COMMENT ON COLUMN music.comment_count IS '评论数';
-COMMENT ON COLUMN music.share_count IS '分享数';
-COMMENT ON COLUMN music.download_count IS '下载数';
+COMMENT ON COLUMN music.play_count IS '播放量(缓存)';
+COMMENT ON COLUMN music.like_count IS '点赞量(缓存)';
+COMMENT ON COLUMN music.collect_count IS '收藏量(缓存)';
+COMMENT ON COLUMN music.comment_count IS '评论数(缓存)';
+COMMENT ON COLUMN music.share_count IS '分享数(缓存)';
+COMMENT ON COLUMN music.download_count IS '下载数(缓存)';
 COMMENT ON COLUMN music.original_data IS '原曲关联信息快照(JSON数组)';
 COMMENT ON COLUMN music.resource_data IS '资源展示快照(JSON对象): 封面和音频的最佳链接';
 COMMENT ON COLUMN music.tags_snapshot IS '标签展示快照(JSON数组): 标签名和颜色';
@@ -103,13 +100,49 @@ COMMENT ON COLUMN music.is_original IS '是否原创: 0否 1是';
 COMMENT ON COLUMN music.resource_status IS '资源状态: 0正常 1部分失效 2全部失效';
 COMMENT ON COLUMN music.copyright_info IS '版权信息';
 COMMENT ON COLUMN music.remark IS '备注';
-COMMENT ON COLUMN music.tenant_id IS '租户编号';
-COMMENT ON COLUMN music.create_dept IS '创建部门';
 COMMENT ON COLUMN music.create_by IS '创建人ID';
 COMMENT ON COLUMN music.create_time IS '创建时间';
 COMMENT ON COLUMN music.update_by IS '更新人ID';
 COMMENT ON COLUMN music.update_time IS '更新时间';
 COMMENT ON COLUMN music.del_flag IS '删除标志: 0存在 1删除';
+
+-- =====================================================
+-- 1.1 music_stat 音乐统计表
+-- =====================================================
+DROP TABLE IF EXISTS music_stat CASCADE;
+CREATE TABLE IF NOT EXISTS music_stat
+(
+    music_id          int8            NOT NULL,
+    play_count        int8            DEFAULT 0,
+    like_count        int8            DEFAULT 0,
+    collect_count     int8            DEFAULT 0,
+    comment_count     int8            DEFAULT 0,
+    share_count       int8            DEFAULT 0,
+    download_count    int8            DEFAULT 0,
+    score             float8          DEFAULT 0,
+
+    create_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
+    update_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_music_stat PRIMARY KEY (music_id)
+);
+
+-- 索引
+CREATE INDEX idx_music_stat_score ON music_stat(score);
+CREATE INDEX idx_music_stat_update_time ON music_stat(update_time);
+
+-- 注释
+COMMENT ON TABLE music_stat IS '音乐统计表(高频读写)';
+COMMENT ON COLUMN music_stat.music_id IS '音乐ID';
+COMMENT ON COLUMN music_stat.play_count IS '播放量';
+COMMENT ON COLUMN music_stat.like_count IS '点赞量';
+COMMENT ON COLUMN music_stat.collect_count IS '收藏量';
+COMMENT ON COLUMN music_stat.comment_count IS '评论数';
+COMMENT ON COLUMN music_stat.share_count IS '分享数';
+COMMENT ON COLUMN music_stat.download_count IS '下载数';
+COMMENT ON COLUMN music_stat.score IS '综合热度分';
+COMMENT ON COLUMN music_stat.create_time IS '创建时间';
+COMMENT ON COLUMN music_stat.update_time IS '更新时间';
 
 -- =====================================================
 -- 2. music_original 原曲关联表
@@ -137,7 +170,6 @@ CREATE TABLE IF NOT EXISTS music_original
     remark            varchar(500),
 
     -- 系统字段
-    tenant_id         varchar(20)     DEFAULT '000000',
     create_by         int8,
     create_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
     update_by         int8,
@@ -166,7 +198,6 @@ COMMENT ON COLUMN music_original.sort_order IS '排序号';
 COMMENT ON COLUMN music_original.link_status IS '链接状态: 0正常 1失效 2未检测';
 COMMENT ON COLUMN music_original.last_check_time IS '最后检测时间';
 COMMENT ON COLUMN music_original.remark IS '备注';
-COMMENT ON COLUMN music_original.tenant_id IS '租户编号';
 COMMENT ON COLUMN music_original.create_by IS '创建者';
 COMMENT ON COLUMN music_original.create_time IS '创建时间';
 COMMENT ON COLUMN music_original.update_by IS '更新者';
@@ -219,7 +250,6 @@ CREATE TABLE IF NOT EXISTS music_resource
     sort_order        int4            DEFAULT 0,
 
     -- 系统字段
-    tenant_id         varchar(20)     DEFAULT '000000',
     create_by         int8,
     create_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
     update_by         int8,
@@ -265,7 +295,6 @@ COMMENT ON COLUMN music_resource.fail_count IS '连续检测失败次数';
 COMMENT ON COLUMN music_resource.fail_reason IS '失败原因';
 COMMENT ON COLUMN music_resource.last_check_time IS '最后检测时间';
 COMMENT ON COLUMN music_resource.sort_order IS '排序号';
-COMMENT ON COLUMN music_resource.tenant_id IS '租户编号';
 COMMENT ON COLUMN music_resource.create_by IS '创建者';
 COMMENT ON COLUMN music_resource.create_time IS '创建时间';
 COMMENT ON COLUMN music_resource.update_by IS '更新者';
@@ -301,7 +330,6 @@ CREATE TABLE IF NOT EXISTS tag
     status            char(1)         DEFAULT '1',
 
     -- 系统字段
-    tenant_id         varchar(20)     DEFAULT '000000',
     create_by         int8,
     create_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
     update_by         int8,
@@ -333,7 +361,6 @@ COMMENT ON COLUMN tag.sort_order IS '排序号';
 COMMENT ON COLUMN tag.is_hot IS '是否热门: 0否 1是';
 COMMENT ON COLUMN tag.is_recommend IS '是否推荐: 0否 1是';
 COMMENT ON COLUMN tag.status IS '状态: 0禁用 1启用';
-COMMENT ON COLUMN tag.tenant_id IS '租户编号';
 COMMENT ON COLUMN tag.create_by IS '创建者';
 COMMENT ON COLUMN tag.create_time IS '创建时间';
 COMMENT ON COLUMN tag.update_by IS '更新者';
@@ -356,7 +383,6 @@ CREATE TABLE IF NOT EXISTS music_tag_rel
     source            varchar(20)     DEFAULT 'manual',
 
     -- 系统字段
-    tenant_id         varchar(20)     DEFAULT '000000',
     create_by         int8,
     create_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
 
@@ -376,28 +402,103 @@ COMMENT ON COLUMN music_tag_rel.tag_id IS '标签ID';
 COMMENT ON COLUMN music_tag_rel.tag_weight IS '标签权重（0-100）';
 COMMENT ON COLUMN music_tag_rel.is_primary IS '是否主标签: 0否 1是';
 COMMENT ON COLUMN music_tag_rel.source IS '标签来源: manual/auto/user';
-COMMENT ON COLUMN music_tag_rel.tenant_id IS '租户编号';
 COMMENT ON COLUMN music_tag_rel.create_by IS '创建者';
 COMMENT ON COLUMN music_tag_rel.create_time IS '创建时间';
 
 -- =====================================================
--- 6. music_audit_log 审核日志表
+-- 6. music_comment 评论表
+-- =====================================================
+DROP TABLE IF EXISTS music_comment CASCADE;
+CREATE TABLE IF NOT EXISTS music_comment
+(
+    id                int8            NOT NULL,
+    music_id          int8            NOT NULL,
+    user_id           int8            NOT NULL,
+    content           text            NOT NULL,
+    root_id           int8            DEFAULT 0,
+    parent_id         int8            DEFAULT 0,
+
+    create_by         int8,
+    create_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
+    update_by         int8,
+    update_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
+    del_flag          char(1)         DEFAULT '0',
+
+    CONSTRAINT pk_music_comment PRIMARY KEY (id)
+);
+
+-- 索引
+CREATE INDEX idx_comment_music_id ON music_comment(music_id);
+CREATE INDEX idx_comment_user_id ON music_comment(user_id);
+CREATE INDEX idx_comment_root_id ON music_comment(root_id);
+CREATE INDEX idx_comment_parent_id ON music_comment(parent_id);
+CREATE INDEX idx_comment_create_time ON music_comment(create_time);
+
+-- 注释
+COMMENT ON TABLE music_comment IS '音乐评论表';
+COMMENT ON COLUMN music_comment.id IS '主键';
+COMMENT ON COLUMN music_comment.music_id IS '音乐ID';
+COMMENT ON COLUMN music_comment.user_id IS '用户ID';
+COMMENT ON COLUMN music_comment.content IS '评论内容';
+COMMENT ON COLUMN music_comment.root_id IS '顶级评论ID(0表示自身为顶级)';
+COMMENT ON COLUMN music_comment.parent_id IS '父评论ID(0表示直接回复音乐)';
+COMMENT ON COLUMN music_comment.create_by IS '创建者';
+COMMENT ON COLUMN music_comment.create_time IS '创建时间';
+COMMENT ON COLUMN music_comment.update_by IS '更新者';
+COMMENT ON COLUMN music_comment.update_time IS '更新时间';
+COMMENT ON COLUMN music_comment.del_flag IS '删除标志: 0存在 1删除';
+
+-- =====================================================
+-- 7. music_action 互动动作表
+-- =====================================================
+DROP TABLE IF EXISTS music_action CASCADE;
+CREATE TABLE IF NOT EXISTS music_action
+(
+    id                int8            NOT NULL,
+    user_id           int8            NOT NULL,
+    target_id         int8            NOT NULL,
+    target_type       varchar(20)     NOT NULL,
+    action            varchar(20)     NOT NULL,
+
+    create_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_music_action PRIMARY KEY (id),
+    CONSTRAINT uk_music_action UNIQUE (user_id, target_id, target_type)
+);
+
+-- 索引
+CREATE INDEX idx_action_target ON music_action(target_id, target_type);
+CREATE INDEX idx_action_user_id ON music_action(user_id);
+CREATE INDEX idx_action_action ON music_action(action);
+
+-- 注释
+COMMENT ON TABLE music_action IS '音乐互动动作表';
+COMMENT ON COLUMN music_action.id IS '主键';
+COMMENT ON COLUMN music_action.user_id IS '用户ID';
+COMMENT ON COLUMN music_action.target_id IS '目标对象ID';
+COMMENT ON COLUMN music_action.target_type IS '目标类型: song/comment';
+COMMENT ON COLUMN music_action.action IS '动作: like/dislike';
+COMMENT ON COLUMN music_action.create_time IS '创建时间';
+
+-- =====================================================
+-- 8. music_audit_log 审核日志表
 -- =====================================================
 DROP TABLE IF EXISTS music_audit_log CASCADE;
 CREATE TABLE IF NOT EXISTS music_audit_log
 (
     id                int8            NOT NULL,
     music_id          int8            NOT NULL,
+    target_type       varchar(20)     DEFAULT 'music',
 
     -- 审核信息
     action            int2            NOT NULL,
     old_status        int2,
     new_status        int2,
     reason            varchar(500),
+    snapshot          jsonb           DEFAULT '{}'::jsonb,
     operator_id       int8,
 
     -- 系统字段
-    tenant_id         varchar(20)     DEFAULT '000000',
     create_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT pk_music_audit_log PRIMARY KEY (id)
@@ -412,16 +513,17 @@ CREATE INDEX idx_audit_time ON music_audit_log(create_time);
 COMMENT ON TABLE music_audit_log IS '音乐审核流水日志表';
 COMMENT ON COLUMN music_audit_log.id IS '主键';
 COMMENT ON COLUMN music_audit_log.music_id IS '音乐ID';
+COMMENT ON COLUMN music_audit_log.target_type IS '目标类型: music/comment';
 COMMENT ON COLUMN music_audit_log.action IS '审核动作: 1通过 2拒绝 3下架';
 COMMENT ON COLUMN music_audit_log.old_status IS '修改前状态';
 COMMENT ON COLUMN music_audit_log.new_status IS '修改后状态';
 COMMENT ON COLUMN music_audit_log.reason IS '拒绝或下架原因';
+COMMENT ON COLUMN music_audit_log.snapshot IS '下架/审核快照(JSONB)';
 COMMENT ON COLUMN music_audit_log.operator_id IS '操作人ID (后台管理员ID)';
-COMMENT ON COLUMN music_audit_log.tenant_id IS '租户编号';
 COMMENT ON COLUMN music_audit_log.create_time IS '操作时间';
 
 -- =====================================================
--- 7. music_link_check_log 链接检测日志表
+-- 9. music_link_check_log 链接检测日志表
 -- =====================================================
 DROP TABLE IF EXISTS music_link_check_log CASCADE;
 CREATE TABLE IF NOT EXISTS music_link_check_log
@@ -445,7 +547,6 @@ CREATE TABLE IF NOT EXISTS music_link_check_log
     check_batch       varchar(50),
 
     -- 系统字段
-    tenant_id         varchar(20)     DEFAULT '000000',
 
     CONSTRAINT pk_music_link_check_log PRIMARY KEY (id)
 );
@@ -470,10 +571,9 @@ COMMENT ON COLUMN music_link_check_log.response_time IS '响应时间（毫秒�
 COMMENT ON COLUMN music_link_check_log.error_message IS '错误信息';
 COMMENT ON COLUMN music_link_check_log.check_time IS '检测时间';
 COMMENT ON COLUMN music_link_check_log.check_batch IS '检测批次号';
-COMMENT ON COLUMN music_link_check_log.tenant_id IS '租户编号';
 
 -- =====================================================
--- 8. music_notify_log 通知日志表
+-- 10. music_notify_log 通知日志表
 -- =====================================================
 DROP TABLE IF EXISTS music_notify_log CASCADE;
 CREATE TABLE IF NOT EXISTS music_notify_log
@@ -497,7 +597,6 @@ CREATE TABLE IF NOT EXISTS music_notify_log
     read_time         timestamp,
 
     -- 系统字段
-    tenant_id         varchar(20)     DEFAULT '000000',
     create_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT pk_music_notify_log PRIMARY KEY (id)
@@ -523,11 +622,141 @@ COMMENT ON COLUMN music_notify_log.send_status IS '发送状态: 0待发送 1已
 COMMENT ON COLUMN music_notify_log.send_time IS '发送时间';
 COMMENT ON COLUMN music_notify_log.read_status IS '阅读状态: 0未读 1已读';
 COMMENT ON COLUMN music_notify_log.read_time IS '阅读时间';
-COMMENT ON COLUMN music_notify_log.tenant_id IS '租户编号';
 COMMENT ON COLUMN music_notify_log.create_time IS '创建时间';
 
 -- =====================================================
--- 9. 字典类型 - 音乐模块
+-- 11. music_coin_ledger 哈气金流水表
+-- =====================================================
+DROP TABLE IF EXISTS music_coin_ledger CASCADE;
+CREATE TABLE IF NOT EXISTS music_coin_ledger
+(
+    id                int8            NOT NULL,
+    user_id           int8            NOT NULL,
+    amount            int4            NOT NULL,
+    reason_code       varchar(50)     NOT NULL,
+    balance_after     int4            NOT NULL,
+
+    create_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_music_coin_ledger PRIMARY KEY (id)
+);
+
+-- 索引
+CREATE INDEX idx_coin_user_id ON music_coin_ledger(user_id);
+CREATE INDEX idx_coin_reason_code ON music_coin_ledger(reason_code);
+CREATE INDEX idx_coin_create_time ON music_coin_ledger(create_time);
+
+-- 注释
+COMMENT ON TABLE music_coin_ledger IS '哈气金流水表';
+COMMENT ON COLUMN music_coin_ledger.id IS '主键';
+COMMENT ON COLUMN music_coin_ledger.user_id IS '用户ID';
+COMMENT ON COLUMN music_coin_ledger.amount IS '变动金额(+/-)';
+COMMENT ON COLUMN music_coin_ledger.reason_code IS '变动原因(upload_reward/system_grant)';
+COMMENT ON COLUMN music_coin_ledger.balance_after IS '变动后余额';
+COMMENT ON COLUMN music_coin_ledger.create_time IS '创建时间';
+
+-- =====================================================
+-- 12. music_chart_snapshot 榜单快照表
+-- =====================================================
+DROP TABLE IF EXISTS music_chart_snapshot CASCADE;
+CREATE TABLE IF NOT EXISTS music_chart_snapshot
+(
+    id                int8            NOT NULL,
+    chart_type        varchar(20)     NOT NULL,
+    period_key        varchar(20)     NOT NULL,
+    status            varchar(20)     DEFAULT 'calculating',
+
+    create_by         int8,
+    create_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
+    update_by         int8,
+    update_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_music_chart_snapshot PRIMARY KEY (id),
+    CONSTRAINT uk_music_chart_period UNIQUE (chart_type, period_key)
+);
+
+-- 索引
+CREATE INDEX idx_chart_snapshot_status ON music_chart_snapshot(status);
+CREATE INDEX idx_chart_snapshot_period ON music_chart_snapshot(period_key);
+
+-- 注释
+COMMENT ON TABLE music_chart_snapshot IS '榜单快照表';
+COMMENT ON COLUMN music_chart_snapshot.id IS '主键';
+COMMENT ON COLUMN music_chart_snapshot.chart_type IS '榜单类型: week/month';
+COMMENT ON COLUMN music_chart_snapshot.period_key IS '周期标识(如 2025-W04)';
+COMMENT ON COLUMN music_chart_snapshot.status IS '状态: calculating/published';
+COMMENT ON COLUMN music_chart_snapshot.create_by IS '创建者';
+COMMENT ON COLUMN music_chart_snapshot.create_time IS '创建时间';
+COMMENT ON COLUMN music_chart_snapshot.update_by IS '更新者';
+COMMENT ON COLUMN music_chart_snapshot.update_time IS '更新时间';
+
+-- =====================================================
+-- 13. music_chart_item 榜单明细表
+-- =====================================================
+DROP TABLE IF EXISTS music_chart_item CASCADE;
+CREATE TABLE IF NOT EXISTS music_chart_item
+(
+    id                int8            NOT NULL,
+    snapshot_id       int8            NOT NULL,
+    music_id          int8            NOT NULL,
+    rank_no           int4            NOT NULL,
+    score             float8          DEFAULT 0,
+    play_count        int8            DEFAULT 0,
+    like_count        int8            DEFAULT 0,
+
+    create_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_music_chart_item PRIMARY KEY (id),
+    CONSTRAINT uk_music_chart_item UNIQUE (snapshot_id, music_id),
+    CONSTRAINT uk_music_chart_rank UNIQUE (snapshot_id, rank_no)
+);
+
+-- 索引
+CREATE INDEX idx_chart_item_snapshot_id ON music_chart_item(snapshot_id);
+CREATE INDEX idx_chart_item_music_id ON music_chart_item(music_id);
+CREATE INDEX idx_chart_item_rank ON music_chart_item(rank_no);
+
+-- 注释
+COMMENT ON TABLE music_chart_item IS '榜单明细表';
+COMMENT ON COLUMN music_chart_item.id IS '主键';
+COMMENT ON COLUMN music_chart_item.snapshot_id IS '榜单快照ID';
+COMMENT ON COLUMN music_chart_item.music_id IS '音乐ID';
+COMMENT ON COLUMN music_chart_item.rank_no IS '排名';
+COMMENT ON COLUMN music_chart_item.score IS '综合热度分';
+COMMENT ON COLUMN music_chart_item.play_count IS '播放量';
+COMMENT ON COLUMN music_chart_item.like_count IS '点赞量';
+COMMENT ON COLUMN music_chart_item.create_time IS '创建时间';
+
+-- =====================================================
+-- 14. music_draft 投稿草稿表
+-- =====================================================
+DROP TABLE IF EXISTS music_draft CASCADE;
+CREATE TABLE IF NOT EXISTS music_draft
+(
+    id                int8            NOT NULL,
+    user_id           int8            NOT NULL,
+    content           jsonb           DEFAULT '{}'::jsonb,
+
+    create_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
+    update_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_music_draft PRIMARY KEY (id)
+);
+
+-- 索引
+CREATE INDEX idx_draft_user_id ON music_draft(user_id);
+CREATE INDEX idx_draft_update_time ON music_draft(update_time);
+
+-- 注释
+COMMENT ON TABLE music_draft IS '投稿草稿表';
+COMMENT ON COLUMN music_draft.id IS '主键';
+COMMENT ON COLUMN music_draft.user_id IS '用户ID';
+COMMENT ON COLUMN music_draft.content IS '表单草稿(JSONB)';
+COMMENT ON COLUMN music_draft.create_time IS '创建时间';
+COMMENT ON COLUMN music_draft.update_time IS '更新时间';
+
+-- =====================================================
+-- 15. 字典类型 - 音乐模块
 -- =====================================================
 
 -- 审核状态
@@ -555,7 +784,7 @@ INSERT INTO sys_dict_type VALUES (106, '000000', '音乐通知类型', 'music_no
 INSERT INTO sys_dict_type VALUES (107, '000000', '资源处理状态', 'music_process_status', 103, 1, now(), NULL, NULL, '资源处理状态列表') ON CONFLICT DO NOTHING;
 
 -- =====================================================
--- 10. 字典数据 - 音乐模块
+-- 16. 字典数据 - 音乐模块
 -- =====================================================
 
 -- 审核状态

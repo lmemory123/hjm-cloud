@@ -1,10 +1,10 @@
 package org.dromara.system.domain;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import org.dromara.common.tenant.core.TenantEntity;
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.dromara.system.domain.base.SystemTenantEntity;
 
 /**
  * 岗位表 sys_post
@@ -14,13 +14,13 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("sys_post")
-public class SysPost extends TenantEntity {
+@Table("sys_post")
+public class SysPost extends SystemTenantEntity {
 
     /**
      * 岗位序号
      */
-    @TableId(value = "post_id")
+    @Id
     private Long postId;
 
     /**

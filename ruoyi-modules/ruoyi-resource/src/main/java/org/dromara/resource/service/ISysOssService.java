@@ -1,8 +1,8 @@
 package org.dromara.resource.service;
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.mybatisflex.core.page.PageQuery;
+import org.dromara.common.mybatisflex.core.page.TableDataInfo;
 import org.dromara.resource.domain.bo.SysOssBo;
 import org.dromara.resource.domain.vo.SysOssVo;
 import org.springframework.web.multipart.MultipartFile;

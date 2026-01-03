@@ -1,8 +1,7 @@
 package org.dromara.gen.mapper;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
-import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
-import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
+import org.dromara.common.mybatisflex.core.mapper.BaseMapperPlus;
 import org.dromara.gen.domain.GenTable;
 
 import java.util.List;
@@ -12,7 +11,6 @@ import java.util.List;
  *
  * @author Lion Li
  */
-@InterceptorIgnore(dataPermission = "true", tenantLine = "true")
 public interface GenTableMapper extends BaseMapperPlus<GenTable, GenTable> {
 
     /**

@@ -9,12 +9,12 @@ import cn.idev.excel.metadata.GlobalConfiguration;
 import cn.idev.excel.metadata.data.ReadCellData;
 import cn.idev.excel.metadata.data.WriteCellData;
 import cn.idev.excel.metadata.property.ExcelContentProperty;
-import org.dromara.common.excel.annotation.ExcelDictFormat;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.service.DictService;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.excel.annotation.ExcelDictFormat;
 import org.dromara.common.excel.utils.ExcelUtil;
-import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
 

@@ -3,7 +3,7 @@ package org.dromara.system.dubbo;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.dromara.common.core.constant.CacheNames;
@@ -16,6 +16,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static org.dromara.system.domain.table.SysDeptTableDef.SYS_DEPT;
 
 /**
  * 数据权限 实现
@@ -45,12 +47,11 @@ public class RemoteDataScopeServiceImpl implements RemoteDataScopeService {
         if (ObjectUtil.isNull(roleId)) {
             return "-1";
         }
-        List<SysRoleDept> list = roleDeptMapper.selectList(
-            new LambdaQueryWrapper<SysRoleDept>()
-                .select(SysRoleDept::getDeptId)
-                .eq(SysRoleDept::getRoleId, roleId));
+        List<Long> list = roleDeptMapper.selectListByQueryAs(QueryWrapper.create()
+            .select(SYS_DEPT.DEPT_ID)
+            .eq(SysRoleDept::getRoleId, roleId), Long.class);
         if (CollUtil.isNotEmpty(list)) {
-            return StreamUtils.join(list, rd -> Convert.toStr(rd.getDeptId()));
+            return StreamUtils.join(list, Convert::toStr);
         }
         return "-1";
     }

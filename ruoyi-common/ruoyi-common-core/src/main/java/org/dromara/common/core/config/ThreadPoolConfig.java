@@ -32,14 +32,14 @@ public class ThreadPoolConfig {
     @Bean(name = "scheduledExecutorService")
     protected ScheduledExecutorService scheduledExecutorService() {
         // daemon 必须为 true
-        BasicThreadFactory.Builder builder = new BasicThreadFactory.Builder().daemon(true);
+        BasicThreadFactory.Builder daemon = BasicThreadFactory.builder().daemon(true);
         if (SpringUtils.isVirtual()) {
-            builder.namingPattern("virtual-schedule-pool-%d").wrappedFactory(new VirtualThreadTaskExecutor().getVirtualThreadFactory());
+            daemon.namingPattern("virtual-schedule-pool-%d").wrappedFactory(new VirtualThreadTaskExecutor().getVirtualThreadFactory());
         } else {
-            builder.namingPattern("schedule-pool-%d");
+            daemon.namingPattern("schedule-pool-%d");
         }
         ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(core,
-            builder.build(),
+            daemon.build(),
             new ThreadPoolExecutor.CallerRunsPolicy()) {
             @Override
             protected void afterExecute(Runnable r, Throwable t) {
@@ -87,9 +87,8 @@ public class ThreadPoolConfig {
      * 打印线程异常信息
      */
     public static void printException(Runnable r, Throwable t) {
-        if (t == null && r instanceof Future<?>) {
+        if (t == null && r instanceof Future<?> future) {
             try {
-                Future<?> future = (Future<?>) r;
                 if (future.isDone()) {
                     future.get();
                 }

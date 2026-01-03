@@ -1,13 +1,10 @@
 package org.dromara.common.redis.utils;
 
-import org.dromara.common.core.utils.SpringUtils;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.redisson.api.RMap;
+import org.dromara.common.core.utils.SpringUtils;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-
-import java.util.Set;
 
 /**
  * 缓存操作工具类

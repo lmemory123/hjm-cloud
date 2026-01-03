@@ -1,11 +1,11 @@
 package org.dromara.common.translation.core.impl;
 
+import lombok.AllArgsConstructor;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.dromara.common.translation.annotation.TranslationType;
 import org.dromara.common.translation.constant.TransConstant;
 import org.dromara.common.translation.core.TranslationInterface;
 import org.dromara.resource.api.RemoteFileService;
-import lombok.AllArgsConstructor;
-import org.apache.dubbo.config.annotation.DubboReference;
 
 /**
  * OSS翻译实现

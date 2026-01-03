@@ -10,7 +10,6 @@ import org.dromara.gen.constant.GenConstants;
 import org.dromara.gen.domain.GenTable;
 import org.dromara.gen.domain.GenTableColumn;
 
-
 import java.util.Arrays;
 
 /**

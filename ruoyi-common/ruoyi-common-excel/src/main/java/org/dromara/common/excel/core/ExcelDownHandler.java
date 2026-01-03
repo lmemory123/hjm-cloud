@@ -167,7 +167,7 @@ public class ExcelDownHandler implements SheetWriteHandler {
      * @param options 额外表格形式存储的下拉可选项
      */
     private void dropDownLinkedOptions(DataValidationHelper helper, Workbook workbook, Sheet sheet, DropDownOptions options) {
-        String linkedOptionsSheetName = String.format("%s_%d", LINKED_OPTIONS_SHEET_NAME, currentLinkedOptionsSheetIndex);
+        String linkedOptionsSheetName = "%s_%d".formatted(LINKED_OPTIONS_SHEET_NAME, currentLinkedOptionsSheetIndex);
         // 创建联动下拉数据表
         Sheet linkedOptionsDataSheet = workbook.createSheet(WorkbookUtil.createSafeSheetName(linkedOptionsSheetName));
         // 将下拉表隐藏
@@ -195,7 +195,7 @@ public class ExcelDownHandler implements SheetWriteHandler {
         // 设置名称管理器的别名
         name.setNameName(linkedOptionsSheetName);
         // 以横向第一行创建一级下拉拼接引用位置
-        String firstOptionsFunction = String.format("%s!$%s$1:$%s$1",
+        String firstOptionsFunction = "%s!$%s$1:$%s$1".formatted(
             linkedOptionsSheetName,
             getExcelColumnName(0),
             getExcelColumnName(firstOptions.size())
@@ -217,7 +217,7 @@ public class ExcelDownHandler implements SheetWriteHandler {
             // 设置名称管理器的别名
             sonName.setNameName(thisFirstOptionsValue);
             // 以第二行该列数据拼接引用位置
-            String sonFunction = String.format("%s!$%s$2:$%s$%d",
+            String sonFunction = "%s!$%s$2:$%s$%d".formatted(
                 linkedOptionsSheetName,
                 firstOptionsColumnName,
                 firstOptionsColumnName,
@@ -232,7 +232,7 @@ public class ExcelDownHandler implements SheetWriteHandler {
             String mainSheetFirstOptionsColumnName = getExcelColumnName(options.getIndex());
             for (int i = 0; i < 100; i++) {
                 // 以一级选项对应的主体所在位置创建二级下拉
-                String secondOptionsFunction = String.format("=INDIRECT(%s%d)", mainSheetFirstOptionsColumnName, i + 1);
+                String secondOptionsFunction = "=INDIRECT(%s%d)".formatted(mainSheetFirstOptionsColumnName, i + 1);
                 // 二级只能主表每一行的每一列添加二级校验
                 markLinkedOptionsToSheet(helper, sheet, i, options.getNextIndex(), helper.createFormulaListConstraint(secondOptionsFunction));
             }
@@ -315,10 +315,10 @@ public class ExcelDownHandler implements SheetWriteHandler {
         // 创建名称管理器
         Name name = workbook.createName();
         // 设置名称管理器的别名
-        String nameName = String.format("%s_%d", tmpOptionsSheetName, celIndex);
+        String nameName = "%s_%d".formatted(tmpOptionsSheetName, celIndex);
         name.setNameName(nameName);
         // 以纵向第一列创建一级下拉拼接引用位置
-        String function = String.format("%s!$%s$1:$%s$%d",
+        String function = "%s!$%s$1:$%s$%d".formatted(
             tmpOptionsSheetName,
             getExcelColumnName(0),
             getExcelColumnName(0),

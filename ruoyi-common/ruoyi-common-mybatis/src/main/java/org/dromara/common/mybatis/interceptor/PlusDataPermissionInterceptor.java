@@ -101,8 +101,8 @@ public class PlusDataPermissionInterceptor extends BaseMultiTableInnerIntercepto
      */
     @Override
     protected void processSelect(Select select, int index, String sql, Object obj) {
-        if (select instanceof PlainSelect) {
-            this.setWhere((PlainSelect) select, (String) obj);
+        if (select instanceof PlainSelect plainSelect) {
+            this.setWhere(plainSelect, (String) obj);
         } else if (select instanceof SetOperationList setOperationList) {
             List<Select> selectBodyList = setOperationList.getSelects();
             selectBodyList.forEach(s -> this.setWhere((PlainSelect) s, (String) obj));

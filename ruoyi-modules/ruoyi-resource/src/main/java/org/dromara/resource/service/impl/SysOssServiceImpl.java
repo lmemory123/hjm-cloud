@@ -3,9 +3,8 @@ package org.dromara.resource.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.CacheNames;
@@ -15,8 +14,8 @@ import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.file.FileUtils;
 import org.dromara.common.json.utils.JsonUtils;
-import org.dromara.common.mybatis.core.page.PageQuery;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.mybatisflex.core.page.PageQuery;
+import org.dromara.common.mybatisflex.core.page.TableDataInfo;
 import org.dromara.common.oss.core.OssClient;
 import org.dromara.common.oss.entity.UploadResult;
 import org.dromara.common.oss.enums.AccessPolicyType;
@@ -61,8 +60,8 @@ public class SysOssServiceImpl implements ISysOssService {
      */
     @Override
     public TableDataInfo<SysOssVo> queryPageList(SysOssBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<SysOss> lqw = buildQueryWrapper(bo);
-        Page<SysOssVo> result = baseMapper.selectVoPage(pageQuery.build(), lqw);
+        QueryWrapper wrapper = buildQueryWrapper(bo);
+        Page<SysOssVo> result = baseMapper.selectVoPage(pageQuery.build(), wrapper);
         List<SysOssVo> filterResult = result.getRecords().stream().map(this::matchingUrl).collect(Collectors.toList());
         result.setRecords(filterResult);
         return TableDataInfo.build(result);
@@ -116,19 +115,32 @@ public class SysOssServiceImpl implements ISysOssService {
         return StringUtils.joinComma(list);
     }
 
-    private LambdaQueryWrapper<SysOss> buildQueryWrapper(SysOssBo bo) {
+    private QueryWrapper buildQueryWrapper(SysOssBo bo) {
         Map<String, Object> params = bo.getParams();
-        LambdaQueryWrapper<SysOss> lqw = Wrappers.lambdaQuery();
-        lqw.like(StringUtils.isNotBlank(bo.getFileName()), SysOss::getFileName, bo.getFileName());
-        lqw.like(StringUtils.isNotBlank(bo.getOriginalName()), SysOss::getOriginalName, bo.getOriginalName());
-        lqw.eq(StringUtils.isNotBlank(bo.getFileSuffix()), SysOss::getFileSuffix, bo.getFileSuffix());
-        lqw.eq(StringUtils.isNotBlank(bo.getUrl()), SysOss::getUrl, bo.getUrl());
-        lqw.between(params.get("beginCreateTime") != null && params.get("endCreateTime") != null,
-            SysOss::getCreateTime, params.get("beginCreateTime"), params.get("endCreateTime"));
-        lqw.eq(ObjectUtil.isNotNull(bo.getCreateBy()), SysOss::getCreateBy, bo.getCreateBy());
-        lqw.eq(StringUtils.isNotBlank(bo.getService()), SysOss::getService, bo.getService());
-        lqw.orderByAsc(SysOss::getOssId);
-        return lqw;
+        QueryWrapper queryWrapper = QueryWrapper.create();
+        if (StringUtils.isNotBlank(bo.getFileName())) {
+            queryWrapper.and("file_name like ?", "%" + bo.getFileName() + "%");
+        }
+        if (StringUtils.isNotBlank(bo.getOriginalName())) {
+            queryWrapper.and("original_name like ?", "%" + bo.getOriginalName() + "%");
+        }
+        if (StringUtils.isNotBlank(bo.getFileSuffix())) {
+            queryWrapper.and("file_suffix = ?", bo.getFileSuffix());
+        }
+        if (StringUtils.isNotBlank(bo.getUrl())) {
+            queryWrapper.and("url = ?", bo.getUrl());
+        }
+        if (params.get("beginCreateTime") != null && params.get("endCreateTime") != null) {
+            queryWrapper.and("create_time between ? and ?", params.get("beginCreateTime"), params.get("endCreateTime"));
+        }
+        if (ObjectUtil.isNotNull(bo.getCreateBy())) {
+            queryWrapper.and("create_by = ?", bo.getCreateBy());
+        }
+        if (StringUtils.isNotBlank(bo.getService())) {
+            queryWrapper.and("service = ?", bo.getService());
+        }
+        queryWrapper.orderBy("oss_id", true);
+        return queryWrapper;
     }
 
     /**
@@ -170,6 +182,9 @@ public class SysOssServiceImpl implements ISysOssService {
      */
     @Override
     public SysOssVo upload(MultipartFile file) {
+        if (ObjectUtil.isNull(file) || file.isEmpty()) {
+            throw new ServiceException("上传文件不能为空");
+        }
         String originalfileName = file.getOriginalFilename();
         String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
         OssClient storage = OssFactory.instance();
@@ -194,12 +209,16 @@ public class SysOssServiceImpl implements ISysOssService {
      */
     @Override
     public SysOssVo upload(File file) {
+        if (ObjectUtil.isNull(file) || !file.isFile() || file.length() <= 0) {
+            throw new ServiceException("上传文件不能为空");
+        }
         String originalfileName = file.getName();
         String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
         OssClient storage = OssFactory.instance();
+        long length = file.length();
         UploadResult uploadResult = storage.uploadSuffix(file, suffix);
         SysOssExt ext1 = new SysOssExt();
-        ext1.setFileSize(file.length());
+        ext1.setFileSize(length);
         // 保存文件信息
         return buildResultEntity(originalfileName, suffix, storage.getConfigKey(), uploadResult, ext1);
     }
@@ -245,12 +264,12 @@ public class SysOssServiceImpl implements ISysOssService {
         if (isValid) {
             // 做一些业务上的校验,判断是否需要校验
         }
-        List<SysOss> list = baseMapper.selectByIds(ids);
+        List<SysOss> list = baseMapper.selectListByIds(ids);
         for (SysOss sysOss : list) {
             OssClient storage = OssFactory.instance(sysOss.getService());
             storage.delete(sysOss.getUrl());
         }
-        return baseMapper.deleteByIds(ids) > 0;
+        return baseMapper.deleteBatchByIds(ids) > 0;
     }
 
     /**

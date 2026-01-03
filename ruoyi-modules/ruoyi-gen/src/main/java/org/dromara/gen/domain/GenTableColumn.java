@@ -1,15 +1,15 @@
 package org.dromara.gen.domain;
 
-import com.baomidou.mybatisplus.annotation.FieldStrategy;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.mybatisflex.annotation.Column;
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.Strings;
 import org.apache.ibatis.type.JdbcType;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.mybatis.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.BaseEntity;
 
 /**
  * 代码生成业务字段表 gen_table_column
@@ -18,13 +18,13 @@ import org.dromara.common.mybatis.core.domain.BaseEntity;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("gen_table_column")
+@Table("gen_table_column")
 public class GenTableColumn extends BaseEntity {
 
     /**
      * 编号
      */
-    @TableId(value = "column_id")
+    @Id
     private Long columnId;
 
     /**
@@ -40,7 +40,6 @@ public class GenTableColumn extends BaseEntity {
     /**
      * 列描述
      */
-    @TableField(updateStrategy = FieldStrategy.ALWAYS, jdbcType = JdbcType.VARCHAR)
     private String columnComment;
 
     /**
@@ -62,43 +61,36 @@ public class GenTableColumn extends BaseEntity {
     /**
      * 是否主键（1是）
      */
-    @TableField(updateStrategy = FieldStrategy.ALWAYS, jdbcType = JdbcType.VARCHAR)
     private String isPk;
 
     /**
      * 是否自增（1是）
      */
-    @TableField(updateStrategy = FieldStrategy.ALWAYS, jdbcType = JdbcType.VARCHAR)
     private String isIncrement;
 
     /**
      * 是否必填（1是）
      */
-    @TableField(updateStrategy = FieldStrategy.ALWAYS, jdbcType = JdbcType.VARCHAR)
     private String isRequired;
 
     /**
      * 是否为插入字段（1是）
      */
-    @TableField(updateStrategy = FieldStrategy.ALWAYS, jdbcType = JdbcType.VARCHAR)
     private String isInsert;
 
     /**
      * 是否编辑字段（1是）
      */
-    @TableField(updateStrategy = FieldStrategy.ALWAYS, jdbcType = JdbcType.VARCHAR)
     private String isEdit;
 
     /**
      * 是否列表字段（1是）
      */
-    @TableField(updateStrategy = FieldStrategy.ALWAYS, jdbcType = JdbcType.VARCHAR)
     private String isList;
 
     /**
      * 是否查询字段（1是）
      */
-    @TableField(updateStrategy = FieldStrategy.ALWAYS, jdbcType = JdbcType.VARCHAR)
     private String isQuery;
 
     /**
@@ -130,7 +122,7 @@ public class GenTableColumn extends BaseEntity {
     }
 
     public boolean isPk(String isPk) {
-        return isPk != null && StringUtils.equals("1", isPk);
+        return isPk != null && Strings.CS.equals("1", isPk);
     }
 
     public boolean isIncrement() {
@@ -138,7 +130,7 @@ public class GenTableColumn extends BaseEntity {
     }
 
     public boolean isIncrement(String isIncrement) {
-        return isIncrement != null && StringUtils.equals("1", isIncrement);
+        return isIncrement != null && Strings.CS.equals("1", isIncrement);
     }
 
     public boolean isRequired() {
@@ -146,7 +138,7 @@ public class GenTableColumn extends BaseEntity {
     }
 
     public boolean isRequired(String isRequired) {
-        return isRequired != null && StringUtils.equals("1", isRequired);
+        return isRequired != null && Strings.CS.equals("1", isRequired);
     }
 
     public boolean isInsert() {
@@ -154,7 +146,7 @@ public class GenTableColumn extends BaseEntity {
     }
 
     public boolean isInsert(String isInsert) {
-        return isInsert != null && StringUtils.equals("1", isInsert);
+        return isInsert != null && Strings.CS.equals("1", isInsert);
     }
 
     public boolean isEdit() {
@@ -162,7 +154,7 @@ public class GenTableColumn extends BaseEntity {
     }
 
     public boolean isEdit(String isEdit) {
-        return isEdit != null && StringUtils.equals("1", isEdit);
+        return isEdit != null && Strings.CS.equals("1", isEdit);
     }
 
     public boolean isList() {
@@ -170,7 +162,7 @@ public class GenTableColumn extends BaseEntity {
     }
 
     public boolean isList(String isList) {
-        return isList != null && StringUtils.equals("1", isList);
+        return isList != null && Strings.CS.equals("1", isList);
     }
 
     public boolean isQuery() {
@@ -178,7 +170,7 @@ public class GenTableColumn extends BaseEntity {
     }
 
     public boolean isQuery(String isQuery) {
-        return isQuery != null && StringUtils.equals("1", isQuery);
+        return isQuery != null && Strings.CS.equals("1", isQuery);
     }
 
     public boolean isSuperColumn() {
@@ -186,7 +178,7 @@ public class GenTableColumn extends BaseEntity {
     }
 
     public static boolean isSuperColumn(String javaField) {
-        return StringUtils.equalsAnyIgnoreCase(javaField,
+        return Strings.CI.containsAny(javaField,
             // BaseEntity
             "createBy", "createTime", "updateBy", "updateTime",
             // TreeEntity
@@ -199,7 +191,7 @@ public class GenTableColumn extends BaseEntity {
 
     public static boolean isUsableColumn(String javaField) {
         // isSuperColumn()中的名单用于避免生成多余Domain属性，若某些属性在生成页面时需要用到不能忽略，则放在此处白名单
-        return StringUtils.equalsAnyIgnoreCase(javaField, "parentId", "orderNum", "remark");
+        return Strings.CI.equalsAny(javaField, "parentId", "orderNum", "remark");
     }
 
     public String readConverterExp() {

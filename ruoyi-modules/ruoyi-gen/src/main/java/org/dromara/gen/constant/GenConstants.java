@@ -1,5 +1,7 @@
 package org.dromara.gen.constant;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * 代码生成通用常量
  *

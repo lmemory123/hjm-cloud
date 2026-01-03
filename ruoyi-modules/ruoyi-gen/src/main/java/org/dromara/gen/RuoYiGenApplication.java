@@ -1,9 +1,11 @@
 package org.dromara.gen;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.metrics.buffering.BufferingApplicationStartup;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * 代码生成
@@ -16,7 +18,9 @@ public class RuoYiGenApplication {
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(RuoYiGenApplication.class);
         application.setApplicationStartup(new BufferingApplicationStartup(2048));
-        application.run(args);
+        ConfigurableApplicationContext context = application.run(args);
+        ObjectMapper mapper = context.getBean(ObjectMapper.class);
+        System.out.println("ObjectMapper bean: " + mapper.getClass().getName());
         System.out.println("(♥◠‿◠)ﾉﾞ  代码生成模块启动成功   ლ(´ڡ`ლ)ﾞ  ");
     }
 }

@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.NullValue;
 import net.sf.jsqlparser.expression.StringValue;
+import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.common.tenant.properties.TenantProperties;
@@ -48,7 +49,7 @@ public class PlusTenantLineHandler implements TenantLineHandler {
                 "gen_table_column"
             );
             tables.addAll(excludes);
-            return StringUtils.equalsAnyIgnoreCase(tableName, tables.toArray(new String[0]));
+            return Strings.CI.equalsAny(tableName, tables.toArray(new String[0]));
         }
         return true;
     }

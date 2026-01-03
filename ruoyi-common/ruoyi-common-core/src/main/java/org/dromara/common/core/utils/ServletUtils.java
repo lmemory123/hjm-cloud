@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.Strings;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedCaseInsensitiveMap;
 import org.springframework.web.context.request.RequestAttributes;
@@ -248,13 +249,13 @@ public class ServletUtils extends JakartaServletUtil {
 
         // 判断 URI 后缀是否为 .json 或 .xml
         String uri = request.getRequestURI();
-        if (StringUtils.equalsAnyIgnoreCase(uri, ".json", ".xml")) {
+        if (Strings.CI.equalsAny(uri, ".json", ".xml")) {
             return true;
         }
 
         // 判断请求参数 __ajax 是否为 json 或 xml
         String ajax = request.getParameter("__ajax");
-        return StringUtils.equalsAnyIgnoreCase(ajax, "json", "xml");
+        return Strings.CI.equalsAny(ajax, "json", "xml");
     }
 
     /**

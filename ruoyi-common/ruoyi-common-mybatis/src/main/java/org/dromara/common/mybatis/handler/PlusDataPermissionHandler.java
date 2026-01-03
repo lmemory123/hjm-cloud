@@ -9,6 +9,7 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.relational.ParenthesedExpressionList;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StreamUtils;
@@ -152,11 +153,11 @@ public class PlusDataPermissionHandler {
                     continue;
                 }
                 // 不包含 key 变量 则不处理
-                if (!StringUtils.containsAny(type.getSqlTemplate(), keys.toArray(String[]::new))) {
+                if (!Strings.CS.containsAny(type.getSqlTemplate(), keys.toArray(String[]::new))) {
                     continue;
                 }
                 // 当前注解不满足模板 不处理
-                if (!StringUtils.containsAny(type.getSqlTemplate(), dataColumn.key())) {
+                if (!Strings.CS.containsAny(type.getSqlTemplate(), dataColumn.key())) {
                     continue;
                 }
                 // 忽略数据权限 防止spel表达式内有其他sql查询导致死循环调用

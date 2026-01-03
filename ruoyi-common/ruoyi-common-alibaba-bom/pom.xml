@@ -14,6 +14,7 @@
     </description>
 
     <properties>
+    <maven.compiler.release>17</maven.compiler.release>
         <revision>2.5.1</revision>
         <spring-cloud-alibaba.version>2025.1.0.0-SNAPSHOT</spring-cloud-alibaba.version>
         <seata.version>2.5.0</seata.version>

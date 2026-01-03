@@ -4,7 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Opt;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.dromara.common.core.constant.SystemConstants;
@@ -15,7 +15,7 @@ import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.mybatis.helper.DataPermissionHelper;
+import org.dromara.common.mybatisflex.helper.DataPermissionHelper;
 import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.api.RemoteUserService;
 import org.dromara.system.api.domain.bo.RemoteUserBo;
@@ -70,7 +70,7 @@ public class RemoteUserServiceImpl implements RemoteUserService {
     @Override
     public LoginUser getUserInfo(String username, String tenantId) throws UserException {
         return TenantHelper.dynamic(tenantId, () -> {
-            SysUserVo sysUser = userMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getUserName, username));
+            SysUserVo sysUser = userMapper.selectVoOne(QueryWrapper.create().eq(SysUser::getUserName, username));
             if (ObjectUtil.isNull(sysUser)) {
                 throw new UserException("user.not.exists", username);
             }
@@ -116,7 +116,7 @@ public class RemoteUserServiceImpl implements RemoteUserService {
     @Override
     public LoginUser getUserInfoByPhonenumber(String phonenumber, String tenantId) throws UserException {
         return TenantHelper.dynamic(tenantId, () -> {
-            SysUserVo sysUser = userMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getPhonenumber, phonenumber));
+            SysUserVo sysUser = userMapper.selectVoOne(QueryWrapper.create().eq(SysUser::getPhonenumber, phonenumber));
             if (ObjectUtil.isNull(sysUser)) {
                 throw new UserException("user.not.exists", phonenumber);
             }
@@ -139,7 +139,7 @@ public class RemoteUserServiceImpl implements RemoteUserService {
     @Override
     public LoginUser getUserInfoByEmail(String email, String tenantId) throws UserException {
         return TenantHelper.dynamic(tenantId, () -> {
-            SysUserVo user = userMapper.selectVoOne(new LambdaQueryWrapper<SysUser>().eq(SysUser::getEmail, email));
+            SysUserVo user = userMapper.selectVoOne(QueryWrapper.create().eq(SysUser::getEmail, email));
             if (ObjectUtil.isNull(user)) {
                 throw new UserException("user.not.exists", email);
             }
@@ -193,8 +193,8 @@ public class RemoteUserServiceImpl implements RemoteUserService {
             if (!("true".equals(configService.selectConfigByKey("sys.account.registerUser")))) {
                 throw new ServiceException("当前系统没有开启注册功能");
             }
-            return userMapper.exists(new LambdaQueryWrapper<SysUser>()
-                .eq(SysUser::getUserName, sysUserBo.getUserName()));
+            return userMapper.selectCountByQuery(QueryWrapper.create()
+                .eq(SysUser::getUserName, sysUserBo.getUserName())) > 0;
         });
         if (exist) {
             throw new UserException("user.register.save.error", username);
@@ -311,7 +311,7 @@ public class RemoteUserServiceImpl implements RemoteUserService {
         if (CollUtil.isEmpty(userIds)) {
             return new ArrayList<>();
         }
-        List<SysUserVo> list = userMapper.selectVoList(new LambdaQueryWrapper<SysUser>()
+        List<SysUserVo> list = userMapper.selectVoList(QueryWrapper.create()
             .select(SysUser::getUserId, SysUser::getDeptId, SysUser::getUserName,
                 SysUser::getNickName, SysUser::getUserType, SysUser::getEmail,
                 SysUser::getPhonenumber, SysUser::getSex, SysUser::getStatus,
@@ -348,8 +348,8 @@ public class RemoteUserServiceImpl implements RemoteUserService {
         }
 
         // 通过角色ID获取用户角色信息
-        List<SysUserRole> userRoles = userRoleMapper.selectList(
-            new LambdaQueryWrapper<SysUserRole>().in(SysUserRole::getRoleId, roleIds));
+        List<SysUserRole> userRoles = userRoleMapper.selectListByQuery(
+            QueryWrapper.create().in(SysUserRole::getRoleId, roleIds));
 
         // 获取用户ID列表
         Set<Long> userIds = StreamUtils.toSet(userRoles, SysUserRole::getUserId);
@@ -368,7 +368,7 @@ public class RemoteUserServiceImpl implements RemoteUserService {
         if (CollUtil.isEmpty(deptIds)) {
             return List.of();
         }
-        List<SysUserVo> list = userMapper.selectVoList(new LambdaQueryWrapper<SysUser>()
+        List<SysUserVo> list = userMapper.selectVoList(QueryWrapper.create()
             .select(SysUser::getUserId, SysUser::getUserName, SysUser::getNickName, SysUser::getEmail, SysUser::getPhonenumber)
             .eq(SysUser::getStatus, SystemConstants.NORMAL)
             .in(SysUser::getDeptId, deptIds));
@@ -388,8 +388,8 @@ public class RemoteUserServiceImpl implements RemoteUserService {
         }
 
         // 通过岗位ID获取用户岗位信息
-        List<SysUserPost> userPosts = userPostMapper.selectList(
-            new LambdaQueryWrapper<SysUserPost>().in(SysUserPost::getPostId, postIds));
+        List<SysUserPost> userPosts = userPostMapper.selectListByQuery(
+            QueryWrapper.create().in(SysUserPost::getPostId, postIds));
 
         // 获取用户ID列表
         Set<Long> userIds = StreamUtils.toSet(userPosts, SysUserPost::getUserId);
@@ -407,8 +407,8 @@ public class RemoteUserServiceImpl implements RemoteUserService {
         if (CollUtil.isEmpty(userIds)) {
             return Collections.emptyMap();
         }
-        List<SysUser> list = userMapper.selectList(
-            new LambdaQueryWrapper<SysUser>()
+        List<SysUser> list = userMapper.selectListByQuery(
+            QueryWrapper.create()
                 .select(SysUser::getUserId, SysUser::getNickName)
                 .in(SysUser::getUserId, userIds)
         );

@@ -16,6 +16,7 @@
  */
 package org.apache.seata.core.store.db;
 
+import org.apache.seata.common.ConfigurationKeys;
 import org.apache.seata.common.exception.ShouldNeverHappenException;
 import org.apache.seata.common.exception.StoreException;
 import org.apache.seata.common.executor.Initialize;
@@ -23,7 +24,6 @@ import org.apache.seata.common.util.ConfigTools;
 import org.apache.seata.common.util.StringUtils;
 import org.apache.seata.config.Configuration;
 import org.apache.seata.config.ConfigurationFactory;
-import org.apache.seata.core.constants.ConfigurationKeys;
 import org.apache.seata.core.constants.DBType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,8 +117,7 @@ public abstract class AbstractDataSourceProvider implements DataSourceProvider, 
                 .findAny()
                 .map(File::getAbsolutePath)
                 .orElseThrow(() -> new ShouldNeverHappenException("cannot find jdbc folder"));
-            throw new StoreException(String.format(
-                "The driver {%s} cannot be found in the path %s. Please ensure that the appropriate database driver dependencies are included in the classpath.",
+            throw new StoreException("The driver {%s} cannot be found in the path %s. Please ensure that the appropriate database driver dependencies are included in the classpath.".formatted(
                 driverClassName, driverClassPath));
         }
     }
@@ -146,7 +145,7 @@ public abstract class AbstractDataSourceProvider implements DataSourceProvider, 
         String driverClassName = CONFIG.getConfig(ConfigurationKeys.STORE_DB_DRIVER_CLASS_NAME);
         if (StringUtils.isBlank(driverClassName)) {
             throw new StoreException(
-                String.format("the {%s} can't be empty", ConfigurationKeys.STORE_DB_DRIVER_CLASS_NAME));
+                "the {%s} can't be empty".formatted(ConfigurationKeys.STORE_DB_DRIVER_CLASS_NAME));
         }
         return driverClassName;
     }
@@ -218,7 +217,7 @@ public abstract class AbstractDataSourceProvider implements DataSourceProvider, 
     protected String getUrl() {
         String url = CONFIG.getConfig(ConfigurationKeys.STORE_DB_URL);
         if (StringUtils.isBlank(url)) {
-            throw new StoreException(String.format("the {%s} can't be empty", ConfigurationKeys.STORE_DB_URL));
+            throw new StoreException("the {%s} can't be empty".formatted(ConfigurationKeys.STORE_DB_URL));
         }
         return url;
     }
@@ -231,7 +230,7 @@ public abstract class AbstractDataSourceProvider implements DataSourceProvider, 
     protected String getUser() {
         String user = CONFIG.getConfig(ConfigurationKeys.STORE_DB_USER);
         if (StringUtils.isBlank(user)) {
-            throw new StoreException(String.format("the {%s} can't be empty", ConfigurationKeys.STORE_DB_USER));
+            throw new StoreException("the {%s} can't be empty".formatted(ConfigurationKeys.STORE_DB_USER));
         }
         return user;
     }

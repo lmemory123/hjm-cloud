@@ -5,16 +5,17 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.constant.CacheConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
-import org.dromara.common.web.core.BaseController;
 import org.dromara.common.log.annotation.Log;
 import org.dromara.common.log.enums.BusinessType;
-import org.dromara.common.mybatis.core.page.TableDataInfo;
+import org.dromara.common.mybatisflex.core.page.TableDataInfo;
 import org.dromara.common.redis.utils.RedisUtils;
+import org.dromara.common.web.core.BaseController;
 import org.dromara.system.api.domain.SysUserOnline;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,16 +57,16 @@ public class SysUserOnlineController extends BaseController {
         }
         if (StringUtils.isNotEmpty(ipaddr) && StringUtils.isNotEmpty(userName)) {
             userOnlineDTOList = StreamUtils.filter(userOnlineDTOList, userOnline ->
-                StringUtils.equals(ipaddr, userOnline.getIpaddr()) &&
-                    StringUtils.equals(userName, userOnline.getUserName())
+                Strings.CS.equals(ipaddr, userOnline.getIpaddr()) &&
+                    Strings.CS.equals(userName, userOnline.getUserName())
             );
         } else if (StringUtils.isNotEmpty(ipaddr)) {
             userOnlineDTOList = StreamUtils.filter(userOnlineDTOList, userOnline ->
-                StringUtils.equals(ipaddr, userOnline.getIpaddr())
+                Strings.CS.equals(ipaddr, userOnline.getIpaddr())
             );
         } else if (StringUtils.isNotEmpty(userName)) {
             userOnlineDTOList = StreamUtils.filter(userOnlineDTOList, userOnline ->
-                StringUtils.equals(userName, userOnline.getUserName())
+                Strings.CS.equals(userName, userOnline.getUserName())
             );
         }
         Collections.reverse(userOnlineDTOList);

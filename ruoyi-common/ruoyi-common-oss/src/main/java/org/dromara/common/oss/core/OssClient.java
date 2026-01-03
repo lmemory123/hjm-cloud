@@ -3,6 +3,7 @@ package org.dromara.common.oss.core;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.IdUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.utils.DateUtils;
 import org.dromara.common.core.utils.StringUtils;
@@ -14,7 +15,9 @@ import org.dromara.common.oss.exception.OssException;
 import org.dromara.common.oss.properties.OssProperties;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.core.async.*;
+import software.amazon.awssdk.core.async.AsyncResponseTransformer;
+import software.amazon.awssdk.core.async.BlockingInputStreamAsyncRequestBody;
+import software.amazon.awssdk.core.async.ResponsePublisher;
 import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -85,7 +88,7 @@ public class OssClient {
                 AwsBasicCredentials.create(properties.getAccessKey(), properties.getSecretKey()));
 
             // MinIO 使用 HTTPS 限制使用域名访问，站点填域名。需要启用路径样式访问
-            boolean isStyle = !StringUtils.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE);
+            boolean isStyle = !Strings.CS.containsAny(properties.getEndpoint(), OssConstant.CLOUD_SERVICE);
 
             // 创建AWS基于 Netty 的 S3 客户端
             this.client = S3AsyncClient.builder()
@@ -94,7 +97,11 @@ public class OssClient {
                 .region(of())
                 .forcePathStyle(isStyle)
                 .httpClient(NettyNioAsyncHttpClient.builder()
-                    .connectionTimeout(Duration.ofSeconds(60)).build())
+                    .connectionTimeout(Duration.ofSeconds(60))
+                    .connectionAcquisitionTimeout(Duration.ofSeconds(30))
+                    .maxConcurrency(100)
+                    .maxPendingConnectionAcquires(1000)
+                    .build())
                 .build();
 
             //AWS基于 CRT 的 S3 AsyncClient 实例用作 S3 传输管理器的底层客户端
@@ -413,7 +420,7 @@ public class OssClient {
         String header = getIsHttps();
 
         // 如果是云服务商，直接返回域名或终端点
-        if (StringUtils.containsAny(endpoint, OssConstant.CLOUD_SERVICE)) {
+        if (Strings.CS.containsAny(endpoint, OssConstant.CLOUD_SERVICE)) {
             return StringUtils.isNotEmpty(domain) ? header + domain : header + endpoint;
         }
 
@@ -450,7 +457,7 @@ public class OssClient {
         String endpoint = properties.getEndpoint();
         String header = getIsHttps();
         // 云服务商直接返回
-        if (StringUtils.containsAny(endpoint, OssConstant.CLOUD_SERVICE)) {
+        if (Strings.CS.containsAny(endpoint, OssConstant.CLOUD_SERVICE)) {
             return header + (StringUtils.isNotEmpty(domain) ? domain : properties.getBucketName() + "." + endpoint);
         }
         // MinIO 单独处理

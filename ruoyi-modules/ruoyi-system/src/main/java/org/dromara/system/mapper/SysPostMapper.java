@@ -1,11 +1,10 @@
 package org.dromara.system.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.dromara.common.mybatis.annotation.DataColumn;
-import org.dromara.common.mybatis.annotation.DataPermission;
-import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
+import org.dromara.common.mybatisflex.annotation.DataColumn;
+import org.dromara.common.mybatisflex.annotation.DataPermission;
+import org.dromara.common.mybatisflex.core.mapper.BaseMapperPlus;
 import org.dromara.system.domain.SysPost;
 import org.dromara.system.domain.vo.SysPostVo;
 
@@ -29,7 +28,7 @@ public interface SysPostMapper extends BaseMapperPlus<SysPost, SysPostVo> {
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "create_by")
     })
-    default Page<SysPostVo> selectPagePostList(Page<SysPost> page, Wrapper<SysPost> queryWrapper) {
+    default Page<SysPostVo> selectPagePostList(Page<SysPost> page, QueryWrapper queryWrapper) {
         return this.selectVoPage(page, queryWrapper);
     }
 
@@ -43,7 +42,7 @@ public interface SysPostMapper extends BaseMapperPlus<SysPost, SysPostVo> {
         @DataColumn(key = "deptName", value = "dept_id"),
         @DataColumn(key = "userName", value = "create_by")
     })
-    default List<SysPostVo> selectPostList(Wrapper<SysPost> queryWrapper) {
+    default List<SysPostVo> selectPostList(QueryWrapper queryWrapper) {
         return this.selectVoList(queryWrapper);
     }
 
@@ -58,7 +57,7 @@ public interface SysPostMapper extends BaseMapperPlus<SysPost, SysPostVo> {
         @DataColumn(key = "userName", value = "create_by")
     })
     default long selectPostCount(List<Long> postIds) {
-        return this.selectCount(new LambdaQueryWrapper<SysPost>().in(SysPost::getPostId, postIds));
+        return this.selectCountByQuery(QueryWrapper.create().in(SysPost::getPostId, postIds));
     }
 
     /**
@@ -68,8 +67,11 @@ public interface SysPostMapper extends BaseMapperPlus<SysPost, SysPostVo> {
      * @return 岗位信息列表
      */
     default List<SysPostVo> selectPostsByUserId(Long userId) {
-        return this.selectVoList(new LambdaQueryWrapper<SysPost>()
-            .inSql(SysPost::getPostId, "select post_id from sys_user_post where user_id = " + userId));
+        QueryWrapper postIds = QueryWrapper.create()
+            .select("post_id")
+            .from("sys_user_post")
+            .where("user_id = ?", userId);
+        return this.selectVoList(QueryWrapper.create().in(SysPost::getPostId, postIds));
     }
 
 }

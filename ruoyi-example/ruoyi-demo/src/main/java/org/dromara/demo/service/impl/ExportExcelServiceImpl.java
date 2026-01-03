@@ -42,8 +42,8 @@ public class ExportExcelServiceImpl implements IExportExcelService {
             everyRowData.setNickName("用户-" + i);
             everyRowData.setUserStatus(UserStatus.OK.getCode());
             everyRowData.setGender("1");
-            everyRowData.setPhoneNumber(String.format("175%08d", i));
-            everyRowData.setEmail(String.format("175%08d", i) + "@163.com");
+            everyRowData.setPhoneNumber("175%08d".formatted(i));
+            everyRowData.setEmail("175%08d".formatted(i) + "@163.com");
             everyRowData.setProvinceId(i);
             everyRowData.setCityId(i);
             everyRowData.setAreaId(i);
@@ -169,23 +169,23 @@ public class ExportExcelServiceImpl implements IExportExcelService {
 
         // 实际业务中一般采用数据库读取的形式，这里直接拼接创建
         for (int i = 0; i < RandomUtil.randomInt(minCount, maxCount); i++) {
-            areaList.add(new DemoCityData(areaList.size(), 0, String.format("A11%04d", i)));
+            areaList.add(new DemoCityData(areaList.size(), 0, "A11%04d".formatted(i)));
         }
 
         for (int i = 0; i < RandomUtil.randomInt(minCount, maxCount); i++) {
-            areaList.add(new DemoCityData(areaList.size(), 1, String.format("A12%04d", i)));
+            areaList.add(new DemoCityData(areaList.size(), 1, "A12%04d".formatted(i)));
         }
 
         for (int i = 0; i < RandomUtil.randomInt(minCount, maxCount); i++) {
-            areaList.add(new DemoCityData(areaList.size(), 2, String.format("A21%04d", i)));
+            areaList.add(new DemoCityData(areaList.size(), 2, "A21%04d".formatted(i)));
         }
 
         for (int i = 0; i < RandomUtil.randomInt(minCount, maxCount); i++) {
-            areaList.add(new DemoCityData(areaList.size(), 3, String.format("A22%04d", i)));
+            areaList.add(new DemoCityData(areaList.size(), 3, "A22%04d".formatted(i)));
         }
 
         for (int i = 0; i < RandomUtil.randomInt(minCount, maxCount); i++) {
-            areaList.add(new DemoCityData(areaList.size(), 4, String.format("A23%04d", i)));
+            areaList.add(new DemoCityData(areaList.size(), 4, "A23%04d".formatted(i)));
         }
 
         selectParentData(cityList, areaList);
@@ -254,8 +254,8 @@ public class ExportExcelServiceImpl implements IExportExcelService {
                 everyRowData.setNickName("用户-" + i);
                 everyRowData.setUserStatus(SystemConstants.NORMAL);
                 everyRowData.setGender("1");
-                everyRowData.setPhoneNumber(String.format("175%08d", i));
-                everyRowData.setEmail(String.format("175%08d", i) + "@163.com");
+                everyRowData.setPhoneNumber("175%08d".formatted(i));
+                everyRowData.setEmail("175%08d".formatted(i) + "@163.com");
                 everyRowData.setProvinceId(i);
                 everyRowData.setCityId(i);
                 everyRowData.setAreaId(i);
@@ -279,8 +279,8 @@ public class ExportExcelServiceImpl implements IExportExcelService {
                 everyRowData.setNickName("用户-" + index);
                 everyRowData.setUserStatus(SystemConstants.NORMAL);
                 everyRowData.setGender("1");
-                everyRowData.setPhoneNumber(String.format("175%08d", index));
-                everyRowData.setEmail(String.format("175%08d", index) + "@163.com");
+                everyRowData.setPhoneNumber("175%08d".formatted(index));
+                everyRowData.setEmail("175%08d".formatted(index) + "@163.com");
                 everyRowData.setProvinceId(index);
                 everyRowData.setCityId(index);
                 everyRowData.setAreaId(index);

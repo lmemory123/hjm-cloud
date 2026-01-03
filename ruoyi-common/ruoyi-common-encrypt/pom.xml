@@ -24,7 +24,8 @@
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15to18</artifactId>
+            <artifactId>bcprov-jdk18on</artifactId>
+      <version>1.83</version>
         </dependency>
 
         <dependency>

@@ -1,6 +1,6 @@
 package me.zhyd.oauth.request;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONObject;
 import me.zhyd.oauth.cache.AuthStateCache;
 import me.zhyd.oauth.config.AuthConfig;
 import me.zhyd.oauth.config.AuthSource;
@@ -52,10 +52,10 @@ public abstract class AbstractAuthWeChatEnterpriseRequest extends AuthDefaultReq
         JSONObject object = this.checkResponse(response);
 
         // 返回 OpenId 或其他，均代表非当前企业用户，不支持
-        if (!object.containsKey("UserId")) {
+        if (!object.containsKey("userId")) {
             throw new AuthException(AuthResponseStatus.UNIDENTIFIED_PLATFORM, source);
         }
-        String userId = object.getString("UserId");
+        String userId = object.getString("userId");
         String userTicket = object.getString("user_ticket");
         JSONObject userDetail = getUserDetail(authToken.getAccessToken(), userId, userTicket);
 

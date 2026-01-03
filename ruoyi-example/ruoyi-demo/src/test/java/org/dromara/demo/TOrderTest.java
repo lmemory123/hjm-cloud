@@ -2,7 +2,6 @@ package org.dromara.demo;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
 import org.dromara.demo.domain.ShardingOrder;
 import org.dromara.demo.mapper.ShardingOrderMapper;
 import org.junit.jupiter.api.Test;

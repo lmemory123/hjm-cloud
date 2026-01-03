@@ -1,8 +1,8 @@
 package org.dromara.common.tenant.core;
 
-import org.dromara.common.mybatis.core.domain.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.dromara.common.mybatis.core.domain.BaseEntity;
 
 /**
  * 租户基类

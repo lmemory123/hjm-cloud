@@ -5,6 +5,7 @@ import cn.hutool.captcha.generator.CodeGenerator;
 import cn.hutool.core.util.IdUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.Strings;
 import org.dromara.auth.domain.vo.CaptchaVo;
 import org.dromara.auth.enums.CaptchaType;
 import org.dromara.auth.properties.CaptchaProperties;
@@ -12,7 +13,6 @@ import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.utils.SpringUtils;
-import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.ratelimiter.annotation.RateLimiter;
 import org.dromara.common.ratelimiter.enums.LimitType;
@@ -77,7 +77,7 @@ public class CaptchaController {
         String code = captcha.getCode();
         if (CaptchaType.MATH == captchaType) {
             ExpressionParser parser = new SpelExpressionParser();
-            Expression exp = parser.parseExpression(StringUtils.remove(code, "="));
+            Expression exp = parser.parseExpression(Strings.CS.remove(code, "="));
             code = exp.getValue(String.class);
         }
         RedisUtils.setCacheObject(verifyKey, code, Duration.ofMinutes(Constants.CAPTCHA_EXPIRATION));

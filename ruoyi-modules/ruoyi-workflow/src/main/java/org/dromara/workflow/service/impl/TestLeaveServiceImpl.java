@@ -200,8 +200,10 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
                     String businessCode = MapUtil.getStr(params, FlowConstant.BUSINESS_CODE, StrUtil.EMPTY);
                     testLeave.setApplyCode(businessCode);
                 }
-                testLeave.setStatus(BusinessStatusEnum.WAITING.getStatus());
+                log.info("申请人提交");
             }
+            String status = BusinessStatusEnum.findByStatus(processEvent.getStatus());
+            log.info("当前流程状态为{}", status);
             baseMapper.updateById(testLeave);
         });
     }

@@ -1,10 +1,10 @@
 package org.dromara.resource.domain;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.common.tenant.core.TenantEntity;
+import org.dromara.common.mybatisflex.core.domain.BaseEntity;
 
 /**
  * OSS对象存储对象
@@ -13,14 +13,19 @@ import org.dromara.common.tenant.core.TenantEntity;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("sys_oss")
-public class SysOss extends TenantEntity {
+@Table("sys_oss")
+public class SysOss extends BaseEntity {
 
     /**
      * 对象存储主键
      */
-    @TableId(value = "oss_id")
+    @Id
     private Long ossId;
+
+    /**
+     * 租户编号
+     */
+    private String tenantId;
 
     /**
      * 文件名

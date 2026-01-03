@@ -3,7 +3,6 @@ package org.dromara.gateway.utils;
 import cn.hutool.core.util.ObjectUtil;
 import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.domain.R;
-import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.gateway.filter.WebCacheRequestFilter;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;

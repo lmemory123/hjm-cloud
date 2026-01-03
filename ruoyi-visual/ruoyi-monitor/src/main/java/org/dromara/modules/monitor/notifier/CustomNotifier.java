@@ -29,13 +29,13 @@ public class CustomNotifier extends AbstractEventNotifier {
     protected Mono<Void> doNotify(InstanceEvent event, Instance instance) {
         return Mono.fromRunnable(() -> {
             // 实例状态改变事件
-            if (event instanceof InstanceStatusChangedEvent) {
+            if (event instanceof InstanceStatusChangedEvent changedEvent) {
                 // 获取实例注册名称
                 String registName = instance.getRegistration().getName();
                 // 获取实例ID
                 String instanceId = event.getInstance().getValue();
                 // 获取实例状态
-                String status = ((InstanceStatusChangedEvent) event).getStatusInfo().getStatus();
+                String status = changedEvent.getStatusInfo().getStatus();
                 // 获取服务URL
                 String serviceUrl = instance.getRegistration().getServiceUrl();
                 String statusName = switch (status) {

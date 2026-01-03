@@ -1,8 +1,8 @@
 package org.dromara.common.encrypt.enumd;
 
-import org.dromara.common.encrypt.core.encryptor.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.dromara.common.encrypt.core.encryptor.*;
 
 /**
  * 算法名称

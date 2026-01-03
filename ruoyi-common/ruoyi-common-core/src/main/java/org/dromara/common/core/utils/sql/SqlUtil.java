@@ -2,6 +2,7 @@ package org.dromara.common.core.utils.sql;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.utils.StringUtils;
 
 /**
@@ -48,7 +49,7 @@ public class SqlUtil {
         }
         String[] sqlKeywords = StringUtils.split(SQL_REGEX, "\\|");
         for (String sqlKeyword : sqlKeywords) {
-            if (StringUtils.indexOfIgnoreCase(value, sqlKeyword) > -1) {
+            if (Strings.CI.indexOf(value, sqlKeyword) > -1) {
                 throw new IllegalArgumentException("参数存在SQL注入风险");
             }
         }

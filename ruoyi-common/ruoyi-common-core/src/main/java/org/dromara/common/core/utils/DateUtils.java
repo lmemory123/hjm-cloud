@@ -210,7 +210,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         long day = TimeUnit.MILLISECONDS.toDays(diffInMillis);
         long hour = TimeUnit.MILLISECONDS.toHours(diffInMillis) % 24;
         long min = TimeUnit.MILLISECONDS.toMinutes(diffInMillis) % 60;
-        return String.format("%d天 %d小时 %d分钟", day, hour, min);
+        return "%d天 %d小时 %d分钟".formatted(day, hour, min);
     }
 
     /**
@@ -229,16 +229,16 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         // 构建时间差字符串，条件是值不为0才显示
         StringBuilder result = new StringBuilder();
         if (day > 0) {
-            result.append(String.format("%d天 ", day));
+            result.append("%d天 ".formatted(day));
         }
         if (hour > 0) {
-            result.append(String.format("%d小时 ", hour));
+            result.append("%d小时 ".formatted(hour));
         }
         if (min > 0) {
-            result.append(String.format("%d分钟 ", min));
+            result.append("%d分钟 ".formatted(min));
         }
         if (sec > 0) {
-            result.append(String.format("%d秒", sec));
+            result.append("%d秒".formatted(sec));
         }
         return result.length() > 0 ? result.toString().trim() : "0秒";
     }
