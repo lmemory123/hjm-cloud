@@ -1,18 +1,19 @@
 package ${packageName}.domain;
 
-#foreach ($column in $columns)
-#if($column.javaField=='tenantId')
-#set($IsTenant=1)
-#end
-#end
-#if($IsTenant==1)
+#set($useSuperColumns = $useBaseEntity || $useTenantEntity)
+#if($useTenantEntity)
 import org.dromara.common.tenant.core.TenantEntity;
-#else
+#elseif($useBaseEntity)
 import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+#else
+import java.io.Serializable;
 #end
+
 import com.mybatisflex.annotation.*;
 import lombok.Data;
+#if($useSuperColumns)
 import lombok.EqualsAndHashCode;
+#end
 #foreach ($import in $importList)
 import ${import};
 #end
@@ -25,21 +26,24 @@ import java.io.Serial;
  * @author ${author}
  * @date ${datetime}
  */
-#if($IsTenant==1)
+#set($Entity="")
+#if($useTenantEntity)
 #set($Entity="TenantEntity")
-#else
+#elseif($useBaseEntity)
 #set($Entity="BaseEntity")
 #end
 @Data
+#if($useSuperColumns)
 @EqualsAndHashCode(callSuper = true)
+#end
 @Table("${tableName}")
-public class ${ClassName} extends ${Entity} {
+public class ${ClassName}#if($Entity != "") extends ${Entity} #else implements Serializable #end{
 
     @Serial
     private static final long serialVersionUID = 1L;
 
 #foreach ($column in $columns)
-#if(!$table.isSuperColumn($column.javaField))
+#if(!$useSuperColumns || !$table.isSuperColumn($column.javaField))
     /**
      * $column.columnComment
      */

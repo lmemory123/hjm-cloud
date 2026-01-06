@@ -26,6 +26,10 @@ import java.util.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class VelocityUtils {
 
+    private static final Set<String> BASE_ENTITY_FIELDS = Set.of(
+        "createDept", "createBy", "createTime", "updateBy", "updateTime");
+    private static final String TENANT_ID_FIELD = "tenantId";
+
     /**
      * 项目空间路径
      */
@@ -54,6 +58,8 @@ public class VelocityUtils {
         String functionName = genTable.getFunctionName();
 
         VelocityContext velocityContext = new VelocityContext();
+        boolean useTenantEntity = shouldUseTenantEntity(genTable);
+        boolean useBaseEntity = shouldUseBaseEntity(genTable, useTenantEntity);
         velocityContext.put("tplCategory", genTable.getTplCategory());
         velocityContext.put("tableName", genTable.getTableName());
         velocityContext.put("functionName", StringUtils.isNotEmpty(functionName) ? functionName : "【请填写功能名称】");
@@ -77,6 +83,8 @@ public class VelocityUtils {
         velocityContext.put("pkColumn", genTable.getPkColumn());
         velocityContext.put("columns", genTable.getColumns());
         velocityContext.put("table", genTable);
+        velocityContext.put("useTenantEntity", useTenantEntity);
+        velocityContext.put("useBaseEntity", useBaseEntity);
         velocityContext.put("StrUtil", new StrUtil());
         setMenuVelocityContext(velocityContext, genTable);
         if (GenConstants.TPL_TREE.equals(tplCategory)) {
@@ -224,13 +232,17 @@ public class VelocityUtils {
     public static HashSet<String> getImportList(GenTable genTable) {
         List<GenTableColumn> columns = genTable.getColumns();
         HashSet<String> importList = new HashSet<>();
+        boolean useTenantEntity = shouldUseTenantEntity(genTable);
+        boolean useBaseEntity = shouldUseBaseEntity(genTable, useTenantEntity);
+        boolean useSuperColumns = useTenantEntity || useBaseEntity;
         for (GenTableColumn column : columns) {
-            if (!column.isSuperColumn() && GenConstants.TYPE_DATE.equals(column.getJavaType())) {
+            boolean isSuperColumn = useSuperColumns && column.isSuperColumn();
+            if (!isSuperColumn && GenConstants.TYPE_DATE.equals(column.getJavaType())) {
                 importList.add("java.util.Date");
                 importList.add("com.fasterxml.jackson.annotation.JsonFormat");
-            } else if (!column.isSuperColumn() && GenConstants.TYPE_BIGDECIMAL.equals(column.getJavaType())) {
+            } else if (!isSuperColumn && GenConstants.TYPE_BIGDECIMAL.equals(column.getJavaType())) {
                 importList.add("java.math.BigDecimal");
-            } else if (!column.isSuperColumn() && "imageUpload".equals(column.getHtmlType())) {
+            } else if (!isSuperColumn && "imageUpload".equals(column.getHtmlType())) {
                 importList.add("org.dromara.common.translation.annotation.Translation");
                 importList.add("org.dromara.common.translation.constant.TransConstant");
             }
@@ -385,5 +397,45 @@ public class VelocityUtils {
             }
         }
         return num;
+    }
+
+    private static boolean shouldUseTenantEntity(GenTable genTable) {
+        return hasJavaField(genTable, TENANT_ID_FIELD) && hasAllJavaFields(genTable, BASE_ENTITY_FIELDS);
+    }
+
+    private static boolean shouldUseBaseEntity(GenTable genTable, boolean useTenantEntity) {
+        return !useTenantEntity && hasAllJavaFields(genTable, BASE_ENTITY_FIELDS);
+    }
+
+    private static boolean hasAllJavaFields(GenTable genTable, Set<String> fields) {
+        if (genTable == null || fields.isEmpty()) {
+            return false;
+        }
+        for (String field : fields) {
+            if (!hasJavaField(genTable, field)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean hasJavaField(GenTable genTable, String javaField) {
+        if (genTable == null || javaField == null) {
+            return false;
+        }
+        List<GenTableColumn> columns = genTable.getColumns();
+        if (columns == null || columns.isEmpty()) {
+            return false;
+        }
+        for (GenTableColumn column : columns) {
+            if (column == null) {
+                continue;
+            }
+            String field = column.getJavaField();
+            if (field != null && field.equalsIgnoreCase(javaField)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
