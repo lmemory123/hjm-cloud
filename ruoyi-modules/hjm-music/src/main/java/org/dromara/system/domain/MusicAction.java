@@ -1,25 +1,26 @@
 package org.dromara.system.domain;
 
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import com.mybatisflex.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.io.Serial;
 
 /**
  * 音乐互动动作对象 music_action
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table("music_action")
-public class MusicAction extends BaseEntity {
+public class MusicAction extends QueryBaseEntity {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+
 
     /**
      * 主键
@@ -38,14 +39,19 @@ public class MusicAction extends BaseEntity {
     private Long targetId;
 
     /**
-     * 目标类型: song/comment
+     * 目标类型
      */
     private String targetType;
 
     /**
-     * 动作: like/dislike
+     * 动作
      */
     private String action;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
 
 
 }

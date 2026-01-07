@@ -1,5 +1,7 @@
 package org.dromara.system.domain.vo;
 
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.dromara.system.domain.MusicStat;
 import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
 import cn.idev.excel.annotation.ExcelProperty;
@@ -18,7 +20,7 @@ import java.util.Date;
  * 音乐统计(高频读写)视图对象 music_stat
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @ExcelIgnoreUnannotated

@@ -1,24 +1,27 @@
 package org.dromara.system.domain.bo;
 
 import org.dromara.system.domain.MusicChartItem;
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * 榜单明细业务对象 music_chart_item
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = MusicChartItem.class, reverseConvertGenerate = false)
-public class MusicChartItemBo extends BaseEntity {
+public class MusicChartItemBo extends QueryBaseEntity {
 
     /**
      * 主键

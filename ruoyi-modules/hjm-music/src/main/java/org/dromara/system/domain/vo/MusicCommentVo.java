@@ -1,5 +1,7 @@
 package org.dromara.system.domain.vo;
 
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.dromara.system.domain.MusicComment;
 import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
 import cn.idev.excel.annotation.ExcelProperty;
@@ -18,7 +20,7 @@ import java.util.Date;
  * 音乐评论视图对象 music_comment
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @ExcelIgnoreUnannotated
@@ -53,15 +55,15 @@ public class MusicCommentVo implements Serializable {
     private String content;
 
     /**
-     * 顶级评论ID(0表示自身为顶级)
+     * 顶级评论ID
      */
-    @ExcelProperty(value = "顶级评论ID(0表示自身为顶级)")
+    @ExcelProperty(value = "顶级评论ID")
     private Long rootId;
 
     /**
-     * 父评论ID(0表示直接回复音乐)
+     * 父评论ID
      */
-    @ExcelProperty(value = "父评论ID(0表示直接回复音乐)")
+    @ExcelProperty(value = "父评论ID")
     private Long parentId;
 
 

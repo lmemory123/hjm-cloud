@@ -1,24 +1,27 @@
 package org.dromara.system.domain.bo;
 
 import org.dromara.system.domain.MusicComment;
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * 音乐评论业务对象 music_comment
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = MusicComment.class, reverseConvertGenerate = false)
-public class MusicCommentBo extends BaseEntity {
+public class MusicCommentBo extends QueryBaseEntity {
 
     /**
      * 主键
@@ -45,12 +48,12 @@ public class MusicCommentBo extends BaseEntity {
     private String content;
 
     /**
-     * 顶级评论ID(0表示自身为顶级)
+     * 顶级评论ID
      */
     private Long rootId;
 
     /**
-     * 父评论ID(0表示直接回复音乐)
+     * 父评论ID
      */
     private Long parentId;
 

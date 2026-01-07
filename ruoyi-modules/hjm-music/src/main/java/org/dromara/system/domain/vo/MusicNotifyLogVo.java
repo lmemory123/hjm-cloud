@@ -20,7 +20,7 @@ import java.util.Date;
  * 音乐通知日志视图对象 music_notify_log
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @ExcelIgnoreUnannotated
@@ -43,16 +43,15 @@ public class MusicNotifyLogVo implements Serializable {
     private Long musicId;
 
     /**
-     * 接收用户ID（UP主）
+     * 接收用户ID
      */
-    @ExcelProperty(value = "接收用户ID", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(readConverterExp = "U=P主")
+    @ExcelProperty(value = "接收用户ID")
     private Long userId;
 
     /**
-     * 通知类型: link_invalid/audit_result/resource_update
+     * 通知类型
      */
-    @ExcelProperty(value = "通知类型: link_invalid/audit_result/resource_update")
+    @ExcelProperty(value = "通知类型")
     private String notifyType;
 
     /**
@@ -68,15 +67,15 @@ public class MusicNotifyLogVo implements Serializable {
     private String notifyContent;
 
     /**
-     * 发送渠道: system/email/sms/wechat
+     * 发送渠道
      */
-    @ExcelProperty(value = "发送渠道: system/email/sms/wechat")
+    @ExcelProperty(value = "发送渠道")
     private String sendChannel;
 
     /**
-     * 发送状态: 0待发送 1已发送 2发送失败
+     * 发送状态
      */
-    @ExcelProperty(value = "发送状态: 0待发送 1已发送 2发送失败")
+    @ExcelProperty(value = "发送状态")
     private String sendStatus;
 
     /**
@@ -86,9 +85,9 @@ public class MusicNotifyLogVo implements Serializable {
     private Date sendTime;
 
     /**
-     * 阅读状态: 0未读 1已读
+     * 阅读状态
      */
-    @ExcelProperty(value = "阅读状态: 0未读 1已读")
+    @ExcelProperty(value = "阅读状态")
     private String readStatus;
 
     /**

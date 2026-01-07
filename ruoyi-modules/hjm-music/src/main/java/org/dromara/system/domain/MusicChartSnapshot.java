@@ -1,25 +1,26 @@
 package org.dromara.system.domain;
 
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import com.mybatisflex.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.io.Serial;
 
 /**
  * 榜单快照对象 music_chart_snapshot
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table("music_chart_snapshot")
-public class MusicChartSnapshot extends BaseEntity {
+public class MusicChartSnapshot extends QueryBaseEntity {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+
 
     /**
      * 主键
@@ -28,19 +29,39 @@ public class MusicChartSnapshot extends BaseEntity {
     private Long id;
 
     /**
-     * 榜单类型: week/month
+     * 榜单类型
      */
     private String chartType;
 
     /**
-     * 周期标识(如 2025-W04)
+     * 周期标识
      */
     private String periodKey;
 
     /**
-     * 状态: calculating/published
+     * 状态
      */
     private String status;
+
+    /**
+     * 创建者
+     */
+    private Long createBy;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 更新者
+     */
+    private Long updateBy;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
 
 
 }

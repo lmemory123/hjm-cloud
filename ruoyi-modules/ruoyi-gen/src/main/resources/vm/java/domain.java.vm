@@ -6,19 +6,16 @@ import org.dromara.common.tenant.core.TenantEntity;
 #elseif($useBaseEntity)
 import org.dromara.common.mybatisflex.core.domain.BaseEntity;
 #else
-import java.io.Serializable;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
 #end
 
 import com.mybatisflex.annotation.*;
 import lombok.Data;
-#if($useSuperColumns)
 import lombok.EqualsAndHashCode;
-#end
 #foreach ($import in $importList)
 import ${import};
 #end
 
-import java.io.Serial;
 
 /**
  * ${functionName}对象 ${tableName}
@@ -33,14 +30,11 @@ import java.io.Serial;
 #set($Entity="BaseEntity")
 #end
 @Data
-#if($useSuperColumns)
 @EqualsAndHashCode(callSuper = true)
-#end
 @Table("${tableName}")
-public class ${ClassName}#if($Entity != "") extends ${Entity} #else implements Serializable #end{
+public class ${ClassName}#if($Entity != "") extends ${Entity} #else extends QueryBaseEntity #end{
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+
 
 #foreach ($column in $columns)
 #if(!$useSuperColumns || !$table.isSuperColumn($column.javaField))

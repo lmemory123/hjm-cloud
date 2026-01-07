@@ -1,25 +1,26 @@
 package org.dromara.system.domain;
 
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import com.mybatisflex.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.io.Serial;
 
 /**
  * 标签字典对象 tag
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table("tag")
-public class Tag extends BaseEntity {
+public class Tag extends QueryBaseEntity {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+
 
     /**
      * 主键
@@ -33,27 +34,27 @@ public class Tag extends BaseEntity {
     private String name;
 
     /**
-     * 标签类型: style/mood/scene/language/instrument/era/theme
+     * 标签类型
      */
     private String type;
 
     /**
-     * 标签别名/同义词（逗号分隔）
+     * 标签别名
      */
     private String tagAlias;
 
     /**
-     * 父标签ID（支持层级）
+     * 父标签ID
      */
     private Long parentId;
 
     /**
-     * 标签图标URL
+     * 标签图标
      */
     private String iconUrl;
 
     /**
-     * 标签颜色(HEX)
+     * 标签颜色
      */
     private String color;
 
@@ -73,22 +74,42 @@ public class Tag extends BaseEntity {
     private Long sortOrder;
 
     /**
-     * 是否热门: 0否 1是
+     * 是否热门
      */
     private String isHot;
 
     /**
-     * 是否推荐: 0否 1是
+     * 是否推荐
      */
     private String isRecommend;
 
     /**
-     * 状态: 0禁用 1启用
+     * 状态
      */
     private String status;
 
     /**
-     * 删除标志: 0存在 1删除
+     * 创建者
+     */
+    private Long createBy;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 更新者
+     */
+    private Long updateBy;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
+
+    /**
+     * 删除标志
      */
     @Column(isLogicDelete = true)
     private String delFlag;

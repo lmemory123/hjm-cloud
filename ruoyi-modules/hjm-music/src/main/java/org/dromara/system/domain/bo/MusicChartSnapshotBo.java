@@ -1,24 +1,27 @@
 package org.dromara.system.domain.bo;
 
 import org.dromara.system.domain.MusicChartSnapshot;
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * 榜单快照业务对象 music_chart_snapshot
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = MusicChartSnapshot.class, reverseConvertGenerate = false)
-public class MusicChartSnapshotBo extends BaseEntity {
+public class MusicChartSnapshotBo extends QueryBaseEntity {
 
     /**
      * 主键
@@ -27,19 +30,19 @@ public class MusicChartSnapshotBo extends BaseEntity {
     private Long id;
 
     /**
-     * 榜单类型: week/month
+     * 榜单类型
      */
-    @NotBlank(message = "榜单类型: week/month不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "榜单类型不能为空", groups = { AddGroup.class, EditGroup.class })
     private String chartType;
 
     /**
-     * 周期标识(如 2025-W04)
+     * 周期标识
      */
-    @NotBlank(message = "周期标识(如 2025-W04)不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "周期标识不能为空", groups = { AddGroup.class, EditGroup.class })
     private String periodKey;
 
     /**
-     * 状态: calculating/published
+     * 状态
      */
     private String status;
 

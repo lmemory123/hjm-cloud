@@ -1,7 +1,8 @@
 package org.dromara.system.domain.bo;
 
 import org.dromara.system.domain.MusicLinkCheckLog;
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import io.github.linpeilie.annotations.AutoMapper;
@@ -15,12 +16,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * 链接检测日志业务对象 music_link_check_log
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = MusicLinkCheckLog.class, reverseConvertGenerate = false)
-public class MusicLinkCheckLogBo extends BaseEntity {
+public class MusicLinkCheckLogBo extends QueryBaseEntity {
 
     /**
      * 主键
@@ -35,9 +36,9 @@ public class MusicLinkCheckLogBo extends BaseEntity {
     private Long resourceId;
 
     /**
-     * 资源类型: audio/cover/original
+     * 资源类型
      */
-    @NotBlank(message = "资源类型: audio/cover/original不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "资源类型不能为空", groups = { AddGroup.class, EditGroup.class })
     private String resourceType;
 
     /**
@@ -52,9 +53,9 @@ public class MusicLinkCheckLogBo extends BaseEntity {
     private String checkUrl;
 
     /**
-     * 检测结果: 0正常 1失效 2超时 3异常
+     * 检测结果
      */
-    @NotBlank(message = "检测结果: 0正常 1失效 2超时 3异常不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "检测结果不能为空", groups = { AddGroup.class, EditGroup.class })
     private String checkResult;
 
     /**

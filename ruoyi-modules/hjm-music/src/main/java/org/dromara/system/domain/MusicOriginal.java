@@ -1,27 +1,26 @@
 package org.dromara.system.domain;
 
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import com.mybatisflex.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.io.Serial;
 
 /**
  * 音乐原曲关联对象 music_original
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table("music_original")
-public class MusicOriginal extends BaseEntity {
+public class MusicOriginal extends QueryBaseEntity {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+
 
     /**
      * 主键
@@ -30,7 +29,7 @@ public class MusicOriginal extends BaseEntity {
     private Long id;
 
     /**
-     * 关联的音乐ID
+     * 关联的音乐
      */
     private Long musicId;
 
@@ -55,12 +54,12 @@ public class MusicOriginal extends BaseEntity {
     private String originalLink;
 
     /**
-     * 来源平台: bilibili/netease/youtube/spotify/other
+     * 来源平台
      */
     private String sourceType;
 
     /**
-     * 关系类型: original/cover/remix/arrange/sample
+     * 关系类型
      */
     private String relationType;
 
@@ -70,7 +69,7 @@ public class MusicOriginal extends BaseEntity {
     private Long sortOrder;
 
     /**
-     * 链接状态: 0正常 1失效 2未检测
+     * 链接状态
      */
     private String linkStatus;
 
@@ -85,7 +84,27 @@ public class MusicOriginal extends BaseEntity {
     private String remark;
 
     /**
-     * 删除标志: 0存在 1删除
+     * 创建者
+     */
+    private Long createBy;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 更新者
+     */
+    private Long updateBy;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
+
+    /**
+     * 删除标志
      */
     @Column(isLogicDelete = true)
     private String delFlag;

@@ -20,7 +20,7 @@ import java.util.Date;
  * 音乐原曲关联视图对象 music_original
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @ExcelIgnoreUnannotated
@@ -37,9 +37,9 @@ public class MusicOriginalVo implements Serializable {
     private Long id;
 
     /**
-     * 关联的音乐ID
+     * 关联的音乐
      */
-    @ExcelProperty(value = "关联的音乐ID")
+    @ExcelProperty(value = "关联的音乐")
     private Long musicId;
 
     /**
@@ -67,15 +67,15 @@ public class MusicOriginalVo implements Serializable {
     private String originalLink;
 
     /**
-     * 来源平台: bilibili/netease/youtube/spotify/other
+     * 来源平台
      */
-    @ExcelProperty(value = "来源平台: bilibili/netease/youtube/spotify/other")
+    @ExcelProperty(value = "来源平台")
     private String sourceType;
 
     /**
-     * 关系类型: original/cover/remix/arrange/sample
+     * 关系类型
      */
-    @ExcelProperty(value = "关系类型: original/cover/remix/arrange/sample")
+    @ExcelProperty(value = "关系类型")
     private String relationType;
 
     /**
@@ -85,9 +85,9 @@ public class MusicOriginalVo implements Serializable {
     private Long sortOrder;
 
     /**
-     * 链接状态: 0正常 1失效 2未检测
+     * 链接状态
      */
-    @ExcelProperty(value = "链接状态: 0正常 1失效 2未检测")
+    @ExcelProperty(value = "链接状态")
     private String linkStatus;
 
     /**

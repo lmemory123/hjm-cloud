@@ -1,24 +1,27 @@
 package org.dromara.system.domain.bo;
 
 import org.dromara.system.domain.MusicCoinLedger;
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * 哈气金流水业务对象 music_coin_ledger
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = MusicCoinLedger.class, reverseConvertGenerate = false)
-public class MusicCoinLedgerBo extends BaseEntity {
+public class MusicCoinLedgerBo extends QueryBaseEntity {
 
     /**
      * 主键
@@ -33,15 +36,15 @@ public class MusicCoinLedgerBo extends BaseEntity {
     private Long userId;
 
     /**
-     * 变动金额(+/-)
+     * 变动金额
      */
-    @NotNull(message = "变动金额(+/-)不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotNull(message = "变动金额不能为空", groups = { AddGroup.class, EditGroup.class })
     private Long amount;
 
     /**
-     * 变动原因(upload_reward/system_grant)
+     * 变动原因
      */
-    @NotBlank(message = "变动原因(upload_reward/system_grant)不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "变动原因不能为空", groups = { AddGroup.class, EditGroup.class })
     private String reasonCode;
 
     /**
