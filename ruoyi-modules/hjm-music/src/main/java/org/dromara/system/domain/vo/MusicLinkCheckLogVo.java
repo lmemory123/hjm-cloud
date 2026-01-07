@@ -20,7 +20,7 @@ import java.util.Date;
  * 链接检测日志视图对象 music_link_check_log
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @ExcelIgnoreUnannotated
@@ -43,9 +43,9 @@ public class MusicLinkCheckLogVo implements Serializable {
     private Long resourceId;
 
     /**
-     * 资源类型: audio/cover/original
+     * 资源类型
      */
-    @ExcelProperty(value = "资源类型: audio/cover/original")
+    @ExcelProperty(value = "资源类型")
     private String resourceType;
 
     /**
@@ -61,9 +61,9 @@ public class MusicLinkCheckLogVo implements Serializable {
     private String checkUrl;
 
     /**
-     * 检测结果: 0正常 1失效 2超时 3异常
+     * 检测结果
      */
-    @ExcelProperty(value = "检测结果: 0正常 1失效 2超时 3异常")
+    @ExcelProperty(value = "检测结果")
     private String checkResult;
 
     /**

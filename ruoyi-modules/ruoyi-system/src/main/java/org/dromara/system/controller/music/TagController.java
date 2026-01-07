@@ -8,7 +8,7 @@ import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import org.dromara.system.domain.bo.TagBo;
 import org.dromara.system.domain.vo.TagVo;
-import org.dromara.system.service.ITagService;
+import org.dromara.system.service.music.ITagService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;

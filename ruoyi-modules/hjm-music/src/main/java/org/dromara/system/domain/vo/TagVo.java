@@ -1,12 +1,14 @@
 package org.dromara.system.domain.vo;
 
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.dromara.system.domain.Tag;
 import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
 import cn.idev.excel.annotation.ExcelProperty;
 import org.dromara.common.excel.annotation.ExcelDictFormat;
 import org.dromara.common.excel.convert.ExcelDictConvert;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
-import org.dromara.system.domain.Tag;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -18,7 +20,7 @@ import java.util.Date;
  * 标签字典视图对象 tag
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @ExcelIgnoreUnannotated
@@ -41,35 +43,33 @@ public class TagVo implements Serializable {
     private String name;
 
     /**
-     * 标签类型: style/mood/scene/language/instrument/era/theme
+     * 标签类型
      */
-    @ExcelProperty(value = "标签类型: style/mood/scene/language/instrument/era/theme")
+    @ExcelProperty(value = "标签类型")
     private String type;
 
     /**
-     * 标签别名/同义词（逗号分隔）
+     * 标签别名
      */
-    @ExcelProperty(value = "标签别名/同义词", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(readConverterExp = "逗=号分隔")
+    @ExcelProperty(value = "标签别名")
     private String tagAlias;
 
     /**
-     * 父标签ID（支持层级）
+     * 父标签ID
      */
-    @ExcelProperty(value = "父标签ID", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(readConverterExp = "支=持层级")
+    @ExcelProperty(value = "父标签ID")
     private Long parentId;
 
     /**
-     * 标签图标URL
+     * 标签图标
      */
-    @ExcelProperty(value = "标签图标URL")
+    @ExcelProperty(value = "标签图标")
     private String iconUrl;
 
     /**
-     * 标签颜色(HEX)
+     * 标签颜色
      */
-    @ExcelProperty(value = "标签颜色(HEX)")
+    @ExcelProperty(value = "标签颜色")
     private String color;
 
     /**
@@ -91,21 +91,23 @@ public class TagVo implements Serializable {
     private Long sortOrder;
 
     /**
-     * 是否热门: 0否 1是
+     * 是否热门
      */
-    @ExcelProperty(value = "是否热门: 0否 1是")
+    @ExcelProperty(value = "是否热门", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "sys_yes_no")
     private String isHot;
 
     /**
-     * 是否推荐: 0否 1是
+     * 是否推荐
      */
-    @ExcelProperty(value = "是否推荐: 0否 1是")
+    @ExcelProperty(value = "是否推荐", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(dictType = "sys_yes_no")
     private String isRecommend;
 
     /**
-     * 状态: 0禁用 1启用
+     * 状态
      */
-    @ExcelProperty(value = "状态: 0禁用 1启用")
+    @ExcelProperty(value = "状态")
     private String status;
 
 

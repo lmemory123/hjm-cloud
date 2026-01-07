@@ -1,24 +1,27 @@
 package org.dromara.system.domain.bo;
 
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.system.domain.Tag;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
-import org.dromara.system.domain.Tag;
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * 标签字典业务对象 tag
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = Tag.class, reverseConvertGenerate = false)
-public class TagBo extends BaseEntity {
+public class TagBo extends QueryBaseEntity {
 
     /**
      * 主键
@@ -33,27 +36,27 @@ public class TagBo extends BaseEntity {
     private String name;
 
     /**
-     * 标签类型: style/mood/scene/language/instrument/era/theme
+     * 标签类型
      */
     private String type;
 
     /**
-     * 标签别名/同义词（逗号分隔）
+     * 标签别名
      */
     private String tagAlias;
 
     /**
-     * 父标签ID（支持层级）
+     * 父标签ID
      */
     private Long parentId;
 
     /**
-     * 标签图标URL
+     * 标签图标
      */
     private String iconUrl;
 
     /**
-     * 标签颜色(HEX)
+     * 标签颜色
      */
     private String color;
 
@@ -73,17 +76,17 @@ public class TagBo extends BaseEntity {
     private Long sortOrder;
 
     /**
-     * 是否热门: 0否 1是
+     * 是否热门
      */
     private String isHot;
 
     /**
-     * 是否推荐: 0否 1是
+     * 是否推荐
      */
     private String isRecommend;
 
     /**
-     * 状态: 0禁用 1启用
+     * 状态
      */
     private String status;
 

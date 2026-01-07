@@ -1,5 +1,7 @@
 package org.dromara.system.domain.vo;
 
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.dromara.system.domain.MusicDraft;
 import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
 import cn.idev.excel.annotation.ExcelProperty;
@@ -18,7 +20,7 @@ import java.util.Date;
  * 投稿草稿视图对象 music_draft
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @ExcelIgnoreUnannotated
@@ -41,9 +43,9 @@ public class MusicDraftVo implements Serializable {
     private Long userId;
 
     /**
-     * 表单草稿(JSONB)
+     * 表单草稿
      */
-    @ExcelProperty(value = "表单草稿(JSONB)")
+    @ExcelProperty(value = "表单草稿")
     private String content;
 
 

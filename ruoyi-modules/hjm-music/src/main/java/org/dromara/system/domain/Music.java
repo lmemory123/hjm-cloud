@@ -1,30 +1,29 @@
 package org.dromara.system.domain;
 
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import com.mybatisflex.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.io.Serial;
 
 /**
  * 音乐曲库主对象 music
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table("music")
-public class Music extends BaseEntity {
+public class Music extends QueryBaseEntity {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+
 
     /**
-     * 主键ID (雪花算法)
+     * 主键ID
      */
     @Id
     private Long id;
@@ -40,27 +39,27 @@ public class Music extends BaseEntity {
     private String subtitle;
 
     /**
-     * 原曲名（冗余，方便搜索）
+     * 原曲名
      */
     private String originalTitle;
 
     /**
-     * UP主/创作者ID（关联用户表）
+     * UP主/创作者ID
      */
     private Long creatorId;
 
     /**
-     * 外部原作者名称 (如: ilem)
+     * 原作者名称
      */
     private String creatorName;
 
     /**
-     * 外部原作者主页链接
+     * 原作者主页链接
      */
     private String creatorLink;
 
     /**
-     * 全民制作人标签（JSON数组或逗号分隔）
+     * 全民制作人标签
      */
     private String producerMark;
 
@@ -110,42 +109,42 @@ public class Music extends BaseEntity {
     private Long downloadCount;
 
     /**
-     * 原曲关联信息快照(JSON数组)
+     * 原曲关联信息快照
      */
     private String originalData;
 
     /**
-     * 资源展示快照(JSON对象): 封面和音频的最佳链接
+     * 资源展示快照
      */
     private String resourceData;
 
     /**
-     * 标签展示快照(JSON数组): 标签名和颜色
+     * 标签展示快照
      */
     private String tagsSnapshot;
 
     /**
-     * 扩展字段(JSON对象): 歌词、备注、PV链接等
+     * 扩展字段
      */
     private String extendData;
 
     /**
-     * 审核状态: 0待审 1通过 2拒绝 3下架
+     * 审核状态
      */
     private String auditStatus;
 
     /**
-     * 是否公开: 0否 1是
+     * 是否公开
      */
     private String isPublic;
 
     /**
-     * 是否原创: 0否 1是
+     * 是否原创
      */
     private String isOriginal;
 
     /**
-     * 资源状态: 0正常 1部分失效 2全部失效
+     * 资源状态
      */
     private String resourceStatus;
 
@@ -158,6 +157,26 @@ public class Music extends BaseEntity {
      * 备注
      */
     private String remark;
+
+    /**
+     * 创建人ID
+     */
+    private Long createBy;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 更新人ID
+     */
+    private Long updateBy;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
 
     /**
      * 删除标志: 0存在 1删除

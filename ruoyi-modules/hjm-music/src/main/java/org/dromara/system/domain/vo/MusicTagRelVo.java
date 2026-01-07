@@ -1,5 +1,7 @@
 package org.dromara.system.domain.vo;
 
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.dromara.system.domain.MusicTagRel;
 import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
 import cn.idev.excel.annotation.ExcelProperty;
@@ -18,7 +20,7 @@ import java.util.Date;
  * 音乐标签关联视图对象 music_tag_rel
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @ExcelIgnoreUnannotated
@@ -47,22 +49,21 @@ public class MusicTagRelVo implements Serializable {
     private Long tagId;
 
     /**
-     * 标签权重（0-100）
+     * 标签权重
      */
-    @ExcelProperty(value = "标签权重", converter = ExcelDictConvert.class)
-    @ExcelDictFormat(readConverterExp = "0=-100")
+    @ExcelProperty(value = "标签权重")
     private Long tagWeight;
 
     /**
-     * 是否主标签: 0否 1是
+     * 是否主标签
      */
-    @ExcelProperty(value = "是否主标签: 0否 1是")
+    @ExcelProperty(value = "是否主标签")
     private String isPrimary;
 
     /**
-     * 标签来源: manual/auto/user
+     * 标签来源
      */
-    @ExcelProperty(value = "标签来源: manual/auto/user")
+    @ExcelProperty(value = "标签来源")
     private String source;
 
 

@@ -1,24 +1,27 @@
 package org.dromara.system.domain.bo;
 
 import org.dromara.system.domain.MusicAction;
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * 音乐互动动作业务对象 music_action
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = MusicAction.class, reverseConvertGenerate = false)
-public class MusicActionBo extends BaseEntity {
+public class MusicActionBo extends QueryBaseEntity {
 
     /**
      * 主键
@@ -39,15 +42,15 @@ public class MusicActionBo extends BaseEntity {
     private Long targetId;
 
     /**
-     * 目标类型: song/comment
+     * 目标类型
      */
-    @NotBlank(message = "目标类型: song/comment不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "目标类型不能为空", groups = { AddGroup.class, EditGroup.class })
     private String targetType;
 
     /**
-     * 动作: like/dislike
+     * 动作
      */
-    @NotBlank(message = "动作: like/dislike不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "动作不能为空", groups = { AddGroup.class, EditGroup.class })
     private String action;
 
 

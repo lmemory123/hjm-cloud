@@ -1,27 +1,26 @@
 package org.dromara.system.domain;
 
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import com.mybatisflex.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.io.Serial;
 
 /**
  * 音乐资源文件对象 music_resource
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table("music_resource")
-public class MusicResource extends BaseEntity {
+public class MusicResource extends QueryBaseEntity {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+
 
     /**
      * 主键ID
@@ -30,42 +29,42 @@ public class MusicResource extends BaseEntity {
     private Long id;
 
     /**
-     * 关联音乐ID
+     * 关联音乐
      */
     private Long musicId;
 
     /**
-     * 资源类型: audio(音频)/cover(封面)
+     * 资源类型
      */
     private String resType;
 
     /**
-     * 质量等级: audio(128k/320k/flac) cover(200/600/1200)
+     * 质量等级
      */
     private String qualityTier;
 
     /**
-     * 来源类型: local/bilibili/netease/soundcloud/youtube
+     * 来源类型
      */
     private String sourceType;
 
     /**
-     * 原始来源地址（外链）
+     * 原始来源
      */
     private String sourceUrl;
 
     /**
-     * 来源平台资源ID（如BV号）
+     * 来源平台资源
      */
     private String sourceId;
 
     /**
-     * 资源实际链接 (OSS或外链)
+     * 资源实际链接
      */
     private String url;
 
     /**
-     * 处理后文件路径（本地/OSS）
+     * 处理后文件路径
      */
     private String filePath;
 
@@ -75,22 +74,22 @@ public class MusicResource extends BaseEntity {
     private String fileName;
 
     /**
-     * 文件格式: mp3/flac/webp/jpeg/png
+     * 文件格式
      */
     private String fileFormat;
 
     /**
-     * 文件大小（字节）
+     * 文件大小
      */
     private Long fileSize;
 
     /**
-     * 文件哈希（去重用）
+     * 文件哈希
      */
     private String fileHash;
 
     /**
-     * 规格信息(JSON): 音频{"bitrate":"320k"} 图片{"width":1200}
+     * 规格信息
      */
     private String specInfo;
 
@@ -105,17 +104,17 @@ public class MusicResource extends BaseEntity {
     private Long accessCount;
 
     /**
-     * 是否主版本: 0否 1是
+     * 是否主版本
      */
     private String isPrimary;
 
     /**
-     * 资源状态: 0正常 1失效 2需补档 3处理中
+     * 资源状态
      */
     private String status;
 
     /**
-     * 处理状态: 0待处理 1处理中 2已完成 3失败
+     * 处理状态
      */
     private String processStatus;
 
@@ -145,7 +144,27 @@ public class MusicResource extends BaseEntity {
     private Long sortOrder;
 
     /**
-     * 删除标志: 0存在 1删除
+     * 创建者
+     */
+    private Long createBy;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 更新者
+     */
+    private Long updateBy;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
+
+    /**
+     * 删除标志
      */
     @Column(isLogicDelete = true)
     private String delFlag;
