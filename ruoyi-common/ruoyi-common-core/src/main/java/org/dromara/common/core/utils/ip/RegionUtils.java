@@ -65,7 +65,7 @@ public class RegionUtils {
                 log.warn("未加载 IPv6 地址库：未在类路径下找到文件 {}。当前仅启用 IPv4 查询。如需启用 IPv6，请将 ip2region_v6.xdb 放置到 resources 目录", DEFAULT_IPV6_XDB_PATH);
             } else {
                 // 创建临时文件
-                File v6TempXdb = FileUtil.writeFromStream(ResourceUtil.getStream(DEFAULT_IPV4_XDB_PATH), FileUtil.createTempFile());
+                File v6TempXdb = FileUtil.writeFromStream(ResourceUtil.getStream(DEFAULT_IPV6_XDB_PATH), FileUtil.createTempFile());
 
                 v6Config = Config.custom()
                         .setCachePolicy(Config.BufferCache)

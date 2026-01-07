@@ -7,16 +7,14 @@ import org.dromara.common.tenant.core.TenantEntity;
 #elseif($useBaseEntity)
 import org.dromara.common.mybatisflex.core.domain.BaseEntity;
 #else
-import java.io.Serializable;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
 #end
 
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
-#if($useSuperColumns)
 import lombok.EqualsAndHashCode;
-#end
 import jakarta.validation.constraints.*;
 #foreach ($import in $importList)
 import ${import};
@@ -35,14 +33,9 @@ import ${import};
 #elseif($useBaseEntity)
 #set($Entity="BaseEntity")
 #end
-#if($useSuperColumns)
 @EqualsAndHashCode(callSuper = true)
-#end
 @AutoMapper(target = ${ClassName}.class, reverseConvertGenerate = false)
-public class ${ClassName}Bo#if($Entity != "") extends ${Entity} #else implements Serializable #end{
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class ${ClassName}Bo#if($Entity != "") extends ${Entity} #else extends QueryBaseEntity #end{
 
 #foreach ($column in $columns)
 #if((!$useSuperColumns || !$table.isSuperColumn($column.javaField)) && ($column.query || $column.insert || $column.edit))

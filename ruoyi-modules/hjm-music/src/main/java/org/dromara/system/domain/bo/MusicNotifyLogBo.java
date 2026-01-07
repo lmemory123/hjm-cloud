@@ -1,7 +1,8 @@
 package org.dromara.system.domain.bo;
 
 import org.dromara.system.domain.MusicNotifyLog;
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import io.github.linpeilie.annotations.AutoMapper;
@@ -15,12 +16,12 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * 音乐通知日志业务对象 music_notify_log
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = MusicNotifyLog.class, reverseConvertGenerate = false)
-public class MusicNotifyLogBo extends BaseEntity {
+public class MusicNotifyLogBo extends QueryBaseEntity {
 
     /**
      * 主键
@@ -35,15 +36,15 @@ public class MusicNotifyLogBo extends BaseEntity {
     private Long musicId;
 
     /**
-     * 接收用户ID（UP主）
+     * 接收用户ID
      */
-    @NotNull(message = "接收用户ID（UP主）不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotNull(message = "接收用户ID不能为空", groups = { AddGroup.class, EditGroup.class })
     private Long userId;
 
     /**
-     * 通知类型: link_invalid/audit_result/resource_update
+     * 通知类型
      */
-    @NotBlank(message = "通知类型: link_invalid/audit_result/resource_update不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "通知类型不能为空", groups = { AddGroup.class, EditGroup.class })
     private String notifyType;
 
     /**
@@ -58,12 +59,12 @@ public class MusicNotifyLogBo extends BaseEntity {
     private String notifyContent;
 
     /**
-     * 发送渠道: system/email/sms/wechat
+     * 发送渠道
      */
     private String sendChannel;
 
     /**
-     * 发送状态: 0待发送 1已发送 2发送失败
+     * 发送状态
      */
     private String sendStatus;
 
@@ -73,7 +74,7 @@ public class MusicNotifyLogBo extends BaseEntity {
     private Date sendTime;
 
     /**
-     * 阅读状态: 0未读 1已读
+     * 阅读状态
      */
     private String readStatus;
 

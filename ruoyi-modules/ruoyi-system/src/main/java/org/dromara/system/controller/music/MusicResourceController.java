@@ -19,7 +19,7 @@ import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.excel.utils.ExcelUtil;
 import org.dromara.system.domain.vo.MusicResourceVo;
 import org.dromara.system.domain.bo.MusicResourceBo;
-import org.dromara.system.service.IMusicResourceService;
+import org.dromara.system.service.music.IMusicResourceService;
 import org.dromara.common.mybatisflex.core.page.TableDataInfo;
 
 /**

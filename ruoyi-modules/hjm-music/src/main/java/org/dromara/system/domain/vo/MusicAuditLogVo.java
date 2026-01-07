@@ -1,5 +1,7 @@
 package org.dromara.system.domain.vo;
 
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.dromara.system.domain.MusicAuditLog;
 import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
 import cn.idev.excel.annotation.ExcelProperty;
@@ -18,7 +20,7 @@ import java.util.Date;
  * 音乐审核流水日志视图对象 music_audit_log
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @ExcelIgnoreUnannotated
@@ -41,15 +43,15 @@ public class MusicAuditLogVo implements Serializable {
     private Long musicId;
 
     /**
-     * 目标类型: music/comment
+     * 目标类型
      */
-    @ExcelProperty(value = "目标类型: music/comment")
+    @ExcelProperty(value = "目标类型")
     private String targetType;
 
     /**
-     * 审核动作: 1通过 2拒绝 3下架
+     * 审核动作
      */
-    @ExcelProperty(value = "审核动作: 1通过 2拒绝 3下架")
+    @ExcelProperty(value = "审核动作")
     private Long action;
 
     /**
@@ -71,15 +73,15 @@ public class MusicAuditLogVo implements Serializable {
     private String reason;
 
     /**
-     * 下架/审核快照(JSONB)
+     * 下架/审核快照
      */
-    @ExcelProperty(value = "下架/审核快照(JSONB)")
+    @ExcelProperty(value = "下架/审核快照")
     private String snapshot;
 
     /**
-     * 操作人ID (后台管理员ID)
+     * 操作人ID
      */
-    @ExcelProperty(value = "操作人ID (后台管理员ID)")
+    @ExcelProperty(value = "操作人ID")
     private Long operatorId;
 
 

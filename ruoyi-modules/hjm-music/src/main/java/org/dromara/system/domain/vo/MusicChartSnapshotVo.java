@@ -1,5 +1,7 @@
 package org.dromara.system.domain.vo;
 
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.dromara.system.domain.MusicChartSnapshot;
 import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
 import cn.idev.excel.annotation.ExcelProperty;
@@ -18,7 +20,7 @@ import java.util.Date;
  * 榜单快照视图对象 music_chart_snapshot
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @ExcelIgnoreUnannotated
@@ -35,21 +37,21 @@ public class MusicChartSnapshotVo implements Serializable {
     private Long id;
 
     /**
-     * 榜单类型: week/month
+     * 榜单类型
      */
-    @ExcelProperty(value = "榜单类型: week/month")
+    @ExcelProperty(value = "榜单类型")
     private String chartType;
 
     /**
-     * 周期标识(如 2025-W04)
+     * 周期标识
      */
-    @ExcelProperty(value = "周期标识(如 2025-W04)")
+    @ExcelProperty(value = "周期标识")
     private String periodKey;
 
     /**
-     * 状态: calculating/published
+     * 状态
      */
-    @ExcelProperty(value = "状态: calculating/published")
+    @ExcelProperty(value = "状态")
     private String status;
 
 

@@ -1,7 +1,8 @@
 package org.dromara.system.domain.bo;
 
 import org.dromara.system.domain.Music;
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import org.dromara.common.core.validate.AddGroup;
 import org.dromara.common.core.validate.EditGroup;
 import io.github.linpeilie.annotations.AutoMapper;
@@ -15,17 +16,17 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * 音乐曲库主业务对象 music
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = Music.class, reverseConvertGenerate = false)
-public class MusicBo extends BaseEntity {
+public class MusicBo extends QueryBaseEntity {
 
     /**
-     * 主键ID (雪花算法)
+     * 主键ID
      */
-    @NotNull(message = "主键ID (雪花算法)不能为空", groups = { EditGroup.class })
+    @NotNull(message = "主键ID不能为空", groups = { EditGroup.class })
     private Long id;
 
     /**
@@ -40,28 +41,28 @@ public class MusicBo extends BaseEntity {
     private String subtitle;
 
     /**
-     * 原曲名（冗余，方便搜索）
+     * 原曲名
      */
     private String originalTitle;
 
     /**
-     * UP主/创作者ID（关联用户表）
+     * UP主/创作者ID
      */
     private Long creatorId;
 
     /**
-     * 外部原作者名称 (如: ilem)
+     * 原作者名称
      */
-    @NotBlank(message = "外部原作者名称 (如: ilem)不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "原作者名称不能为空", groups = { AddGroup.class, EditGroup.class })
     private String creatorName;
 
     /**
-     * 外部原作者主页链接
+     * 原作者主页链接
      */
     private String creatorLink;
 
     /**
-     * 全民制作人标签（JSON数组或逗号分隔）
+     * 全民制作人标签
      */
     private String producerMark;
 
@@ -111,42 +112,42 @@ public class MusicBo extends BaseEntity {
     private Long downloadCount;
 
     /**
-     * 原曲关联信息快照(JSON数组)
+     * 原曲关联信息快照
      */
     private String originalData;
 
     /**
-     * 资源展示快照(JSON对象): 封面和音频的最佳链接
+     * 资源展示快照
      */
     private String resourceData;
 
     /**
-     * 标签展示快照(JSON数组): 标签名和颜色
+     * 标签展示快照
      */
     private String tagsSnapshot;
 
     /**
-     * 扩展字段(JSON对象): 歌词、备注、PV链接等
+     * 扩展字段
      */
     private String extendData;
 
     /**
-     * 审核状态: 0待审 1通过 2拒绝 3下架
+     * 审核状态
      */
     private String auditStatus;
 
     /**
-     * 是否公开: 0否 1是
+     * 是否公开
      */
     private String isPublic;
 
     /**
-     * 是否原创: 0否 1是
+     * 是否原创
      */
     private String isOriginal;
 
     /**
-     * 资源状态: 0正常 1部分失效 2全部失效
+     * 资源状态
      */
     private String resourceStatus;
 

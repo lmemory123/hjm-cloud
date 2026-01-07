@@ -1,25 +1,26 @@
 package org.dromara.system.domain;
 
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import com.mybatisflex.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.io.Serial;
 
 /**
  * 音乐标签关联对象 music_tag_rel
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table("music_tag_rel")
-public class MusicTagRel extends BaseEntity {
+public class MusicTagRel extends QueryBaseEntity {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+
 
     /**
      * 主键
@@ -38,19 +39,29 @@ public class MusicTagRel extends BaseEntity {
     private Long tagId;
 
     /**
-     * 标签权重（0-100）
+     * 标签权重
      */
     private Long tagWeight;
 
     /**
-     * 是否主标签: 0否 1是
+     * 是否主标签
      */
     private String isPrimary;
 
     /**
-     * 标签来源: manual/auto/user
+     * 标签来源
      */
     private String source;
+
+    /**
+     * 创建者
+     */
+    private Long createBy;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
 
 
 }

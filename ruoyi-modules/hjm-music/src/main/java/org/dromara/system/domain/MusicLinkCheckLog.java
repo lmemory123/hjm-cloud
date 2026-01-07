@@ -1,27 +1,26 @@
 package org.dromara.system.domain;
 
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import com.mybatisflex.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.io.Serial;
 
 /**
  * 链接检测日志对象 music_link_check_log
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table("music_link_check_log")
-public class MusicLinkCheckLog extends BaseEntity {
+public class MusicLinkCheckLog extends QueryBaseEntity {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+
 
     /**
      * 主键
@@ -35,7 +34,7 @@ public class MusicLinkCheckLog extends BaseEntity {
     private Long resourceId;
 
     /**
-     * 资源类型: audio/cover/original
+     * 资源类型
      */
     private String resourceType;
 
@@ -50,7 +49,7 @@ public class MusicLinkCheckLog extends BaseEntity {
     private String checkUrl;
 
     /**
-     * 检测结果: 0正常 1失效 2超时 3异常
+     * 检测结果
      */
     private String checkResult;
 

@@ -1,25 +1,26 @@
 package org.dromara.system.domain;
 
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import com.mybatisflex.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.io.Serial;
 
 /**
  * 音乐统计(高频读写)对象 music_stat
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table("music_stat")
-public class MusicStat extends BaseEntity {
+public class MusicStat extends QueryBaseEntity {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+
 
     /**
      * 音乐ID
@@ -61,6 +62,16 @@ public class MusicStat extends BaseEntity {
      * 综合热度分
      */
     private Long score;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
 
 
 }

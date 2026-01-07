@@ -1,25 +1,26 @@
 package org.dromara.system.domain;
 
-import org.dromara.common.mybatisflex.core.domain.BaseEntity;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import com.mybatisflex.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.io.Serial;
 
 /**
  * 音乐评论对象 music_comment
  *
  * @author momao
- * @date 2025-12-30
+ * @date 2026-01-07
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table("music_comment")
-public class MusicComment extends BaseEntity {
+public class MusicComment extends QueryBaseEntity {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+
 
     /**
      * 主键
@@ -43,17 +44,37 @@ public class MusicComment extends BaseEntity {
     private String content;
 
     /**
-     * 顶级评论ID(0表示自身为顶级)
+     * 顶级评论ID
      */
     private Long rootId;
 
     /**
-     * 父评论ID(0表示直接回复音乐)
+     * 父评论ID
      */
     private Long parentId;
 
     /**
-     * 删除标志: 0存在 1删除
+     * 创建者
+     */
+    private Long createBy;
+
+    /**
+     * 创建时间
+     */
+    private Date createTime;
+
+    /**
+     * 更新者
+     */
+    private Long updateBy;
+
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
+
+    /**
+     * 删除标志
      */
     @Column(isLogicDelete = true)
     private String delFlag;
