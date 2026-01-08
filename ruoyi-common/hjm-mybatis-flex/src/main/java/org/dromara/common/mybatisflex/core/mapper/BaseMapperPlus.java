@@ -116,13 +116,9 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
         if (CollUtil.isEmpty(entityList)) {
             return false;
         }
-        int index = 0;
         for (T entity : entityList) {
             this.insertOrUpdate(entity);
-            index++;
-            if (batchSize > 0 && index % batchSize == 0) {
-                // BaseMapper 内部已处理批处理会话，无需额外操作
-            }
+            // BaseMapper 内部已处理批处理会话，无需额外操作
         }
         return true;
     }
@@ -236,11 +232,7 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
      */
     default <C> C selectVoOne(QueryWrapper wrapper, Class<C> voClass) {
         QueryWrapper queryWrapper = ObjectUtil.isNull(wrapper) ? QueryWrapper.create() : wrapper;
-        T obj = this.selectOneByQuery(queryWrapper);
-        if (ObjectUtil.isNull(obj)) {
-            return null;
-        }
-        return MapstructUtils.convert(obj, voClass);
+        return this.selectOneByQueryAs(queryWrapper,voClass);
     }
 
     /**
@@ -285,11 +277,8 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
      */
     default <C> List<C> selectVoList(QueryWrapper wrapper, Class<C> voClass) {
         QueryWrapper queryWrapper = ObjectUtil.isNull(wrapper) ? QueryWrapper.create() : wrapper;
-        List<T> list = this.selectListByQuery(queryWrapper);
-        if (CollUtil.isEmpty(list)) {
-            return CollUtil.newArrayList();
-        }
-        return MapstructUtils.convert(list, voClass);
+        List<C> list = this.selectListByQueryAs(queryWrapper,voClass);
+        return list;
     }
 
     /**
