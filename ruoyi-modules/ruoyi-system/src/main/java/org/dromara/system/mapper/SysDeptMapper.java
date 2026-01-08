@@ -12,6 +12,8 @@ import org.dromara.system.domain.vo.SysDeptVo;
 
 import java.util.List;
 
+import static org.dromara.system.domain.table.SysDeptTableDef.SYS_DEPT;
+
 /**
  * 部门管理 数据层
  *
@@ -67,7 +69,7 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDept, SysDeptVo> {
      */
     default List<SysDept> selectListByParentId(Long parentId) {
         return this.selectListByQuery(QueryWrapper.create()
-            .select(SysDept::getDeptId)
+            .select(SYS_DEPT.DEPT_ID)
             .where(DataBaseHelper.findInSet(parentId, "ancestors")));
     }
 
@@ -98,10 +100,10 @@ public interface SysDeptMapper extends BaseMapperPlus<SysDept, SysDeptVo> {
             .leftJoin("sys_role sr").on("sr.role_id = srd.role_id")
             .where("srd.role_id = ? and sr.status = '0'", roleId);
         QueryWrapper wrapper = QueryWrapper.create()
-            .select(SysDept::getDeptId)
-            .in(SysDept::getDeptId, roleDeptIds)
-            .orderBy(SysDept::getParentId, true)
-            .orderBy(SysDept::getOrderNum, true);
+            .select(SYS_DEPT.DEPT_ID)
+            .where(SYS_DEPT.DEPT_ID.in(roleDeptIds))
+            .orderBy(SYS_DEPT.PARENT_ID.asc())
+            .orderBy(SYS_DEPT.ORDER_NUM.asc());
         if (deptCheckStrictly) {
             QueryWrapper parentDeptIds = QueryWrapper.create()
                 .select("parent_id")

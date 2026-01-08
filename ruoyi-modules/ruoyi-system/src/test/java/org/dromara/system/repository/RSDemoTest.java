@@ -28,7 +28,7 @@ public class RSDemoTest {
     @Test
     void testOne(){
 
-        List<SysUser> sysUsers = sysUserService.selectList();
+        List<SysUser> sysUsers = sysUserService.selectAll();
         System.out.println(sysUsers.size());
 
 

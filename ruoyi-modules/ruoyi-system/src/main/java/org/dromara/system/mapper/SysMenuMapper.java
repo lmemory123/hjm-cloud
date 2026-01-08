@@ -12,6 +12,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.dromara.system.domain.table.SysMenuTableDef.SYS_MENU;
+import static org.dromara.system.domain.table.SysRoleMenuTableDef.SYS_ROLE_MENU;
+import static org.dromara.system.domain.table.SysRoleTableDef.SYS_ROLE;
+import static org.dromara.system.domain.table.SysUserRoleTableDef.SYS_USER_ROLE;
+
 /**
  * 菜单表 数据层
  *
@@ -27,18 +32,19 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo> {
      */
     default Set<String> selectMenuPermsByUserId(Long userId) {
         QueryWrapper roleIds = QueryWrapper.create()
-            .select("sur.role_id")
-            .from("sys_user_role sur")
-            .leftJoin("sys_role sr").on("sr.role_id = sur.role_id")
-            .where("sur.user_id = ? and sr.status = '0'", userId);
+                .select(SYS_USER_ROLE.ROLE_ID)
+                .from(SYS_USER_ROLE)
+                .leftJoin(SYS_ROLE).on(SYS_ROLE.ROLE_ID.eq(SYS_USER_ROLE.ROLE_ID))
+                .where(SYS_USER_ROLE.USER_ID.eq(userId).and(SYS_ROLE.STATUS.eq("0")));
         QueryWrapper menuIds = QueryWrapper.create()
-            .select("menu_id")
-            .from("sys_role_menu")
-            .in("role_id", roleIds);
-        List<String> list = this.selectObjs(QueryWrapper.create()
-            .select(SysMenu::getPerms)
-            .in(SysMenu::getMenuId, menuIds)
-            .isNotNull(SysMenu::getPerms), obj -> (String) obj);
+                .select(SYS_ROLE_MENU.MENU_ID)
+                .from(SYS_ROLE_MENU)
+                .where(SYS_ROLE_MENU.ROLE_ID.in(roleIds));
+        List<String> list = this.selectListByQueryAs(QueryWrapper.create()
+                .select(SYS_MENU.PERMS)
+                .where(SYS_MENU.MENU_ID.in(menuIds)
+                        .and(SYS_MENU.PERMS.isNotNull())
+                ), String.class);
         return new HashSet<>(StreamUtils.filter(list, StringUtils::isNotBlank));
     }
 
@@ -50,14 +56,15 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo> {
      */
     default Set<String> selectMenuPermsByRoleId(Long roleId) {
         QueryWrapper menuIds = QueryWrapper.create()
-            .select("srm.menu_id")
-            .from("sys_role_menu srm")
-            .leftJoin("sys_role sr").on("sr.role_id = srm.role_id")
-            .where("srm.role_id = ? and sr.status = '0'", roleId);
-        List<String> list = this.selectObjs(QueryWrapper.create()
-            .select(SysMenu::getPerms)
-            .in(SysMenu::getMenuId, menuIds)
-            .isNotNull(SysMenu::getPerms), obj -> (String) obj);
+                .select(SYS_ROLE_MENU.MENU_ID)
+                .from(SYS_ROLE_MENU)
+                .leftJoin(SYS_ROLE).on(SYS_ROLE.ROLE_ID.eq(SYS_ROLE_MENU.ROLE_ID))
+                .where(SYS_ROLE_MENU.ROLE_ID.eq(roleId).and(SYS_ROLE.STATUS.eq("0")));
+        List<String> list = this.selectListByQueryAs(QueryWrapper.create()
+                .select(SYS_MENU.PERMS)
+                .where(SYS_MENU.MENU_ID.in(menuIds)
+                        .and(SYS_MENU.PERMS.isNotNull())
+                ), String.class);
         return new HashSet<>(StreamUtils.filter(list, StringUtils::isNotBlank));
     }
 
@@ -68,10 +75,11 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo> {
      */
     default List<SysMenu> selectMenuTreeAll() {
         QueryWrapper queryWrapper = QueryWrapper.create()
-            .in(SysMenu::getMenuType, SystemConstants.TYPE_DIR, SystemConstants.TYPE_MENU)
-            .eq(SysMenu::getStatus, SystemConstants.NORMAL)
-            .orderBy(SysMenu::getParentId, true)
-            .orderBy(SysMenu::getOrderNum, true);
+                .where(SYS_MENU.MENU_TYPE.in(SystemConstants.TYPE_DIR, SystemConstants.TYPE_MENU)
+                        .and(SYS_MENU.STATUS.eq(SystemConstants.NORMAL))
+                )
+                .orderBy(SYS_MENU.PARENT_ID.asc())
+                .orderBy(SYS_MENU.ORDER_NUM.asc());
         return this.selectListByQuery(queryWrapper);
     }
 
@@ -84,23 +92,22 @@ public interface SysMenuMapper extends BaseMapperPlus<SysMenu, SysMenuVo> {
      */
     default List<Long> selectMenuListByRoleId(Long roleId, boolean menuCheckStrictly) {
         QueryWrapper menuIds = QueryWrapper.create()
-            .select("srm.menu_id")
-            .from("sys_role_menu srm")
-            .leftJoin("sys_role sr").on("sr.role_id = srm.role_id")
-            .where("srm.role_id = ? and sr.status = '0'", roleId);
+                .select(SYS_ROLE_MENU.MENU_ID)
+                .from(SYS_ROLE_MENU)
+                .leftJoin(SYS_ROLE).on(SYS_ROLE.ROLE_ID.eq(SYS_ROLE_MENU.ROLE_ID))
+                .where(SYS_ROLE_MENU.ROLE_ID.eq(roleId).and(SYS_ROLE.STATUS.eq("0")));
         QueryWrapper wrapper = QueryWrapper.create()
-            .select(SysMenu::getMenuId)
-            .in(SysMenu::getMenuId, menuIds)
-            .orderBy(SysMenu::getParentId, true)
-            .orderBy(SysMenu::getOrderNum, true);
+                .select(SYS_MENU.MENU_ID)
+                .where(SYS_MENU.MENU_ID.in(menuIds))
+                .orderBy(SYS_MENU.PARENT_ID.asc())
+                .orderBy(SYS_MENU.ORDER_NUM.asc());
         if (menuCheckStrictly) {
             QueryWrapper parentIds = QueryWrapper.create()
-                .select("parent_id")
-                .from("sys_menu")
-                .in("menu_id", menuIds);
-            wrapper.notIn(SysMenu::getMenuId, parentIds);
+                    .select(SYS_MENU.PARENT_ID)
+                    .where(SYS_MENU.MENU_ID.in(menuIds));
+            wrapper.and(SYS_MENU.MENU_ID.notIn(parentIds));
         }
-        return this.selectObjs(wrapper, obj -> (Long) obj);
+        return this.selectListByQueryAs(wrapper, Long.class);
     }
 
 }

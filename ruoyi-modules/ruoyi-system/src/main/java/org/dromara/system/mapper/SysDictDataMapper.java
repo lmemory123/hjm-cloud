@@ -7,6 +7,8 @@ import org.dromara.system.domain.vo.SysDictDataVo;
 
 import java.util.List;
 
+import static org.dromara.system.domain.table.SysDictDataTableDef.SYS_DICT_DATA;
+
 /**
  * 字典表 数据层
  *
@@ -16,7 +18,7 @@ public interface SysDictDataMapper extends BaseMapperPlus<SysDictData, SysDictDa
 
     default List<SysDictDataVo> selectDictDataByType(String dictType) {
         return selectVoList(QueryWrapper.create()
-            .eq(SysDictData::getDictType, dictType)
-            .orderBy(SysDictData::getDictSort, true));
+                .where(SYS_DICT_DATA.DICT_TYPE.eq(dictType))
+                .orderBy(SYS_DICT_DATA.DICT_SORT.asc()));
     }
 }
