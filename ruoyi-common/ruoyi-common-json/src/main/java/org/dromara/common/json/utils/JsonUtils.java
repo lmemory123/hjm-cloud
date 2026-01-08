@@ -10,8 +10,8 @@ import org.dromara.common.core.utils.StringUtils;
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.exc.MismatchedInputException;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +24,9 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class JsonUtils {
 
-    private static final ObjectMapper OBJECT_MAPPER = SpringUtils.getBean(ObjectMapper.class);
+    private static final JsonMapper OBJECT_MAPPER = SpringUtils.getBean(JsonMapper.class);
 
-    public static ObjectMapper getObjectMapper() {
+    public static JsonMapper getObjectMapper() {
         return OBJECT_MAPPER;
     }
 
