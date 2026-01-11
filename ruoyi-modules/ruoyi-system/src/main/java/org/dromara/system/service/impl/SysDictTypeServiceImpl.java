@@ -1,7 +1,7 @@
 package org.dromara.system.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -211,7 +211,7 @@ public class SysDictTypeServiceImpl implements ISysDictTypeService {
     public boolean checkDictTypeUnique(SysDictTypeBo dictType) {
         boolean exist = baseMapper.selectCountByQuery(QueryWrapper.create()
             .eq(SysDictType::getDictType, dictType.getDictType())
-            .ne(SysDictType::getDictId, dictType.getDictId(), ObjectUtil.isNotNull(dictType.getDictId()))) > 0;
+            .ne(SysDictType::getDictId, dictType.getDictId(), ObjUtil.isNotNull(dictType.getDictId()))) > 0;
         return !exist;
     }
 

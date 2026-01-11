@@ -1,6 +1,6 @@
 package org.dromara.common.mybatisflex.core.page;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
@@ -59,8 +59,8 @@ public class PageQuery implements Serializable {
      * 构建分页对象
      */
     public <T> Page<T> build() {
-        Integer pageNum = ObjectUtil.defaultIfNull(getPageNum(), DEFAULT_PAGE_NUM);
-        Integer pageSize = ObjectUtil.defaultIfNull(getPageSize(), DEFAULT_PAGE_SIZE);
+        Integer pageNum = ObjUtil.defaultIfNull(getPageNum(), DEFAULT_PAGE_NUM);
+        Integer pageSize = ObjUtil.defaultIfNull(getPageSize(), DEFAULT_PAGE_SIZE);
         if (pageNum <= 0) {
             pageNum = DEFAULT_PAGE_NUM;
         }
@@ -77,7 +77,7 @@ public class PageQuery implements Serializable {
      * {isAsc:"asc,desc",orderByColumn:"id,createTime"} order by id asc,create_time desc
      */
     public void applyOrder(QueryWrapper wrapper) {
-        if (ObjectUtil.isNull(wrapper) || StringUtils.isBlank(orderByColumn) || StringUtils.isBlank(isAsc)) {
+        if (ObjUtil.isNull(wrapper) || StringUtils.isBlank(orderByColumn) || StringUtils.isBlank(isAsc)) {
             return;
         }
         String orderBy = SqlUtil.escapeOrderBySql(orderByColumn);

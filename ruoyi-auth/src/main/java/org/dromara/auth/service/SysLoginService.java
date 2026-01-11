@@ -3,9 +3,9 @@ package org.dromara.auth.service;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.digest.BCrypt;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.baomidou.lock.annotation.Lock4j;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -112,7 +112,7 @@ public class SysLoginService {
     public void logout() {
         try {
             LoginUser loginUser = LoginHelper.getLoginUser();
-            if (ObjectUtil.isNull(loginUser)) {
+            if (ObjUtil.isNull(loginUser)) {
                 return;
             }
             if (TenantHelper.isEnable() && LoginHelper.isSuperAdmin()) {
@@ -209,7 +209,7 @@ public class SysLoginService {
         Integer lockTime = userPasswordProperties.getLockTime();
 
         // 获取用户登录错误次数，默认为0 (可自定义限制策略 例如: key + username + ip)
-        int errorNumber = ObjectUtil.defaultIfNull(RedisUtils.getCacheObject(errorKey), 0);
+        int errorNumber = ObjUtil.defaultIfNull(RedisUtils.getCacheObject(errorKey), 0);
         // 锁定时间内登录 则踢出
         if (errorNumber >= maxRetryCount) {
             recordLogininfor(tenantId, username, loginFail, MessageUtils.message(loginType.getRetryLimitExceed(), maxRetryCount, lockTime));
@@ -251,13 +251,13 @@ public class SysLoginService {
             return;
         }
         RemoteTenantVo tenant = remoteTenantService.queryByTenantId(tenantId);
-        if (ObjectUtil.isNull(tenant)) {
+        if (ObjUtil.isNull(tenant)) {
             log.info("登录租户：{} 不存在.", tenantId);
             throw new TenantException("tenant.not.exists");
         } else if (SystemConstants.DISABLE.equals(tenant.getStatus())) {
             log.info("登录租户：{} 已被停用.", tenantId);
             throw new TenantException("tenant.blocked");
-        } else if (ObjectUtil.isNotNull(tenant.getExpireTime())
+        } else if (ObjUtil.isNotNull(tenant.getExpireTime())
             && new Date().after(tenant.getExpireTime())) {
             log.info("登录租户：{} 已超过有效期.", tenantId);
             throw new TenantException("tenant.expired");

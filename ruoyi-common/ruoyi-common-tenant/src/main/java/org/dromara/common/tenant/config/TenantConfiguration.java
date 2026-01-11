@@ -1,7 +1,7 @@
 package org.dromara.common.tenant.config;
 
 import cn.dev33.satoken.dao.SaTokenDao;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.redis.config.RedisConfiguration;
@@ -51,14 +51,14 @@ public class TenantConfiguration {
         return config -> {
             TenantKeyPrefixHandler nameMapper = new TenantKeyPrefixHandler(redissonProperties.getKeyPrefix());
             SingleServerConfig singleServerConfig = ReflectUtils.invokeGetter(config, "singleServerConfig");
-            if (ObjectUtil.isNotNull(singleServerConfig)) {
+            if (ObjUtil.isNotNull(singleServerConfig)) {
                 // 使用单机模式
                 // 设置多租户 redis key前缀
                 singleServerConfig.setNameMapper(nameMapper);
             }
             ClusterServersConfig clusterServersConfig = ReflectUtils.invokeGetter(config, "clusterServersConfig");
             // 集群配置方式 参考下方注释
-            if (ObjectUtil.isNotNull(clusterServersConfig)) {
+            if (ObjUtil.isNotNull(clusterServersConfig)) {
                 // 设置多租户 redis key前缀
                 clusterServersConfig.setNameMapper(nameMapper);
             }

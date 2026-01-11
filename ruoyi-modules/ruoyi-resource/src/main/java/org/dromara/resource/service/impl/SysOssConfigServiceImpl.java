@@ -1,8 +1,9 @@
 package org.dromara.resource.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.collection.ListUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -104,16 +105,16 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         SysOssConfig config = BeanUtil.toBean(bo, SysOssConfig.class);
         validEntityBeforeSave(config);
         // 处理可能为null的字段
-        if (ObjectUtil.isNull(config.getPrefix())) {
+        if (ObjUtil.isNull(config.getPrefix())) {
             config.setPrefix("");
         }
-        if (ObjectUtil.isNull(config.getRegion())) {
+        if (ObjUtil.isNull(config.getRegion())) {
             config.setRegion("");
         }
-        if (ObjectUtil.isNull(config.getExt1())) {
+        if (ObjUtil.isNull(config.getExt1())) {
             config.setExt1("");
         }
-        if (ObjectUtil.isNull(config.getRemark())) {
+        if (ObjUtil.isNull(config.getRemark())) {
             config.setRemark("");
         }
         boolean flag = baseMapper.update(config) > 0;
@@ -141,7 +142,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
                 throw new ServiceException("系统内置, 不可删除!");
             }
         }
-        List<SysOssConfig> list = CollUtil.newArrayList();
+        List<SysOssConfig> list = ListUtil.of();
         for (Long configId : ids) {
             SysOssConfig config = baseMapper.selectOneById(configId);
             list.add(config);
@@ -162,7 +163,7 @@ public class SysOssConfigServiceImpl implements ISysOssConfigService {
         SysOssConfig info = baseMapper.selectOneByQuery(QueryWrapper.create()
             .select("oss_config_id", "config_key")
             .where("config_key = ?", sysOssConfig.getConfigKey()));
-        if (ObjectUtil.isNotNull(info) && info.getOssConfigId() != ossConfigId) {
+        if (ObjUtil.isNotNull(info) && info.getOssConfigId() != ossConfigId) {
             return false;
         }
         return true;

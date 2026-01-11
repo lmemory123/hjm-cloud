@@ -1,6 +1,6 @@
 package org.dromara.common.doc.handler;
 
-import cn.hutool.core.io.IoUtil;
+import cn.hutool.v7.core.io.IoUtil;
 import io.swagger.v3.core.jackson.TypeNameResolver;
 import io.swagger.v3.core.util.AnnotationsUtils;
 import io.swagger.v3.oas.annotations.tags.Tags;

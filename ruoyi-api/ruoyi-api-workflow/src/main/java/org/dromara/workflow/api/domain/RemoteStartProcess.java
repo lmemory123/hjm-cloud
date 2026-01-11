@@ -1,7 +1,7 @@
 package org.dromara.workflow.api.domain;
 
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import lombok.Data;
 
 import java.io.Serial;
@@ -55,7 +55,7 @@ public class RemoteStartProcess implements Serializable {
     }
 
     public RemoteFlowInstanceBizExt getBizExt() {
-        if (ObjectUtil.isNull(bizExt)) {
+        if (ObjUtil.isNull(bizExt)) {
             bizExt = new RemoteFlowInstanceBizExt();
         }
         return bizExt;

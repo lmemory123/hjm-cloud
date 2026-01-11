@@ -1,7 +1,7 @@
 package org.dromara.common.redis.config;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.v7.core.text.StrUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -81,7 +81,7 @@ public class RedisConfiguration {
                 config.setNettyExecutor(new VirtualThreadTaskExecutor("redisson-"));
             }
             RedissonProperties.SingleServerConfig singleServerConfig = redissonProperties.getSingleServerConfig();
-            if (ObjectUtil.isNotNull(singleServerConfig)) {
+            if (ObjUtil.isNotNull(singleServerConfig)) {
                 // 使用单机模式
                 config.useSingleServer()
                     //设置redis key前缀
@@ -94,7 +94,7 @@ public class RedisConfiguration {
             }
             // 集群配置方式 参考下方注释
             RedissonProperties.ClusterServersConfig clusterServersConfig = redissonProperties.getClusterServersConfig();
-            if (ObjectUtil.isNotNull(clusterServersConfig)) {
+            if (ObjUtil.isNotNull(clusterServersConfig)) {
                 config.useClusterServers()
                     //设置redis key前缀
                     .setTimeout(clusterServersConfig.getTimeout())

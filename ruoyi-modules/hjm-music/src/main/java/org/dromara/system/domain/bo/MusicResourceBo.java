@@ -1,16 +1,16 @@
 package org.dromara.system.domain.bo;
 
-import org.dromara.system.domain.MusicResource;
-import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
-
-import org.dromara.common.core.validate.AddGroup;
-import org.dromara.common.core.validate.EditGroup;
 import io.github.linpeilie.annotations.AutoMapper;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import jakarta.validation.constraints.*;
+import org.dromara.common.core.validate.AddGroup;
+import org.dromara.common.core.validate.EditGroup;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+import org.dromara.system.domain.MusicResource;
+
 import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * 音乐资源文件业务对象 music_resource

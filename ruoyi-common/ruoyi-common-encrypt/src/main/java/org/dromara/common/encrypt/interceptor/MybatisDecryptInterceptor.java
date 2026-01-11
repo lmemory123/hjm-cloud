@@ -1,8 +1,8 @@
 package org.dromara.common.encrypt.interceptor;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
@@ -47,7 +47,7 @@ public class MybatisDecryptInterceptor implements Interceptor {
         Object target = parameterHandlerField.get(resultSetHandler);
         if (target instanceof ParameterHandler parameterHandler) {
             Object parameterObject = parameterHandler.getParameterObject();
-            if (ObjectUtil.isNotNull(parameterObject) && !(parameterObject instanceof String)) {
+            if (ObjUtil.isNotNull(parameterObject) && !(parameterObject instanceof String)) {
                 this.decryptHandler(parameterObject);
             }
         }
@@ -66,7 +66,7 @@ public class MybatisDecryptInterceptor implements Interceptor {
      * @param sourceObject 待加密对象
      */
     private void decryptHandler(Object sourceObject) {
-        if (ObjectUtil.isNull(sourceObject)) {
+        if (ObjUtil.isNull(sourceObject)) {
             return;
         }
         if (sourceObject instanceof Map<?, ?> map) {
@@ -79,7 +79,7 @@ public class MybatisDecryptInterceptor implements Interceptor {
             }
             // 判断第一个元素是否含有注解。如果没有直接返回，提高效率
             Object firstItem = list.get(0);
-            if (ObjectUtil.isNull(firstItem) || CollUtil.isEmpty(encryptorManager.getFieldCache(firstItem.getClass()))) {
+            if (ObjUtil.isNull(firstItem) || CollUtil.isEmpty(encryptorManager.getFieldCache(firstItem.getClass()))) {
                 return;
             }
             list.forEach(this::decryptHandler);
@@ -87,12 +87,12 @@ public class MybatisDecryptInterceptor implements Interceptor {
         }
         // 不在缓存中的类,就是没有加密注解的类(当然也有可能是typeAliasesPackage写错)
         Set<Field> fields = encryptorManager.getFieldCache(sourceObject.getClass());
-        if(ObjectUtil.isNull(fields)){
+        if(ObjUtil.isNull(fields)){
             return;
         }
         try {
             for (Field field : fields) {
-                field.set(sourceObject, this.decryptField(Convert.toStr(field.get(sourceObject)), field));
+                field.set(sourceObject, this.decryptField(ConvertUtil.toStr(field.get(sourceObject)), field));
             }
         } catch (Exception e) {
             log.error("处理解密字段时出错", e);
@@ -107,7 +107,7 @@ public class MybatisDecryptInterceptor implements Interceptor {
      * @return 加密后结果
      */
     private String decryptField(String value, Field field) {
-        if (ObjectUtil.isNull(value)) {
+        if (ObjUtil.isNull(value)) {
             return null;
         }
         EncryptField encryptField = field.getAnnotation(EncryptField.class);

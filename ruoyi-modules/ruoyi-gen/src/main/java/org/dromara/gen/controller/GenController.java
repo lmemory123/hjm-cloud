@@ -1,8 +1,8 @@
 package org.dromara.gen.controller;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
 import com.baomidou.lock.annotation.Lock4j;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -99,7 +99,7 @@ public class GenController extends BaseController {
     @RepeatSubmit()
     @PostMapping("/importTable")
     public R<Void> importTableSave(String tables, String dataName) {
-        String[] tableNames = Convert.toStrArray(tables);
+        String[] tableNames = ConvertUtil.toStrArray(tables);
         // 查询表信息
         List<GenTable> tableList = genTableService.selectDbTableListByNames(tableNames, dataName);
         genTableService.importGenTable(tableList, dataName);
@@ -193,7 +193,7 @@ public class GenController extends BaseController {
     @Log(title = "代码生成", businessType = BusinessType.GENCODE)
     @GetMapping("/batchGenCode")
     public void batchGenCode(HttpServletResponse response, String tableIdStr) throws IOException {
-        String[] tableIds = Convert.toStrArray(tableIdStr);
+        String[] tableIds = ConvertUtil.toStrArray(tableIdStr);
         byte[] data = genTableService.downloadCode(tableIds);
         genCode(response, data);
     }

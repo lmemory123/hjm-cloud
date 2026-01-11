@@ -3,7 +3,7 @@ package org.dromara.common.satoken.handler;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
-import cn.hutool.http.HttpStatus;
+import cn.hutool.v7.http.meta.HttpStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.R;

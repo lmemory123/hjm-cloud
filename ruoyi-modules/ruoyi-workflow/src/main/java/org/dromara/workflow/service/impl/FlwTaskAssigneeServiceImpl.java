@@ -1,11 +1,11 @@
 package org.dromara.workflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -171,9 +171,9 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
      */
     private TreeFunDto<RemoteDeptVo> buildDeptTree(List<RemoteDeptVo> depts) {
         return new TreeFunDto<>(depts)
-            .setId(dept -> Convert.toStr(dept.getDeptId()))
+            .setId(dept -> ConvertUtil.toStr(dept.getDeptId()))
             .setName(RemoteDeptVo::getDeptName)
-            .setParentId(dept -> Convert.toStr(dept.getParentId()));
+            .setParentId(dept -> ConvertUtil.toStr(dept.getParentId()));
     }
 
     /**
@@ -228,7 +228,7 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
         if (type == TaskAssigneeEnum.SPEL) {
             return new ArrayList<>();
         }
-        List<Long> longIds = StreamUtils.toList(ids, Convert::toLong);
+        List<Long> longIds = StreamUtils.toList(ids, ConvertUtil::toLong);
         return switch (type) {
             case USER -> remoteUserService.selectListByIds(longIds);
             case ROLE -> remoteUserService.selectUsersByRoleIds(longIds);
@@ -250,7 +250,7 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
             return spelService.selectRemarksBySpels(ids);
         }
 
-        List<Long> longIds = StreamUtils.toList(ids, Convert::toLong);
+        List<Long> longIds = StreamUtils.toList(ids, ConvertUtil::toLong);
         Map<Long, String> rawMap = switch (type) {
             case USER -> remoteUserService.selectUserNamesByIds(longIds);
             case ROLE -> remoteRoleService.selectRoleNamesByIds(longIds);
@@ -264,7 +264,7 @@ public class FlwTaskAssigneeServiceImpl implements IFlwTaskAssigneeService, Hand
         return rawMap.entrySet()
             .stream()
             .collect(Collectors.toMap(
-                e -> Convert.toStr(e.getKey()),
+                e -> ConvertUtil.toStr(e.getKey()),
                 Map.Entry::getValue
             ));
     }

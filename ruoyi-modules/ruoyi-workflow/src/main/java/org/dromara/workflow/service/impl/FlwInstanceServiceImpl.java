@@ -1,9 +1,9 @@
 package org.dromara.workflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -110,7 +110,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
      */
     @Override
     public FlowInstanceVo queryByBusinessId(Long businessId) {
-        FlowInstance instance = this.selectInstByBusinessId(Convert.toStr(businessId));
+        FlowInstance instance = this.selectInstByBusinessId(ConvertUtil.toStr(businessId));
         FlowInstanceVo instanceVo = BeanUtil.toBean(instance, FlowInstanceVo.class);
         Definition definition = defService.getById(instanceVo.getDefinitionId());
         instanceVo.setFlowName(definition.getFlowName());
@@ -134,8 +134,8 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         queryWrapper.like(StringUtils.isNotBlank(flowInstanceBo.getFlowName()), "fd.flow_name", flowInstanceBo.getFlowName());
         queryWrapper.like(StringUtils.isNotBlank(flowInstanceBo.getFlowCode()), "fd.flow_code", flowInstanceBo.getFlowCode());
         if (StringUtils.isNotBlank(flowInstanceBo.getCategory())) {
-            List<Long> categoryIds = flwCategoryMapper.selectCategoryIdsByParentId(Convert.toLong(flowInstanceBo.getCategory()));
-            queryWrapper.in("fd.category", StreamUtils.toList(categoryIds, Convert::toStr));
+            List<Long> categoryIds = flwCategoryMapper.selectCategoryIdsByParentId(ConvertUtil.toLong(flowInstanceBo.getCategory()));
+            queryWrapper.in("fd.category", StreamUtils.toList(categoryIds, ConvertUtil::toStr));
         }
         queryWrapper.eq(StringUtils.isNotBlank(flowInstanceBo.getBusinessId()), "fi.business_id", flowInstanceBo.getBusinessId());
         queryWrapper.in(CollUtil.isNotEmpty(flowInstanceBo.getCreateByIds()), "fi.create_by", flowInstanceBo.getCreateByIds());
@@ -182,7 +182,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean deleteByBusinessIds(List<Long> businessIds) {
-        List<FlowInstance> flowInstances = flowInstanceMapper.selectList(new LambdaQueryWrapper<FlowInstance>().in(FlowInstance::getBusinessId, StreamUtils.toList(businessIds, Convert::toStr)));
+        List<FlowInstance> flowInstances = flowInstanceMapper.selectList(new LambdaQueryWrapper<FlowInstance>().in(FlowInstance::getBusinessId, StreamUtils.toList(businessIds, ConvertUtil::toStr)));
         if (CollUtil.isEmpty(flowInstances)) {
             log.warn("未找到对应的流程实例信息，无法执行删除操作。");
             return false;
@@ -214,7 +214,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         // 逐一触发删除事件
         instances.forEach(instance -> {
             Definition definition = definitionMap.get(instance.getDefinitionId());
-            if (ObjectUtil.isNull(definition)) {
+            if (ObjUtil.isNull(definition)) {
                 log.warn("实例 ID: {} 对应的流程定义信息未找到，跳过删除事件触发。", instance.getId());
                 return;
             }
@@ -247,7 +247,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
         // 逐一触发删除事件
         instances.forEach(instance -> {
             Definition definition = definitionMap.get(instance.getDefinitionId());
-            if (ObjectUtil.isNull(definition)) {
+            if (ObjUtil.isNull(definition)) {
                 log.warn("实例 ID: {} 对应的流程定义信息未找到，跳过删除事件触发。", instance.getId());
                 return;
             }
@@ -314,7 +314,7 @@ public class FlwInstanceServiceImpl implements IFlwInstanceService {
     @Override
     public Map<String, Object> flowHisTaskList(String businessId) {
         FlowInstance flowInstance = this.selectInstByBusinessId(businessId);
-        if (ObjectUtil.isNull(flowInstance)) {
+        if (ObjUtil.isNull(flowInstance)) {
             throw new ServiceException(ExceptionCons.NOT_FOUNT_INSTANCE);
         }
         Long instanceId = flowInstance.getId();

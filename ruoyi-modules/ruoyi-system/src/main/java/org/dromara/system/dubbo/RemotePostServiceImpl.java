@@ -1,6 +1,6 @@
 package org.dromara.system.dubbo;
 
-import cn.hutool.core.collection.CollUtil;
+import cn.hutool.v7.core.collection.CollUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboService;

@@ -9,7 +9,6 @@ import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatisflex.core.page.PageQuery;
 import org.dromara.common.mybatisflex.core.page.TableDataInfo;
 import org.dromara.system.domain.SysNotice;
-import org.dromara.system.domain.SysUser;
 import org.dromara.system.domain.bo.SysNoticeBo;
 import org.dromara.system.domain.vo.SysNoticeVo;
 import org.dromara.system.domain.vo.SysUserVo;

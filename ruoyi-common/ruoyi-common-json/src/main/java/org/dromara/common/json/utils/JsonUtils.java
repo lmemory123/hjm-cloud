@@ -1,8 +1,8 @@
 package org.dromara.common.json.utils;
 
-import cn.hutool.core.lang.Dict;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.array.ArrayUtil;
+import cn.hutool.v7.core.map.Dict;
+import cn.hutool.v7.core.util.ObjUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.utils.SpringUtils;
@@ -38,7 +38,7 @@ public class JsonUtils {
      * @throws RuntimeException 如果转换过程中发生JSON处理异常，则抛出运行时异常
      */
     public static String toJsonString(Object object) {
-        if (ObjectUtil.isNull(object)) {
+        if (ObjUtil.isNull(object)) {
             return null;
         }
         try {

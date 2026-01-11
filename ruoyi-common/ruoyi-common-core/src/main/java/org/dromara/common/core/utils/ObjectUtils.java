@@ -1,6 +1,6 @@
 package org.dromara.common.core.utils;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +12,7 @@ import java.util.function.Function;
  * @author 秋辞未寒
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ObjectUtils extends ObjectUtil {
+public class ObjectUtils extends ObjUtil {
 
     /**
      * 如果对象不为空，则获取对象中的某个字段 ObjectUtils.notNullGetter(user, User::getName);

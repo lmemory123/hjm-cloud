@@ -1,7 +1,7 @@
 package org.dromara.common.sensitive.core;
 
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.DesensitizedUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.data.masking.MaskingUtil;
 import lombok.AllArgsConstructor;
 import org.dromara.common.core.utils.DesensitizedUtils;
 
@@ -19,67 +19,67 @@ public enum SensitiveStrategy {
     /**
      * 身份证脱敏
      */
-    ID_CARD(s -> DesensitizedUtil.idCardNum(s, 3, 4)),
+    ID_CARD(s -> MaskingUtil.idCardNum(s, 3, 4)),
 
     /**
      * 手机号脱敏
      */
-    PHONE(DesensitizedUtil::mobilePhone),
+    PHONE(MaskingUtil::mobilePhone),
 
     /**
      * 地址脱敏
      */
-    ADDRESS(s -> DesensitizedUtil.address(s, 8)),
+    ADDRESS(s -> MaskingUtil.address(s, 8)),
 
     /**
      * 邮箱脱敏
      */
-    EMAIL(DesensitizedUtil::email),
+    EMAIL(MaskingUtil::email),
 
     /**
      * 银行卡
      */
-    BANK_CARD(DesensitizedUtil::bankCard),
+    BANK_CARD(MaskingUtil::bankCard),
 
     /**
      * 中文名
      */
-    CHINESE_NAME(DesensitizedUtil::chineseName),
+    CHINESE_NAME(MaskingUtil::chineseName),
 
     /**
      * 固定电话
      */
-    FIXED_PHONE(DesensitizedUtil::fixedPhone),
+    FIXED_PHONE(MaskingUtil::fixedPhone),
 
     /**
      * 用户ID
      */
-    USER_ID(s -> Convert.toStr(DesensitizedUtil.userId())),
+    USER_ID(s -> ConvertUtil.toStr(MaskingUtil.userId())),
 
     /**
      * 密码
      */
-    PASSWORD(DesensitizedUtil::password),
+    PASSWORD(MaskingUtil::password),
 
     /**
      * ipv4
      */
-    IPV4(DesensitizedUtil::ipv4),
+    IPV4(MaskingUtil::ipv4),
 
     /**
      * ipv6
      */
-    IPV6(DesensitizedUtil::ipv6),
+    IPV6(MaskingUtil::ipv6),
 
     /**
      * 中国大陆车牌，包含普通车辆、新能源车辆
      */
-    CAR_LICENSE(DesensitizedUtil::carLicense),
+    CAR_LICENSE(MaskingUtil::carLicense),
 
     /**
      * 只显示第一个字符
      */
-    FIRST_MASK(DesensitizedUtil::firstMask),
+    FIRST_MASK(MaskingUtil::firstMask),
 
     /**
      * 通用字符串脱敏
@@ -91,12 +91,12 @@ public enum SensitiveStrategy {
     /**
      * 清空为null
      */
-    CLEAR(s -> DesensitizedUtil.clear()),
+    CLEAR(s -> MaskingUtil.clear()),
 
     /**
      * 清空为""
      */
-    CLEAR_TO_NULL(s -> DesensitizedUtil.clearToNull());
+    CLEAR_TO_NULL(s -> MaskingUtil.clearToNull());
 
     //可自行添加其他脱敏策略
 

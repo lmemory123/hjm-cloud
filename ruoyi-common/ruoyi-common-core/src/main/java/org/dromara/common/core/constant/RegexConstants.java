@@ -1,6 +1,7 @@
 package org.dromara.common.core.constant;
 
-import cn.hutool.core.lang.RegexPool;
+
+import cn.hutool.v7.core.regex.RegexPool;
 
 /**
  * 常用正则表达式字符串

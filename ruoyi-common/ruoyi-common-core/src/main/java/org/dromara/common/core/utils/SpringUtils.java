@@ -1,6 +1,6 @@
 package org.dromara.common.core.utils;
 
-import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.v7.extra.spring.SpringUtil;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.boot.thread.Threading;
 import org.springframework.context.ApplicationContext;

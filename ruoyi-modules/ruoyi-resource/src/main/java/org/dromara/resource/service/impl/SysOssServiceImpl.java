@@ -1,8 +1,8 @@
 package org.dromara.resource.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import jakarta.servlet.http.HttpServletResponse;
@@ -79,7 +79,7 @@ public class SysOssServiceImpl implements ISysOssService {
         SysOssServiceImpl ossService = SpringUtils.getAopProxy(this);
         for (Long id : ossIds) {
             SysOssVo vo = ossService.getById(id);
-            if (ObjectUtil.isNotNull(vo)) {
+            if (ObjUtil.isNotNull(vo)) {
                 try {
                     list.add(this.matchingUrl(vo));
                 } catch (Exception ignored) {
@@ -101,9 +101,9 @@ public class SysOssServiceImpl implements ISysOssService {
     public String selectUrlByIds(String ossIds) {
         List<String> list = new ArrayList<>();
         SysOssServiceImpl ossService = SpringUtils.getAopProxy(this);
-        for (Long id : StringUtils.splitTo(ossIds, Convert::toLong)) {
+        for (Long id : StringUtils.splitTo(ossIds, ConvertUtil::toLong)) {
             SysOssVo vo = ossService.getById(id);
-            if (ObjectUtil.isNotNull(vo)) {
+            if (ObjUtil.isNotNull(vo)) {
                 try {
                     list.add(this.matchingUrl(vo).getUrl());
                 } catch (Exception ignored) {
@@ -133,7 +133,7 @@ public class SysOssServiceImpl implements ISysOssService {
         if (params.get("beginCreateTime") != null && params.get("endCreateTime") != null) {
             queryWrapper.and("create_time between ? and ?", params.get("beginCreateTime"), params.get("endCreateTime"));
         }
-        if (ObjectUtil.isNotNull(bo.getCreateBy())) {
+        if (ObjUtil.isNotNull(bo.getCreateBy())) {
             queryWrapper.and("create_by = ?", bo.getCreateBy());
         }
         if (StringUtils.isNotBlank(bo.getService())) {
@@ -164,7 +164,7 @@ public class SysOssServiceImpl implements ISysOssService {
     @Override
     public void download(Long ossId, HttpServletResponse response) throws IOException {
         SysOssVo sysOss = SpringUtils.getAopProxy(this).getById(ossId);
-        if (ObjectUtil.isNull(sysOss)) {
+        if (ObjUtil.isNull(sysOss)) {
             throw new ServiceException("文件数据不存在!");
         }
         FileUtils.setAttachmentResponseHeader(response, sysOss.getOriginalName());
@@ -182,7 +182,7 @@ public class SysOssServiceImpl implements ISysOssService {
      */
     @Override
     public SysOssVo upload(MultipartFile file) {
-        if (ObjectUtil.isNull(file) || file.isEmpty()) {
+        if (ObjUtil.isNull(file) || file.isEmpty()) {
             throw new ServiceException("上传文件不能为空");
         }
         String originalfileName = file.getOriginalFilename();
@@ -209,7 +209,7 @@ public class SysOssServiceImpl implements ISysOssService {
      */
     @Override
     public SysOssVo upload(File file) {
-        if (ObjectUtil.isNull(file) || !file.isFile() || file.length() <= 0) {
+        if (ObjUtil.isNull(file) || !file.isFile() || file.length() <= 0) {
             throw new ServiceException("上传文件不能为空");
         }
         String originalfileName = file.getName();

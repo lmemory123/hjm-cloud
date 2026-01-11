@@ -3,12 +3,12 @@ package org.dromara.common.mybatis.helper;
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.context.model.SaStorage;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.reflect.FieldUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.mybatis.annotation.DataPermission;
 
 import java.util.HashMap;
@@ -91,7 +91,7 @@ public class DataPermissionHelper {
         if (SaHolder.getContext().isValid()) {
             SaStorage saStorage = SaHolder.getStorage();
             attribute = saStorage.get(DATA_PERMISSION_KEY);
-            if (ObjectUtil.isNull(attribute)) {
+            if (ObjUtil.isNull(attribute)) {
                 saStorage.set(DATA_PERMISSION_KEY, new HashMap<>());
                 attribute = saStorage.get(DATA_PERMISSION_KEY);
             }
@@ -103,7 +103,7 @@ public class DataPermissionHelper {
     }
 
     private static IgnoreStrategy getIgnoreStrategy() {
-        Object ignoreStrategyLocal = ReflectUtils.getStaticFieldValue(ReflectUtils.getField(InterceptorIgnoreHelper.class, "IGNORE_STRATEGY_LOCAL"));
+        Object ignoreStrategyLocal = FieldUtil.getStaticFieldValue(FieldUtil.getField(InterceptorIgnoreHelper.class, "IGNORE_STRATEGY_LOCAL"));
         if (ignoreStrategyLocal instanceof ThreadLocal<?> IGNORE_STRATEGY_LOCAL) {
             if (IGNORE_STRATEGY_LOCAL.get() instanceof IgnoreStrategy ignoreStrategy) {
                 return ignoreStrategy;
@@ -117,7 +117,7 @@ public class DataPermissionHelper {
      */
     public static void enableIgnore() {
         IgnoreStrategy ignoreStrategy = getIgnoreStrategy();
-        if (ObjectUtil.isNull(ignoreStrategy)) {
+        if (ObjUtil.isNull(ignoreStrategy)) {
             InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().dataPermission(true).build());
         } else {
             ignoreStrategy.setDataPermission(true);
@@ -131,7 +131,7 @@ public class DataPermissionHelper {
      */
     public static void disableIgnore() {
         IgnoreStrategy ignoreStrategy = getIgnoreStrategy();
-        if (ObjectUtil.isNotNull(ignoreStrategy)) {
+        if (ObjUtil.isNotNull(ignoreStrategy)) {
             boolean noOtherIgnoreStrategy = !Boolean.TRUE.equals(ignoreStrategy.getDynamicTableName())
                 && !Boolean.TRUE.equals(ignoreStrategy.getBlockAttack())
                 && !Boolean.TRUE.equals(ignoreStrategy.getIllegalSql())

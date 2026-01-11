@@ -1,7 +1,7 @@
 package org.dromara.common.mybatisflex.handler;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.exception.ServiceException;
@@ -51,12 +51,12 @@ public class PlusDataPermissionHandler {
     public String getSqlSegment(boolean isSelect) {
         // 获取数据权限配置
         DataPermission dataPermission = getDataPermission();
-        if (ObjectUtil.isNull(dataPermission)) {
+        if (ObjUtil.isNull(dataPermission)) {
             return StringUtils.EMPTY;
         }
         // 获取当前登录用户信息
         LoginUser currentUser = DataPermissionHelper.getVariable("user");
-        if (ObjectUtil.isNull(currentUser)) {
+        if (ObjUtil.isNull(currentUser)) {
             currentUser = LoginHelper.getLoginUser();
             DataPermissionHelper.setVariable("user", currentUser);
         }
@@ -114,7 +114,7 @@ public class PlusDataPermissionHandler {
             user.setRoleId(role.getRoleId());
             // 获取角色权限泛型
             DataScopeType type = DataScopeType.findCode(role.getDataScope());
-            if (ObjectUtil.isNull(type)) {
+            if (ObjUtil.isNull(type)) {
                 throw new ServiceException("角色数据范围异常 => " + role.getDataScope());
             }
             // 全部数据权限直接返回

@@ -1,7 +1,7 @@
 package org.dromara.system.api;
 
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.lang.Dict;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.map.Dict;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -35,7 +35,7 @@ public interface RemoteConfigService {
      * @return Boolean 值
      */
     default Boolean getConfigBool(String configKey) {
-        return Convert.toBool(getConfigValue(configKey));
+        return ConvertUtil.toBoolean(getConfigValue(configKey));
     }
 
     /**
@@ -45,7 +45,7 @@ public interface RemoteConfigService {
      * @return Integer 值
      */
     default Integer getConfigInt(String configKey) {
-        return Convert.toInt(getConfigValue(configKey));
+        return ConvertUtil.toInt(getConfigValue(configKey));
     }
 
     /**
@@ -55,7 +55,7 @@ public interface RemoteConfigService {
      * @return Long 值
      */
     default Long getConfigLong(String configKey) {
-        return Convert.toLong(getConfigValue(configKey));
+        return ConvertUtil.toLong(getConfigValue(configKey));
     }
 
     /**
@@ -64,9 +64,7 @@ public interface RemoteConfigService {
      * @param configKey 参数 key
      * @return BigDecimal 值
      */
-    default BigDecimal getConfigDecimal(String configKey) {
-        return Convert.toBigDecimal(getConfigValue(configKey));
-    }
+    default BigDecimal getConfigDecimal(String configKey) {return ConvertUtil.toBigDecimal(getConfigValue(configKey));}
 
     /**
      * 根据参数 key 获取 Map 类型的配置

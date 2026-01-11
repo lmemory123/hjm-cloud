@@ -1,7 +1,7 @@
 package org.dromara.workflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.warm.flow.orm.entity.FlowInstance;
@@ -56,7 +56,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     public String getBusinessStatusByTaskId(Long taskId) {
         FlowInstance flowInstance = flwInstanceService.selectByTaskId(taskId);
-        return ObjectUtil.isNotNull(flowInstance) ? flowInstance.getFlowStatus() : StringUtils.EMPTY;
+        return ObjUtil.isNotNull(flowInstance) ? flowInstance.getFlowStatus() : StringUtils.EMPTY;
     }
 
     /**
@@ -67,7 +67,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     public String getBusinessStatus(String businessId) {
         FlowInstance flowInstance = flwInstanceService.selectInstByBusinessId(businessId);
-        return ObjectUtil.isNotNull(flowInstance) ? flowInstance.getFlowStatus() : StringUtils.EMPTY;
+        return ObjUtil.isNotNull(flowInstance) ? flowInstance.getFlowStatus() : StringUtils.EMPTY;
     }
 
     /**
@@ -100,7 +100,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     @Override
     public Long getInstanceIdByBusinessId(String businessId) {
         FlowInstance flowInstance = flwInstanceService.selectInstByBusinessId(businessId);
-        return ObjectUtil.isNotNull(flowInstance) ? flowInstance.getId() : null;
+        return ObjUtil.isNotNull(flowInstance) ? flowInstance.getId() : null;
     }
 
     /**

@@ -1,8 +1,9 @@
 package org.dromara.auth.enums;
 
-import cn.hutool.captcha.generator.CodeGenerator;
-import cn.hutool.captcha.generator.MathGenerator;
-import cn.hutool.captcha.generator.RandomGenerator;
+
+import cn.hutool.v7.swing.captcha.generator.CodeGenerator;
+import cn.hutool.v7.swing.captcha.generator.MathGenerator;
+import cn.hutool.v7.swing.captcha.generator.RandomGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -1,6 +1,6 @@
 package org.dromara.common.core.enums;
 
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.v7.core.text.StrUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.dromara.common.core.exception.ServiceException;

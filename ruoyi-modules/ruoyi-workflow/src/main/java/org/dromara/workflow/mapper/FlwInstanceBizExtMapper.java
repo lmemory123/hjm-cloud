@@ -1,6 +1,6 @@
 package org.dromara.workflow.mapper;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.dromara.common.mybatis.core.mapper.BaseMapperPlus;
 import org.dromara.workflow.domain.FlowInstanceBizExt;
@@ -26,7 +26,7 @@ public interface FlwInstanceBizExtMapper extends BaseMapperPlus<FlowInstanceBizE
         FlowInstanceBizExt exist = this.selectOne(new LambdaQueryWrapper<FlowInstanceBizExt>()
             .eq(FlowInstanceBizExt::getInstanceId, entity.getInstanceId()));
 
-        if (ObjectUtil.isNotNull(exist)) {
+        if (ObjUtil.isNotNull(exist)) {
             // 存在就带上主键更新
             entity.setId(exist.getId());
             return updateById(entity);

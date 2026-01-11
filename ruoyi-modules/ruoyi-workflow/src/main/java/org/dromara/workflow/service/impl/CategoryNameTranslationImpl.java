@@ -1,6 +1,6 @@
 package org.dromara.workflow.service.impl;
 
-import cn.hutool.core.convert.Convert;
+import cn.hutool.v7.core.convert.ConvertUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.translation.annotation.TranslationType;
@@ -26,6 +26,6 @@ public class CategoryNameTranslationImpl implements TranslationInterface<String>
 
     @Override
     public String translation(Object key, String other) {
-        return flwCategoryService.selectCategoryNameById(Convert.toLong(key));
+        return flwCategoryService.selectCategoryNameById(ConvertUtil.toLong(key));
     }
 }

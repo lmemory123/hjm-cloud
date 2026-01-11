@@ -1,12 +1,13 @@
 package org.dromara.system.domain;
 
-import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
-
-import com.mybatisflex.annotation.*;
+import com.mybatisflex.annotation.Column;
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+
 import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 
 /**

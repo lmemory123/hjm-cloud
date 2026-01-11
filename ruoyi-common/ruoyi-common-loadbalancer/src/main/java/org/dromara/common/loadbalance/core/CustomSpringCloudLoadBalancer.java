@@ -1,6 +1,6 @@
 package org.dromara.common.loadbalance.core;
 
-import cn.hutool.core.net.NetUtil;
+import cn.hutool.v7.core.net.NetUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -49,7 +49,7 @@ public class CustomSpringCloudLoadBalancer implements ReactorServiceInstanceLoad
     private Response<ServiceInstance> getInstanceResponse(List<ServiceInstance> instances) {
         if (instances.isEmpty()) {
             if (log.isWarnEnabled()) {
-                log.warn("No servers available for service: " + serviceId);
+                log.warn("No servers available for service: {}", serviceId);
             }
             return new EmptyResponse();
         }

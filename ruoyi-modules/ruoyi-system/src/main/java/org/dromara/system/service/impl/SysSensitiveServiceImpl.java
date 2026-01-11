@@ -1,7 +1,7 @@
 package org.dromara.system.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.v7.core.array.ArrayUtil;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.common.sensitive.core.SensitiveService;
 import org.dromara.common.tenant.helper.TenantHelper;

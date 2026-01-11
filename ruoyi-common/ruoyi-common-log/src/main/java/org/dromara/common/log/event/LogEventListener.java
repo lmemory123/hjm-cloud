@@ -1,9 +1,9 @@
 package org.dromara.common.log.event;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.http.useragent.UserAgent;
-import cn.hutool.http.useragent.UserAgentUtil;
+import cn.hutool.v7.core.util.ObjUtil;
+import cn.hutool.v7.http.useragent.UserAgent;
+import cn.hutool.v7.http.useragent.UserAgentUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
@@ -76,7 +76,7 @@ public class LogEventListener {
         RemoteLogininforBo logininfor = new RemoteLogininforBo();
         logininfor.setTenantId(logininforEvent.getTenantId());
         logininfor.setUserName(logininforEvent.getUsername());
-        if (ObjectUtil.isNotNull(clientVo)) {
+        if (ObjUtil.isNotNull(clientVo)) {
             logininfor.setClientKey(clientVo.getClientKey());
             logininfor.setDeviceType(clientVo.getDeviceType());
         }

@@ -1,7 +1,7 @@
 package org.dromara.common.mybatisflex.handler;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.http.HttpStatus;
+import cn.hutool.v7.core.util.ObjUtil;
+import cn.hutool.v7.http.meta.HttpStatus;
 import com.mybatisflex.annotation.InsertListener;
 import com.mybatisflex.annotation.UpdateListener;
 import lombok.extern.slf4j.Slf4j;
@@ -43,9 +43,9 @@ public class InjectionMetaObjectHandler implements InsertListener, UpdateListene
             baseEntity.setUpdateTime(current);
 
             // 如果创建人为空，则填充当前登录用户的信息
-            if (ObjectUtil.isNull(baseEntity.getCreateBy())) {
+            if (ObjUtil.isNull(baseEntity.getCreateBy())) {
                 LoginUser loginUser = getLoginUser();
-                if (ObjectUtil.isNotNull(loginUser)) {
+                if (ObjUtil.isNotNull(loginUser)) {
                     Long userId = loginUser.getUserId();
                     // 填充创建人、更新人和创建部门信息
                     baseEntity.setCreateBy(userId);
@@ -80,7 +80,7 @@ public class InjectionMetaObjectHandler implements InsertListener, UpdateListene
 
             // 获取当前登录用户的ID，并填充更新人信息
             Long userId = LoginHelper.getUserId();
-            if (ObjectUtil.isNotNull(userId)) {
+            if (ObjUtil.isNotNull(userId)) {
                 baseEntity.setUpdateBy(userId);
             } else {
                 baseEntity.setUpdateBy(DEFAULT_USER_ID);

@@ -1,7 +1,7 @@
 package org.dromara.common.excel.convert;
 
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import cn.idev.excel.converters.Converter;
 import cn.idev.excel.enums.CellDataTypeEnum;
 import cn.idev.excel.metadata.GlobalConfiguration;
@@ -33,13 +33,13 @@ public class ExcelBigNumberConvert implements Converter<Long> {
 
     @Override
     public Long convertToJavaData(ReadCellData<?> cellData, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
-        return Convert.toLong(cellData.getData());
+        return ConvertUtil.toLong(cellData.getData());
     }
 
     @Override
     public WriteCellData<Object> convertToExcelData(Long object, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
-        if (ObjectUtil.isNotNull(object)) {
-            String str = Convert.toStr(object);
+        if (ObjUtil.isNotNull(object)) {
+            String str = ConvertUtil.toStr(object);
             if (str.length() > 15) {
                 return new WriteCellData<>(str);
             }

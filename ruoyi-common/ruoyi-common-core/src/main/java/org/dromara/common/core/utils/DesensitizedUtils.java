@@ -1,7 +1,7 @@
 package org.dromara.common.core.utils;
 
-import cn.hutool.core.util.DesensitizedUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.v7.core.data.masking.MaskingUtil;
+import cn.hutool.v7.core.text.StrUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
  * @author AprilWind
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class DesensitizedUtils extends DesensitizedUtil {
+public class DesensitizedUtils extends MaskingUtil {
 
     /**
      * 灵活脱敏方法

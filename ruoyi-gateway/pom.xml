@@ -47,8 +47,9 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
+
         <dependency>
-            <groupId>cn.hutool</groupId>
+            <groupId>cn.hutool.v7</groupId>
             <artifactId>hutool-http</artifactId>
         </dependency>
 

@@ -1,6 +1,6 @@
 package org.dromara.common.mybatis.helper;
 
-import cn.hutool.core.convert.Convert;
+import cn.hutool.v7.core.convert.ConvertUtil;
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -60,7 +60,7 @@ public class DataBaseHelper {
      * @return 适用于当前数据库的 SQL 条件字符串，通常用于 where 或 apply 中拼接
      */
     public static String findInSet(Object var1, String var2) {
-        String var = Convert.toStr(var1);
+        String var = ConvertUtil.toStr(var1);
         return switch (getDataBaseType()) {
             // instr(',0,100,101,' , ',100,') <> 0
             case ORACLE -> "instr(','||%s||',' , ',%s,') <> 0".formatted(var2, var);

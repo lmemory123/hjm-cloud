@@ -1,7 +1,7 @@
 package org.dromara.common.core.xss;
 
-import cn.hutool.core.util.ReUtil;
-import cn.hutool.http.HtmlUtil;
+import cn.hutool.v7.core.regex.ReUtil;
+import cn.hutool.v7.http.html.HtmlUtil;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

@@ -1,6 +1,6 @@
 package org.dromara.common.websocket.handler;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.websocket.dto.WebSocketMessageDto;
 import org.dromara.common.websocket.holder.WebSocketSessionHolder;
@@ -29,7 +29,7 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws IOException {
         LoginUser loginUser = (LoginUser) session.getAttributes().get(LOGIN_USER_KEY);
-        if (ObjectUtil.isNull(loginUser)) {
+        if (ObjUtil.isNull(loginUser)) {
             session.close(CloseStatus.BAD_DATA);
             log.info("[connect] invalid token received. sessionId: {}", session.getId());
             return;
@@ -102,7 +102,7 @@ public class PlusWebSocketHandler extends AbstractWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         LoginUser loginUser = (LoginUser) session.getAttributes().get(LOGIN_USER_KEY);
-        if (ObjectUtil.isNull(loginUser)) {
+        if (ObjUtil.isNull(loginUser)) {
             log.info("[disconnect] invalid token received. sessionId: {}", session.getId());
             return;
         }

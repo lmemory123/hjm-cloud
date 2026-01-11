@@ -3,7 +3,7 @@ package org.dromara.common.job.config;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import cn.hutool.core.collection.CollUtil;
+import cn.hutool.v7.core.collection.CollUtil;
 import com.aizuda.snailjob.client.common.appender.SnailLogbackAppender;
 import com.aizuda.snailjob.client.common.event.SnailChannelReconnectEvent;
 import com.aizuda.snailjob.client.common.event.SnailClientStartingEvent;

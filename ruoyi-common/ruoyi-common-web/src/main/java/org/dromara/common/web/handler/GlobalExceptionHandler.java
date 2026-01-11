@@ -1,7 +1,7 @@
 package org.dromara.common.web.handler;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.http.HttpStatus;
+import cn.hutool.v7.core.util.ObjUtil;
+import cn.hutool.v7.http.meta.HttpStatus;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
@@ -16,7 +16,6 @@ import org.dromara.common.json.utils.JsonUtils;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.expression.ExpressionException;
-import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -58,9 +57,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ServiceException.class)
     public R<Void> handleServiceException(ServiceException e, HttpServletRequest request) {
-        log.error(e.getMessage());
+        log.error(e.getMessage(),e);
         Integer code = e.getCode();
-        return ObjectUtil.isNotNull(code) ? R.fail(code, e.getMessage()) : R.fail(e.getMessage());
+        return ObjUtil.isNotNull(code) ? R.fail(code, e.getMessage()) : R.fail(e.getMessage());
     }
 
     /**
@@ -89,7 +88,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BaseException.class)
     public R<Void> handleBaseException(BaseException e, HttpServletRequest request) {
-        log.error(e.getMessage());
+        log.error(e.getMessage(),e);
         return R.fail(e.getMessage());
     }
 
@@ -169,7 +168,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(BindException.class)
     public R<Void> handleBindException(BindException e) {
-        log.error(e.getMessage());
+        log.error(e.getMessage(),e);
         String message = StreamUtils.join(e.getAllErrors(), DefaultMessageSourceResolvable::getDefaultMessage, ", ");
         return R.fail(message);
     }
@@ -179,7 +178,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ConstraintViolationException.class)
     public R<Void> constraintViolationException(ConstraintViolationException e) {
-        log.error(e.getMessage());
+        log.error(e.getMessage(),e);
         String message = StreamUtils.join(e.getConstraintViolations(), ConstraintViolation::getMessage, ", ");
         return R.fail(message);
     }
@@ -189,7 +188,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public R<Void> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        log.error(e.getMessage());
+        log.error(e.getMessage(),e);
         String message = StreamUtils.join(e.getBindingResult().getAllErrors(), DefaultMessageSourceResolvable::getDefaultMessage, ", ");
         return R.fail(message);
     }
@@ -198,7 +197,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HandlerMethodValidationException.class)
     public R<Void> handlerMethodValidationException(HandlerMethodValidationException e) {
-        log.error(e.getMessage());
+        log.error(e.getMessage(),e);
         String message = StreamUtils.join(e.getAllErrors(), MessageSourceResolvable::getDefaultMessage, ", ");
         return R.fail(message);
     }

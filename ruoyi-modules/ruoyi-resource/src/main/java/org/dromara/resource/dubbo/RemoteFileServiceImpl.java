@@ -1,6 +1,6 @@
 package org.dromara.resource.dubbo;
 
-import cn.hutool.core.convert.Convert;
+import cn.hutool.v7.core.convert.ConvertUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -90,7 +90,7 @@ public class RemoteFileServiceImpl implements RemoteFileService {
      */
     @Override
     public List<RemoteFile> selectByIds(String ossIds){
-        List<SysOssVo> sysOssVos = sysOssService.listByIds(StringUtils.splitTo(ossIds, Convert::toLong));
+        List<SysOssVo> sysOssVos = sysOssService.listByIds(StringUtils.splitTo(ossIds, ConvertUtil::toLong));
         return MapstructUtils.convert(sysOssVos, RemoteFile.class);
     }
 }

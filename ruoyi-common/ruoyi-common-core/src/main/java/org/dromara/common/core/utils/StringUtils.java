@@ -1,9 +1,10 @@
 package org.dromara.common.core.utils;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.lang.Validator;
+import cn.hutool.v7.core.text.StrUtil;
+import cn.hutool.v7.core.text.split.SplitUtil;
 import org.apache.commons.lang3.Strings;
 import org.springframework.util.AntPathMatcher;
 
@@ -34,7 +35,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * @return value 返回值
      */
     public static String blankToDefault(String str, String defaultValue) {
-        return StrUtil.blankToDefault(str, defaultValue);
+        return StrUtil.defaultIfEmpty(str, defaultValue);
     }
 
     /**
@@ -261,13 +262,13 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         if (s != null) {
             final int len = s.length();
             if (s.length() <= size) {
-                sb.append(Convert.toStr(c).repeat(size - len));
+                sb.append(ConvertUtil.toStr(c).repeat(size - len));
                 sb.append(s);
             } else {
                 return s.substring(len - size, len);
             }
         } else {
-            sb.append(Convert.toStr(c).repeat(Math.max(0, size)));
+            sb.append(ConvertUtil.toStr(c).repeat(Math.max(0, size)));
         }
         return sb.toString();
     }
@@ -279,7 +280,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * @return 分割后的数据列表
      */
     public static List<String> splitList(String str) {
-        return splitTo(str, Convert::toStr);
+        return splitTo(str, ConvertUtil::toStr);
     }
 
     /**
@@ -290,7 +291,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
      * @return 分割后的数据列表
      */
     public static List<String> splitList(String str, String separator) {
-        return splitTo(str, separator, Convert::toStr);
+        return splitTo(str, separator, ConvertUtil::toStr);
     }
 
     /**
@@ -316,7 +317,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         if (isBlank(str)) {
             return new ArrayList<>(0);
         }
-        return StrUtil.split(str, separator)
+        return SplitUtil.split(str, separator)
             .stream()
             .filter(Objects::nonNull)
             .map(mapper)

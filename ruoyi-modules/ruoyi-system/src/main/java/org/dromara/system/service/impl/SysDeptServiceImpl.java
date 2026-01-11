@@ -1,9 +1,10 @@
 package org.dromara.system.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.lang.tree.Tree;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.collection.ListUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.tree.MapTree;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -84,7 +85,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @return 部门树信息集合
      */
     @Override
-    public List<Tree<Long>> selectDeptTreeList(SysDeptBo bo) {
+    public List<MapTree<Long>> selectDeptTreeList(SysDeptBo bo) {
         QueryWrapper lqw = buildQueryWrapper(bo);
         List<SysDeptVo> depts = baseMapper.selectDeptList(lqw);
         return buildDeptTreeSelect(depts);
@@ -109,7 +110,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
             queryWrapper.between(SysDept::getCreateTime, params.get("beginTime"), params.get("endTime"));
         }
         // 部门树搜索
-        if (ObjectUtil.isNotNull(bo.getBelongDeptId())) {
+        if (ObjUtil.isNotNull(bo.getBelongDeptId())) {
             List<Long> deptIds = baseMapper.selectDeptAndChildById(bo.getBelongDeptId());
             queryWrapper.in(SysDept::getDeptId, deptIds);
         }
@@ -123,9 +124,9 @@ public class SysDeptServiceImpl implements ISysDeptService {
      * @return 下拉树结构列表
      */
     @Override
-    public List<Tree<Long>> buildDeptTreeSelect(List<SysDeptVo> depts) {
+    public List<MapTree<Long>> buildDeptTreeSelect(List<SysDeptVo> depts) {
         if (CollUtil.isEmpty(depts)) {
-            return CollUtil.newArrayList();
+            return ListUtil.of();
         }
         return TreeBuildUtils.buildMultiRoot(
             depts,
@@ -162,7 +163,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
     @Override
     public SysDeptVo selectDeptById(Long deptId) {
         SysDeptVo dept = baseMapper.selectVoById(deptId);
-        if (ObjectUtil.isNull(dept)) {
+        if (ObjUtil.isNull(dept)) {
             return null;
         }
         SysDeptVo parentDept = baseMapper.selectVoOne(QueryWrapper.create()
@@ -195,9 +196,9 @@ public class SysDeptServiceImpl implements ISysDeptService {
     @Override
     public String selectDeptNameByIds(String deptIds) {
         List<String> list = new ArrayList<>();
-        for (Long id : StringUtils.splitTo(deptIds, Convert::toLong)) {
+        for (Long id : StringUtils.splitTo(deptIds, ConvertUtil::toLong)) {
             SysDeptVo vo = SpringUtils.getAopProxy(this).selectDeptById(id);
-            if (ObjectUtil.isNotNull(vo)) {
+            if (ObjUtil.isNotNull(vo)) {
                 list.add(vo.getDeptName());
             }
         }
@@ -252,7 +253,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
         boolean exist = baseMapper.selectCountByQuery(QueryWrapper.create()
             .eq(SysDept::getDeptName, dept.getDeptName())
             .eq(SysDept::getParentId, dept.getParentId())
-            .ne(SysDept::getDeptId, dept.getDeptId(), ObjectUtil.isNotNull(dept.getDeptId()))) > 0;
+            .ne(SysDept::getDeptId, dept.getDeptId(), ObjUtil.isNotNull(dept.getDeptId()))) > 0;
         return !exist;
     }
 
@@ -263,7 +264,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
      */
     @Override
     public void checkDeptDataScope(Long deptId) {
-        if (ObjectUtil.isNull(deptId)) {
+        if (ObjUtil.isNull(deptId)) {
             return;
         }
         if (LoginHelper.isSuperAdmin()) {
@@ -312,7 +313,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
             // 如果是新父部门 则校验是否具有新父部门权限 避免越权
             this.checkDeptDataScope(dept.getParentId());
             SysDept newParentDept = baseMapper.selectOneById(dept.getParentId());
-            if (ObjectUtil.isNotNull(newParentDept) && ObjectUtil.isNotNull(oldDept)) {
+            if (ObjUtil.isNotNull(newParentDept) && ObjUtil.isNotNull(oldDept)) {
                 String newAncestors = newParentDept.getAncestors() + StringUtils.SEPARATOR + newParentDept.getDeptId();
                 String oldAncestors = oldDept.getAncestors();
                 dept.setAncestors(newAncestors);
@@ -339,7 +340,7 @@ public class SysDeptServiceImpl implements ISysDeptService {
      */
     private void updateParentDeptStatusNormal(SysDept dept) {
         String ancestors = dept.getAncestors();
-        Long[] deptIds = Convert.toLongArray(ancestors);
+        Long[] deptIds = ConvertUtil.toLongArray(ancestors);
         SysDept update = new SysDept();
         update.setStatus(SystemConstants.NORMAL);
         baseMapper.updateByQuery(update, QueryWrapper.create()

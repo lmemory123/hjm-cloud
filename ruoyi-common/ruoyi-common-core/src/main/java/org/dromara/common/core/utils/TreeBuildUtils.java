@@ -1,10 +1,11 @@
 package org.dromara.common.core.utils;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.tree.Tree;
-import cn.hutool.core.lang.tree.TreeNodeConfig;
-import cn.hutool.core.lang.tree.TreeUtil;
-import cn.hutool.core.lang.tree.parser.NodeParser;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.collection.ListUtil;
+import cn.hutool.v7.core.tree.MapTree;
+import cn.hutool.v7.core.tree.TreeNodeConfig;
+import cn.hutool.v7.core.tree.TreeUtil;
+import cn.hutool.v7.core.tree.parser.NodeParser;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
@@ -38,9 +39,9 @@ public class TreeBuildUtils extends TreeUtil {
      * @param nodeParser 解析器，用于将输入节点转换为树节点
      * @return 构建好的树形结构列表
      */
-    public static <T, K> List<Tree<K>> build(List<T> list, NodeParser<T, K> nodeParser) {
+    public static <T, K> List<MapTree<K>> build(List<T> list, NodeParser<T, K> nodeParser) {
         if (CollUtil.isEmpty(list)) {
-            return CollUtil.newArrayList();
+            return ListUtil.of();
         }
         K k = ReflectUtils.invokeGetter(list.get(0), "parentId");
         return TreeUtil.build(list, k, DEFAULT_CONFIG, nodeParser);
@@ -56,9 +57,9 @@ public class TreeBuildUtils extends TreeUtil {
      * @param nodeParser 解析器，用于将输入节点转换为树节点
      * @return 构建好的树形结构列表
      */
-    public static <T, K> List<Tree<K>> build(List<T> list, K parentId, NodeParser<T, K> nodeParser) {
+    public static <T, K> List<MapTree<K>> build(List<T> list, K parentId, NodeParser<T, K> nodeParser) {
         if (CollUtil.isEmpty(list)) {
-            return CollUtil.newArrayList();
+            return ListUtil.of();
         }
         return TreeUtil.build(list, parentId, DEFAULT_CONFIG, nodeParser);
     }
@@ -74,9 +75,9 @@ public class TreeBuildUtils extends TreeUtil {
      * @param <K>         节点 ID 类型（如 Long、String）
      * @return 构建完成的树形结构（可能包含多个顶级根节点）
      */
-    public static <T, K> List<Tree<K>> buildMultiRoot(List<T> list, Function<T, K> getId, Function<T, K> getParentId, NodeParser<T, K> parser) {
+    public static <T, K> List<MapTree<K>> buildMultiRoot(List<T> list, Function<T, K> getId, Function<T, K> getParentId, NodeParser<T, K> parser) {
         if (CollUtil.isEmpty(list)) {
-            return CollUtil.newArrayList();
+            return ListUtil.of();
         }
 
         // 提取所有节点 ID，用于后续判断哪些节点为根节点（即 parentId 不在其中）
@@ -102,9 +103,9 @@ public class TreeBuildUtils extends TreeUtil {
      * @param nodes 节点列表
      * @return 包含所有叶子节点的列表
      */
-    public static <K> List<Tree<K>> getLeafNodes(List<Tree<K>> nodes) {
+    public static <K> List<MapTree<K>> getLeafNodes(List<MapTree<K>> nodes) {
         if (CollUtil.isEmpty(nodes)) {
-            return CollUtil.newArrayList();
+            return ListUtil.of();
         }
         return nodes.stream()
             .flatMap(TreeBuildUtils::extractLeafNodes)
@@ -118,7 +119,7 @@ public class TreeBuildUtils extends TreeUtil {
      * @param node 要查找叶子节点的根节点
      * @return 包含所有叶子节点的列表
      */
-    private static <K> Stream<Tree<K>> extractLeafNodes(Tree<K> node) {
+    private static <K> Stream<MapTree<K>> extractLeafNodes(MapTree<K> node) {
         if (!node.hasChild()) {
             return Stream.of(node);
         } else {

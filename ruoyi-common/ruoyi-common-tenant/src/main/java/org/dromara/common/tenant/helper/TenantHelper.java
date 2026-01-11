@@ -3,8 +3,9 @@ package org.dromara.common.tenant.helper;
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.context.model.SaStorage;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.reflect.FieldUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import lombok.AccessLevel;
@@ -13,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 
@@ -39,11 +39,11 @@ public class TenantHelper {
      * 租户功能是否启用
      */
     public static boolean isEnable() {
-        return Convert.toBool(SpringUtils.getProperty("tenant.enable"), false);
+        return ConvertUtil.toBoolean(SpringUtils.getProperty("tenant.enable"), false);
     }
 
     private static IgnoreStrategy getIgnoreStrategy() {
-        Object ignoreStrategyLocal = ReflectUtils.getStaticFieldValue(ReflectUtils.getField(InterceptorIgnoreHelper.class, "IGNORE_STRATEGY_LOCAL"));
+        Object ignoreStrategyLocal = FieldUtil.getStaticFieldValue(FieldUtil.getField(InterceptorIgnoreHelper.class, "IGNORE_STRATEGY_LOCAL"));
         if (ignoreStrategyLocal instanceof ThreadLocal<?> IGNORE_STRATEGY_LOCAL) {
             if (IGNORE_STRATEGY_LOCAL.get() instanceof IgnoreStrategy ignoreStrategy) {
                 return ignoreStrategy;
@@ -57,7 +57,7 @@ public class TenantHelper {
      */
     public static void enableIgnore() {
         IgnoreStrategy ignoreStrategy = getIgnoreStrategy();
-        if (ObjectUtil.isNull(ignoreStrategy)) {
+        if (ObjUtil.isNull(ignoreStrategy)) {
             InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().tenantLine(true).build());
         } else {
             ignoreStrategy.setTenantLine(true);
@@ -71,7 +71,7 @@ public class TenantHelper {
      */
     public static void disableIgnore() {
         IgnoreStrategy ignoreStrategy = getIgnoreStrategy();
-        if (ObjectUtil.isNotNull(ignoreStrategy)) {
+        if (ObjUtil.isNotNull(ignoreStrategy)) {
             boolean noOtherIgnoreStrategy = !Boolean.TRUE.equals(ignoreStrategy.getDynamicTableName())
                 && !Boolean.TRUE.equals(ignoreStrategy.getBlockAttack())
                 && !Boolean.TRUE.equals(ignoreStrategy.getIllegalSql())

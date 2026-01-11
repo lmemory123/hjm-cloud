@@ -1,6 +1,6 @@
 package org.dromara.demo.controller;
 
-import cn.hutool.core.collection.CollUtil;
+import cn.hutool.v7.core.collection.ListUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -48,7 +48,7 @@ public class TestExcelController {
         list.add(new TestObj("单列表测试1", "列表测试1", "列表测试2", "列表测试3", "列表测试4"));
         list.add(new TestObj("单列表测试2", "列表测试5", "列表测试6", "列表测试7", "列表测试8"));
         list.add(new TestObj("单列表测试3", "列表测试9", "列表测试10", "列表测试11", "列表测试12"));
-        ExcelUtil.exportTemplate(CollUtil.newArrayList(map, list), "单列表.xlsx", "excel/单列表.xlsx", response);
+        ExcelUtil.exportTemplate(ListUtil.of(map, list), "单列表.xlsx", "excel/单列表.xlsx", response);
     }
 
     /**

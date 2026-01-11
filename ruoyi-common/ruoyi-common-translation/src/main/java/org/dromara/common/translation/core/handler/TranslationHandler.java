@@ -1,6 +1,6 @@
 package org.dromara.common.translation.core.handler;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.reflect.ReflectUtils;
@@ -33,13 +33,13 @@ public class TranslationHandler extends ValueSerializer<Object> {
     @Override
     public void serialize(Object value, JsonGenerator gen, SerializationContext serializers) {
         TranslationInterface<?> trans = TRANSLATION_MAPPER.get(translation.type());
-        if (ObjectUtil.isNotNull(trans)) {
+        if (ObjUtil.isNotNull(trans)) {
             // 如果映射字段不为空 则取映射字段的值
             if (StringUtils.isNotBlank(translation.mapper())) {
                 value = ReflectUtils.invokeGetter(gen.currentValue(), translation.mapper());
             }
             // 如果为 null 直接写出
-            if (ObjectUtil.isNull(value)) {
+            if (ObjUtil.isNull(value)) {
                 gen.writeNull();
                 return;
             }

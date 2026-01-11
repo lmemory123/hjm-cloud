@@ -3,8 +3,8 @@ package org.dromara.system.service.impl;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 import static org.dromara.system.domain.table.SysRoleTableDef.SYS_ROLE;
+import static org.dromara.system.domain.table.SysUserRoleTableDef.SYS_USER_ROLE;
 
 /**
  * 角色 业务层处理
@@ -136,7 +137,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         List<SysRoleVo> perms = baseMapper.selectRolesByUserId(userId);
         Set<String> permsSet = new HashSet<>();
         for (SysRoleVo perm : perms) {
-            if (ObjectUtil.isNotNull(perm)) {
+            if (ObjUtil.isNotNull(perm)) {
                 permsSet.addAll(StringUtils.splitList(perm.getRoleKey().trim()));
             }
         }
@@ -199,7 +200,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     public boolean checkRoleNameUnique(SysRoleBo role) {
         boolean exist = baseMapper.selectCountByQuery(QueryWrapper.create()
             .eq(SysRole::getRoleName, role.getRoleName())
-            .ne(SysRole::getRoleId, role.getRoleId(), ObjectUtil.isNotNull(role.getRoleId()))) > 0;
+            .ne(SysRole::getRoleId, role.getRoleId(), ObjUtil.isNotNull(role.getRoleId()))) > 0;
         return !exist;
     }
 
@@ -213,7 +214,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
     public boolean checkRoleKeyUnique(SysRoleBo role) {
         boolean exist = baseMapper.selectCountByQuery(QueryWrapper.create()
             .eq(SysRole::getRoleKey, role.getRoleKey())
-            .ne(SysRole::getRoleId, role.getRoleId(), ObjectUtil.isNotNull(role.getRoleId()))) > 0;
+            .ne(SysRole::getRoleId, role.getRoleId(), ObjUtil.isNotNull(role.getRoleId()))) > 0;
         return !exist;
     }
 
@@ -224,17 +225,17 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public void checkRoleAllowed(SysRoleBo role) {
-        if (ObjectUtil.isNotNull(role.getRoleId()) && LoginHelper.isSuperAdmin(role.getRoleId())) {
+        if (ObjUtil.isNotNull(role.getRoleId()) && LoginHelper.isSuperAdmin(role.getRoleId())) {
             throw new ServiceException("不允许操作超级管理员角色");
         }
         String[] keys = new String[]{TenantConstants.SUPER_ADMIN_ROLE_KEY, TenantConstants.TENANT_ADMIN_ROLE_KEY};
         // 新增不允许使用 管理员标识符
-        if (ObjectUtil.isNull(role.getRoleId())
+        if (ObjUtil.isNull(role.getRoleId())
             && Strings.CS.equalsAny(role.getRoleKey(), keys)) {
             throw new ServiceException("不允许使用系统内置管理员角色标识符!");
         }
         // 修改不允许修改 管理员标识符
-        if (ObjectUtil.isNotNull(role.getRoleId())) {
+        if (ObjUtil.isNotNull(role.getRoleId())) {
             SysRole sysRole = baseMapper.selectOneById(role.getRoleId());
             // 如果标识符不相等 判断为修改了管理员标识符
             if (!Strings.CS.equals(sysRole.getRoleKey(), role.getRoleKey())) {
@@ -254,7 +255,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
      */
     @Override
     public void checkRoleDataScope(Long roleId) {
-        if (ObjectUtil.isNull(roleId)) {
+        if (ObjUtil.isNull(roleId)) {
             return;
         }
         this.checkRoleDataScope(Collections.singletonList(roleId));
@@ -532,8 +533,8 @@ public class SysRoleServiceImpl implements ISysRoleService {
     @Override
     public void cleanOnlineUserByRole(Long roleId) {
         // 如果角色未绑定用户 直接返回
-        Long num = userRoleMapper.selectCountByQuery(QueryWrapper.create()
-            .eq(SysUserRole::getRoleId, roleId));
+        long num = userRoleMapper.selectCountByQuery(QueryWrapper.create()
+            .where(SYS_USER_ROLE.ROLE_ID.eq(roleId)));
         if (num == 0) {
             return;
         }
@@ -549,7 +550,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
                 return;
             }
             LoginUser loginUser = LoginHelper.getLoginUser(token);
-            if (ObjectUtil.isNull(loginUser) || CollUtil.isEmpty(loginUser.getRoles())) {
+            if (ObjUtil.isNull(loginUser) || CollUtil.isEmpty(loginUser.getRoles())) {
                 return;
             }
             if (loginUser.getRoles().stream().anyMatch(r -> r.getRoleId().equals(roleId))) {
@@ -585,7 +586,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
                 return;
             }
             LoginUser loginUser = LoginHelper.getLoginUser(token);
-            if (ObjectUtil.isNull(loginUser)) {
+            if (ObjUtil.isNull(loginUser)) {
                 return;
             }
             if (userIds.contains(loginUser.getUserId())) {

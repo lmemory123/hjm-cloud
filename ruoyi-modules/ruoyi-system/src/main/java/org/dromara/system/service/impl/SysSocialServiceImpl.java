@@ -1,6 +1,6 @@
 package org.dromara.system.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.utils.MapstructUtils;
@@ -46,7 +46,7 @@ public class SysSocialServiceImpl implements ISysSocialService {
     @Override
     public List<SysSocialVo> queryList(SysSocialBo bo) {
         QueryWrapper queryWrapper = QueryWrapper.create()
-            .eq(SysSocial::getUserId, bo.getUserId(), ObjectUtil.isNotNull(bo.getUserId()))
+            .eq(SysSocial::getUserId, bo.getUserId(), ObjUtil.isNotNull(bo.getUserId()))
             .eq(SysSocial::getAuthId, bo.getAuthId(), StringUtils.isNotBlank(bo.getAuthId()))
             .eq(SysSocial::getSource, bo.getSource(), StringUtils.isNotBlank(bo.getSource()));
         return baseMapper.selectVoList(queryWrapper);

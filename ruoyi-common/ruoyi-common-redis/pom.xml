@@ -54,10 +54,6 @@
             <artifactId>jedis</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-jackson2</artifactId>
-        </dependency>
 <!--        &lt;!&ndash; redis序列化替代方案 比json快无数的跨语言二进制序列化 &ndash;&gt;-->
 <!--        <dependency>-->
 <!--            <groupId>org.apache.fury</groupId>-->

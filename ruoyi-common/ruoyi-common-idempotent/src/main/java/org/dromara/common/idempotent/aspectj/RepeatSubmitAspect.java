@@ -1,9 +1,9 @@
 package org.dromara.common.idempotent.aspectj;
 
 import cn.dev33.satoken.SaManager;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.crypto.SecureUtil;
+import cn.hutool.v7.core.array.ArrayUtil;
+import cn.hutool.v7.core.util.ObjUtil;
+import cn.hutool.v7.crypto.SecureUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.Strings;
@@ -111,7 +111,7 @@ public class RepeatSubmitAspect {
             return params.toString();
         }
         for (Object o : paramsArray) {
-            if (ObjectUtil.isNotNull(o) && !isFilterObject(o)) {
+            if (ObjUtil.isNotNull(o) && !isFilterObject(o)) {
                 params.add(JsonUtils.toJsonString(o));
             }
         }

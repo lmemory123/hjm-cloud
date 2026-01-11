@@ -1,11 +1,11 @@
 package org.dromara.common.excel.core;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.EnumUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.v7.core.array.ArrayUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.reflect.FieldUtil;
+import cn.hutool.v7.core.text.StrUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import cn.idev.excel.metadata.FieldCache;
 import cn.idev.excel.metadata.FieldWrapper;
 import cn.idev.excel.util.ClassUtils;
@@ -115,10 +115,13 @@ public class ExcelDownHandler implements SheetWriteHandler {
             } else if (field.isAnnotationPresent(ExcelEnumFormat.class)) {
                 // 否则如果指定了@ExcelEnumFormat，则使用枚举的逻辑
                 ExcelEnumFormat format = field.getDeclaredAnnotation(ExcelEnumFormat.class);
-                List<Object> values = EnumUtil.getFieldValues(format.enumClass(), format.textField());
-                options = StreamUtils.toList(values, Convert::toStr);
+                List<Object> values = Arrays.stream(format.enumClass().getEnumConstants())
+                        .map(e -> FieldUtil.getFieldValue(e, format.textField()))
+                        .toList();
+
+                options = StreamUtils.toList(values, ConvertUtil::toStr);
             }
-            if (ObjectUtil.isNotEmpty(options)) {
+            if (ObjUtil.isNotEmpty(options)) {
                 // 仅当下拉可选项不为空时执行
                 if (options.size() > 20) {
                     // 这里限制如果可选项大于20，则使用额外表形式
@@ -155,10 +158,10 @@ public class ExcelDownHandler implements SheetWriteHandler {
      * @param value    下拉选可选值
      */
     private void dropDownWithSimple(DataValidationHelper helper, Sheet sheet, Integer celIndex, List<String> value) {
-        if (ObjectUtil.isEmpty(value)) {
+        if (ObjUtil.isEmpty(value)) {
             return;
         }
-        this.markOptionsToSheet(helper, sheet, celIndex, helper.createExplicitListConstraint(ArrayUtil.toArray(value, String.class)));
+        this.markOptionsToSheet(helper, sheet, celIndex, helper.createExplicitListConstraint(ArrayUtil.ofArray(value, String.class)));
     }
 
     /**
@@ -252,10 +255,10 @@ public class ExcelDownHandler implements SheetWriteHandler {
                     continue;
                 }
                 // 取第一个
-                String str = data.get(0);
+                String str = data.getFirst();
                 rowData.add(str);
                 // 通过移除的方式避免重复
-                data.remove(0);
+                data.removeFirst();
                 // 设置可以继续
                 flag = true;
             }
@@ -393,9 +396,9 @@ public class ExcelDownHandler implements SheetWriteHandler {
         // 26一循环的次数大于0，则视为栏名至少两位
         String columnPrefix = columnCircleCount == 0
             ? StrUtil.EMPTY
-            : StrUtil.subWithLength(EXCEL_COLUMN_NAME, columnCircleCount - 1, 1);
+            : StrUtil.subByLength(EXCEL_COLUMN_NAME, columnCircleCount - 1, 1);
         // 从26一循环内取对应的栏位名
-        String columnNext = StrUtil.subWithLength(EXCEL_COLUMN_NAME, thisCircleColumnIndex, 1);
+        String columnNext = StrUtil.subByLength(EXCEL_COLUMN_NAME, thisCircleColumnIndex, 1);
         // 将二者拼接即为最终的栏位名
         return columnPrefix + columnNext;
     }

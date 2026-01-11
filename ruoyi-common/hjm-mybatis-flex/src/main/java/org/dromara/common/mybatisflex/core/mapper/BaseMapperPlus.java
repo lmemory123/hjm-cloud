@@ -1,7 +1,8 @@
 package org.dromara.common.mybatisflex.core.mapper;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.collection.ListUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.mybatisflex.core.BaseMapper;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
@@ -143,7 +144,7 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
      */
     default <C> C selectVoById(Serializable id, Class<C> voClass) {
         T obj = this.selectOneById(id);
-        if (ObjectUtil.isNull(obj)) {
+        if (ObjUtil.isNull(obj)) {
             return null;
         }
         return MapstructUtils.convert(obj, voClass);
@@ -170,7 +171,7 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
     default <C> List<C> selectVoByIds(Collection<? extends Serializable> idList, Class<C> voClass) {
         List<T> list = this.selectListByIds(idList);
         if (CollUtil.isEmpty(list)) {
-            return CollUtil.newArrayList();
+            return ListUtil.of();
         }
         return MapstructUtils.convert(list, voClass);
     }
@@ -196,7 +197,7 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
     default <C> List<C> selectVoByMap(Map<String, Object> map, Class<C> voClass) {
         List<T> list = this.selectListByMap(map);
         if (CollUtil.isEmpty(list)) {
-            return CollUtil.newArrayList();
+            return ListUtil.of();
         }
         return MapstructUtils.convert(list, voClass);
     }
@@ -231,7 +232,7 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
      * @return 查询到的单个VO对象，经过类型转换为指定的VO类后返回
      */
     default <C> C selectVoOne(QueryWrapper wrapper, Class<C> voClass) {
-        QueryWrapper queryWrapper = ObjectUtil.isNull(wrapper) ? QueryWrapper.create() : wrapper;
+        QueryWrapper queryWrapper = ObjUtil.isNull(wrapper) ? QueryWrapper.create() : wrapper;
         return this.selectOneByQueryAs(queryWrapper,voClass);
     }
 
@@ -276,7 +277,7 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
      * @return 查询到的VO对象列表，经过转换为指定的VO类后返回
      */
     default <C> List<C> selectVoList(QueryWrapper wrapper, Class<C> voClass) {
-        QueryWrapper queryWrapper = ObjectUtil.isNull(wrapper) ? QueryWrapper.create() : wrapper;
+        QueryWrapper queryWrapper = ObjUtil.isNull(wrapper) ? QueryWrapper.create() : wrapper;
         List<C> list = this.selectListByQueryAs(queryWrapper,voClass);
         return list;
     }
@@ -303,7 +304,7 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
      * @return 查询到的VO对象分页列表，经过转换为指定的VO类后返回
      */
     default <C, P extends Page<C>> P selectVoPage(Page<T> page, QueryWrapper wrapper, Class<C> voClass) {
-        QueryWrapper queryWrapper = ObjectUtil.isNull(wrapper) ? QueryWrapper.create() : wrapper;
+        QueryWrapper queryWrapper = ObjUtil.isNull(wrapper) ? QueryWrapper.create() : wrapper;
         Page<T> entityPage = this.paginate(page, queryWrapper);
         Page<C> voPage = new Page<>(entityPage.getPageNumber(), entityPage.getPageSize(), entityPage.getTotalRow());
         if (CollUtil.isEmpty(entityPage.getRecords())) {
@@ -322,7 +323,7 @@ public interface BaseMapperPlus<T, V> extends BaseMapper<T> {
      * @return 查询到的符合条件的对象列表，经过转换为指定类型的对象后返回
      */
     default <C> List<C> selectObjs(QueryWrapper wrapper, Function<? super Object, C> mapper) {
-        QueryWrapper queryWrapper = ObjectUtil.isNull(wrapper) ? QueryWrapper.create() : wrapper;
+        QueryWrapper queryWrapper = ObjUtil.isNull(wrapper) ? QueryWrapper.create() : wrapper;
         return this.selectObjectListByQuery(queryWrapper).stream()
             .filter(Objects::nonNull)
             .map(mapper)

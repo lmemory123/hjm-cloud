@@ -1,7 +1,7 @@
 package org.dromara.common.json.handler;
 
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
+import cn.hutool.v7.core.date.DateTime;
+import cn.hutool.v7.core.date.DateUtil;
 import org.dromara.common.core.utils.ObjectUtils;
 import tools.jackson.core.JsonParser;
 import tools.jackson.databind.DeserializationContext;

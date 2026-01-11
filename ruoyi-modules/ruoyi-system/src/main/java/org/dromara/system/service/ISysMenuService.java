@@ -1,6 +1,6 @@
 package org.dromara.system.service;
 
-import cn.hutool.core.lang.tree.Tree;
+import cn.hutool.v7.core.tree.MapTree;
 import org.dromara.system.domain.SysMenu;
 import org.dromara.system.domain.bo.SysMenuBo;
 import org.dromara.system.domain.vo.RouterVo;
@@ -87,7 +87,7 @@ public interface ISysMenuService {
      * @param menus 菜单列表
      * @return 下拉树结构列表
      */
-    List<Tree<Long>> buildMenuTreeSelect(List<SysMenuVo> menus);
+    List<MapTree<Long>> buildMenuTreeSelect(List<SysMenuVo> menus);
 
     /**
      * 根据菜单ID查询信息

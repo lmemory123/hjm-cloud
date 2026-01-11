@@ -1,11 +1,11 @@
 package org.dromara.common.mybatis.handler;
 
-import cn.hutool.core.convert.Convert;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.reflect.FieldUtil;
 import com.baomidou.mybatisplus.core.handlers.PostInitTableInfoHandler;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import org.apache.ibatis.session.Configuration;
 import org.dromara.common.core.utils.SpringUtils;
-import org.dromara.common.core.utils.reflect.ReflectUtils;
 
 /**
  * 修改表信息初始化方式
@@ -19,8 +19,8 @@ public class PlusPostInitTableInfoHandler implements PostInitTableInfoHandler {
     public void postTableInfo(TableInfo tableInfo, Configuration configuration) {
         String flag = SpringUtils.getProperty("mybatis-plus.enableLogicDelete", "true");
         // 只有关闭时 统一设置false 为true时mp自动判断不处理
-        if (!Convert.toBool(flag)) {
-            ReflectUtils.setFieldValue(tableInfo, "withLogicDelete", false);
+        if (!ConvertUtil.toBoolean(flag)) {
+            FieldUtil.setFieldValue(tableInfo, "withLogicDelete", false);
         }
     }
 

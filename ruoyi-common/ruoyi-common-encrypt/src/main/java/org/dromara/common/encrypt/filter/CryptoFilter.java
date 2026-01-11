@@ -1,6 +1,6 @@
 package org.dromara.common.encrypt.filter;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -51,7 +51,7 @@ public class CryptoFilter implements Filter {
                 requestWrapper = new DecryptRequestBodyWrapper(servletRequest, properties.getPrivateKey(), properties.getHeaderFlag());
             } else {
                 // 是否有注解，有就报错，没有放行
-                if (ObjectUtil.isNotNull(apiEncrypt)) {
+                if (ObjUtil.isNotNull(apiEncrypt)) {
                     HandlerExceptionResolver exceptionResolver = SpringUtils.getBean("handlerExceptionResolver", HandlerExceptionResolver.class);
                     exceptionResolver.resolveException(
                         servletRequest, servletResponse, null,
@@ -68,8 +68,8 @@ public class CryptoFilter implements Filter {
         }
 
         chain.doFilter(
-            ObjectUtil.defaultIfNull(requestWrapper, request),
-            ObjectUtil.defaultIfNull(responseWrapper, response));
+            ObjUtil.defaultIfNull(requestWrapper, request),
+            ObjUtil.defaultIfNull(responseWrapper, response));
 
         if (responseFlag) {
             servletResponse.reset();
@@ -89,9 +89,9 @@ public class CryptoFilter implements Filter {
         // 获取注解
         try {
             HandlerExecutionChain mappingHandler = handlerMapping.getHandler(servletRequest);
-            if (ObjectUtil.isNotNull(mappingHandler)) {
+            if (ObjUtil.isNotNull(mappingHandler)) {
                 Object handler = mappingHandler.getHandler();
-                if (ObjectUtil.isNotNull(handler)) {
+                if (ObjUtil.isNotNull(handler)) {
                     // 从handler获取注解
                     if (handler instanceof HandlerMethod handlerMethod) {
                         return handlerMethod.getMethodAnnotation(ApiEncrypt.class);

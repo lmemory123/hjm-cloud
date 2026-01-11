@@ -1,14 +1,12 @@
 package org.dromara.common.core.utils;
 
-import cn.hutool.core.convert.Convert;
-import cn.hutool.extra.servlet.JakartaServletUtil;
-import cn.hutool.http.HttpStatus;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.http.meta.HttpStatus;
+import cn.hutool.v7.http.server.servlet.ServletUtil;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.Strings;
 import org.springframework.http.MediaType;
 import org.springframework.util.LinkedCaseInsensitiveMap;
@@ -20,18 +18,15 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 客户端工具类，提供获取请求参数、响应处理、头部信息等常用操作
  *
  * @author ruoyi
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ServletUtils extends JakartaServletUtil {
+public class ServletUtils extends ServletUtil {
+
 
     /**
      * 获取指定名称的 String 类型的请求参数
@@ -51,7 +46,7 @@ public class ServletUtils extends JakartaServletUtil {
      * @return 参数值或默认值
      */
     public static String getParameter(String name, String defaultValue) {
-        return Convert.toStr(getRequest().getParameter(name), defaultValue);
+        return ConvertUtil.toStr(getRequest().getParameter(name), defaultValue);
     }
 
     /**
@@ -61,7 +56,7 @@ public class ServletUtils extends JakartaServletUtil {
      * @return 参数值
      */
     public static Integer getParameterToInt(String name) {
-        return Convert.toInt(getRequest().getParameter(name));
+        return ConvertUtil.toInt(getRequest().getParameter(name));
     }
 
     /**
@@ -72,7 +67,7 @@ public class ServletUtils extends JakartaServletUtil {
      * @return 参数值或默认值
      */
     public static Integer getParameterToInt(String name, Integer defaultValue) {
-        return Convert.toInt(getRequest().getParameter(name), defaultValue);
+        return ConvertUtil.toInt(getRequest().getParameter(name), defaultValue);
     }
 
     /**
@@ -82,7 +77,7 @@ public class ServletUtils extends JakartaServletUtil {
      * @return 参数值
      */
     public static Boolean getParameterToBool(String name) {
-        return Convert.toBool(getRequest().getParameter(name));
+        return ConvertUtil.toBoolean(getRequest().getParameter(name));
     }
 
     /**
@@ -93,7 +88,7 @@ public class ServletUtils extends JakartaServletUtil {
      * @return 参数值或默认值
      */
     public static Boolean getParameterToBool(String name, Boolean defaultValue) {
-        return Convert.toBool(getRequest().getParameter(name), defaultValue);
+        return ConvertUtil.toBoolean(getRequest().getParameter(name), defaultValue);
     }
 
     /**
@@ -264,7 +259,7 @@ public class ServletUtils extends JakartaServletUtil {
      * @return 客户端 IP 地址
      */
     public static String getClientIP() {
-        return getClientIP(getRequest());
+        return ServletUtil.getClientIP(Objects.requireNonNull(getRequest()));
     }
 
     /**

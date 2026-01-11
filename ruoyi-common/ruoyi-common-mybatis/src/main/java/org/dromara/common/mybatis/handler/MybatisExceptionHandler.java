@@ -1,7 +1,7 @@
 package org.dromara.common.mybatis.handler;
 
 import cn.dev33.satoken.exception.NotLoginException;
-import cn.hutool.http.HttpStatus;
+import cn.hutool.v7.http.meta.HttpStatus;
 import com.baomidou.dynamic.datasource.exception.CannotFindDataSourceException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;

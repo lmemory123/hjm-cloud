@@ -1,7 +1,7 @@
 package org.dromara.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.hutool.core.convert.Convert;
+import cn.hutool.v7.core.convert.ConvertUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.constant.SystemConstants;
@@ -54,7 +54,7 @@ public class SysDeptController extends BaseController {
     public R<List<SysDeptVo>> excludeChild(@PathVariable(value = "deptId", required = false) Long deptId) {
         List<SysDeptVo> depts = deptService.selectDeptList(new SysDeptBo());
         depts.removeIf(d -> d.getDeptId().equals(deptId)
-            || StringUtils.splitList(d.getAncestors()).contains(Convert.toStr(deptId)));
+            || StringUtils.splitList(d.getAncestors()).contains(ConvertUtil.toStr(deptId)));
         return R.ok(depts);
     }
 

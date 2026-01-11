@@ -1,6 +1,6 @@
 package org.dromara.common.social.maxkey;
 
-import cn.hutool.core.lang.Dict;
+import cn.hutool.v7.core.map.Dict;
 import me.zhyd.oauth.cache.AuthStateCache;
 import me.zhyd.oauth.config.AuthConfig;
 import me.zhyd.oauth.exception.AuthException;

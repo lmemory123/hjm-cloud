@@ -1,9 +1,10 @@
 package org.dromara.system.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.lang.tree.Tree;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.collection.ListUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.tree.MapTree;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.Strings;
@@ -80,7 +81,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 .eq(SysMenu::getVisible, menu.getVisible(), StringUtils.isNotBlank(menu.getVisible()))
                 .eq(SysMenu::getStatus, menu.getStatus(), StringUtils.isNotBlank(menu.getStatus()))
                 .eq(SysMenu::getMenuType, menu.getMenuType(), StringUtils.isNotBlank(menu.getMenuType()))
-                .eq(SysMenu::getParentId, menu.getParentId(), ObjectUtil.isNotNull(menu.getParentId()))
+                .eq(SysMenu::getParentId, menu.getParentId(), ObjUtil.isNotNull(menu.getParentId()))
                 .orderBy(SysMenu::getParentId, true)
                 .orderBy(SysMenu::getOrderNum, true));
         return menuList;
@@ -152,7 +153,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
     @Override
     public List<Long> selectMenuListByPackageId(Long packageId) {
         SysTenantPackage tenantPackage = tenantPackageMapper.selectOneById(packageId);
-        List<Long> menuIds = StringUtils.splitTo(tenantPackage.getMenuIds(), Convert::toLong);
+        List<Long> menuIds = StringUtils.splitTo(tenantPackage.getMenuIds(), ConvertUtil::toLong);
         if (CollUtil.isEmpty(menuIds)) {
             return List.of();
         }
@@ -160,12 +161,12 @@ public class SysMenuServiceImpl implements ISysMenuService {
         if (tenantPackage.getMenuCheckStrictly()) {
             parentIds = baseMapper.selectObjs(QueryWrapper.create()
                 .select(SysMenu::getParentId)
-                .in(SysMenu::getMenuId, menuIds), Convert::toLong);
+                .in(SysMenu::getMenuId, menuIds), ConvertUtil::toLong);
         }
         return baseMapper.selectObjs(QueryWrapper.create()
             .select(SysMenu::getMenuId)
             .in(SysMenu::getMenuId, menuIds)
-            .notIn(SysMenu::getMenuId, parentIds, CollUtil.isNotEmpty(parentIds)), Convert::toLong);
+            .notIn(SysMenu::getMenuId, parentIds, CollUtil.isNotEmpty(parentIds)), ConvertUtil::toLong);
     }
 
     /**
@@ -230,12 +231,12 @@ public class SysMenuServiceImpl implements ISysMenuService {
      * @return 下拉树结构列表
      */
     @Override
-    public List<Tree<Long>> buildMenuTreeSelect(List<SysMenuVo> menus) {
+    public List<MapTree<Long>> buildMenuTreeSelect(List<SysMenuVo> menus) {
         if (CollUtil.isEmpty(menus)) {
-            return CollUtil.newArrayList();
+            return ListUtil.of();
         }
         return TreeBuildUtils.build(menus, (menu, tree) -> {
-            Tree<Long> menuTree = tree.setId(menu.getMenuId())
+            MapTree<Long> menuTree = tree.setId(menu.getMenuId())
                 .setParentId(menu.getParentId())
                 .setName(menu.getMenuName())
                 .setWeight(menu.getOrderNum());
@@ -352,7 +353,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
         boolean exist = baseMapper.selectCountByQuery(QueryWrapper.create()
             .eq(SysMenu::getMenuName, menu.getMenuName())
             .eq(SysMenu::getParentId, menu.getParentId())
-            .ne(SysMenu::getMenuId, menu.getMenuId(), ObjectUtil.isNotNull(menu.getMenuId()))) > 0;
+            .ne(SysMenu::getMenuId, menu.getMenuId(), ObjUtil.isNotNull(menu.getMenuId()))) > 0;
         return !exist;
     }
 

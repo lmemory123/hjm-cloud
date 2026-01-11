@@ -1,6 +1,6 @@
 package org.dromara.common.loadbalance.core;
 
-import cn.hutool.core.net.NetUtil;
+import cn.hutool.v7.core.net.NetUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.common.URL;
 import org.apache.dubbo.rpc.Invocation;

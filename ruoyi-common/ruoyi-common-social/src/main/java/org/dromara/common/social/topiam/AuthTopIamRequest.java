@@ -1,10 +1,11 @@
 package org.dromara.common.social.topiam;
 
-import cn.hutool.core.codec.Base64;
-import cn.hutool.core.lang.Dict;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
+import cn.hutool.v7.core.codec.binary.Base64;
+import cn.hutool.v7.core.map.Dict;
+import cn.hutool.v7.core.text.StrUtil;
+import cn.hutool.v7.http.HttpUtil;
+import cn.hutool.v7.http.client.Request;
+import cn.hutool.v7.http.client.Response;
 import com.xkcoding.http.support.HttpHeader;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.cache.AuthStateCache;
@@ -18,6 +19,8 @@ import me.zhyd.oauth.utils.HttpUtils;
 import me.zhyd.oauth.utils.UrlBuilder;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.json.utils.JsonUtils;
+
+import java.util.Map;
 
 import static org.dromara.common.social.topiam.AuthTopIamSource.TOPIAM;
 
@@ -75,13 +78,17 @@ public class AuthTopIamRequest extends AuthDefaultRequest {
 
     @Override
     protected String doPostAuthorizationCode(String code) {
-        HttpRequest request = HttpRequest.post(source.accessToken())
-            .header("Authorization", "Basic " + Base64.encode("%s:%s".formatted(config.getClientId(), config.getClientSecret())))
-            .form("grant_type", "authorization_code")
-            .form("code", code)
-            .form("redirect_uri", config.getRedirectUri());
-        HttpResponse response = request.execute();
-        return response.body();
+        Map<String,Object> form = Map.of(
+            "grant_type", "authorization_code",
+            "code", code,
+            "redirect_uri", config.getRedirectUri()
+        );
+
+        Request request = HttpUtil.createPost(source.accessToken())
+                .header("Authorization", "Basic " + Base64.encode("%s:%s".formatted(config.getClientId(), config.getClientSecret())))
+                .form(form);
+        Response response = request.send();
+        return response.bodyStr();
     }
 
     @Override

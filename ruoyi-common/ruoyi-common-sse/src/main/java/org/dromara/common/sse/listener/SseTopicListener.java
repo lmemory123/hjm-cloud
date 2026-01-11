@@ -1,6 +1,6 @@
 package org.dromara.common.sse.listener;
 
-import cn.hutool.core.collection.CollUtil;
+import cn.hutool.v7.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.sse.core.SseEmitterManager;
 import org.springframework.beans.factory.annotation.Autowired;

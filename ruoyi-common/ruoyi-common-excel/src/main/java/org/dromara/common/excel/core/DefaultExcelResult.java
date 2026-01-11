@@ -1,6 +1,6 @@
 package org.dromara.common.excel.core;
 
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.v7.core.text.StrUtil;
 import lombok.Setter;
 
 import java.util.ArrayList;

@@ -1,8 +1,8 @@
 package org.dromara.common.excel.convert;
 
-import cn.hutool.core.annotation.AnnotationUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.annotation.AnnotationUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import cn.idev.excel.converters.Converter;
 import cn.idev.excel.enums.CellDataTypeEnum;
 import cn.idev.excel.metadata.GlobalConfiguration;
@@ -47,17 +47,17 @@ public class ExcelDictConvert implements Converter<Object> {
         } else {
             value = SpringUtils.getBean(DictService.class).getDictValue(type, label, anno.separator());
         }
-        return Convert.convert(contentProperty.getField().getType(), value);
+        return ConvertUtil.convert(contentProperty.getField().getType(), value);
     }
 
     @Override
     public WriteCellData<String> convertToExcelData(Object object, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
-        if (ObjectUtil.isNull(object)) {
+        if (ObjUtil.isNull(object)) {
             return new WriteCellData<>("");
         }
         ExcelDictFormat anno = getAnnotation(contentProperty.getField());
         String type = anno.dictType();
-        String value = Convert.toStr(object);
+        String value = ConvertUtil.toStr(object);
         String label;
         if (StringUtils.isBlank(type)) {
             label = ExcelUtil.convertByExp(value, anno.readConverterExp(), anno.separator());

@@ -2,7 +2,7 @@ package org.dromara.common.mybatisflex.helper;
 
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.context.model.SaStorage;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.mybatisflex.annotation.DataPermission;
@@ -86,7 +86,7 @@ public class DataPermissionHelper {
         if (SaHolder.getContext().isValid()) {
             SaStorage saStorage = SaHolder.getStorage();
             attribute = saStorage.get(DATA_PERMISSION_KEY);
-            if (ObjectUtil.isNull(attribute)) {
+            if (ObjUtil.isNull(attribute)) {
                 saStorage.set(DATA_PERMISSION_KEY, new HashMap<>());
                 attribute = saStorage.get(DATA_PERMISSION_KEY);
             }

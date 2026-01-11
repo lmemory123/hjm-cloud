@@ -1,8 +1,8 @@
 package org.dromara.system.dubbo;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -44,14 +44,14 @@ public class RemoteDataScopeServiceImpl implements RemoteDataScopeService {
     @Cacheable(cacheNames = CacheNames.SYS_ROLE_CUSTOM, key = "#roleId", condition = "#roleId != null")
     @Override
     public String getRoleCustom(Long roleId) {
-        if (ObjectUtil.isNull(roleId)) {
+        if (ObjUtil.isNull(roleId)) {
             return "-1";
         }
         List<Long> list = roleDeptMapper.selectListByQueryAs(QueryWrapper.create()
             .select(SYS_DEPT.DEPT_ID)
             .eq(SysRoleDept::getRoleId, roleId), Long.class);
         if (CollUtil.isNotEmpty(list)) {
-            return StreamUtils.join(list, Convert::toStr);
+            return StreamUtils.join(list, ConvertUtil::toStr);
         }
         return "-1";
     }
@@ -65,11 +65,11 @@ public class RemoteDataScopeServiceImpl implements RemoteDataScopeService {
     @Cacheable(cacheNames = CacheNames.SYS_DEPT_AND_CHILD, key = "#deptId", condition = "#deptId != null")
     @Override
     public String getDeptAndChild(Long deptId) {
-        if (ObjectUtil.isNull(deptId)) {
+        if (ObjUtil.isNull(deptId)) {
             return "-1";
         }
         List<Long> deptIds = deptMapper.selectDeptAndChildById(deptId);
-        return CollUtil.isNotEmpty(deptIds) ? StreamUtils.join(deptIds, Convert::toStr) : "-1";
+        return CollUtil.isNotEmpty(deptIds) ? StreamUtils.join(deptIds, ConvertUtil::toStr) : "-1";
     }
 
 }

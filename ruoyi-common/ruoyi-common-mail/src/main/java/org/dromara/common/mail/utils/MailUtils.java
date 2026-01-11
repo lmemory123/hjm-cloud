@@ -1,21 +1,24 @@
 package org.dromara.common.mail.utils;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.CharUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.extra.mail.JakartaMail;
-import cn.hutool.extra.mail.JakartaUserPassAuthenticator;
-import cn.hutool.extra.mail.MailAccount;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.collection.ListUtil;
+import cn.hutool.v7.core.map.MapUtil;
+import cn.hutool.v7.core.text.CharUtil;
+import cn.hutool.v7.core.text.StrUtil;
+import cn.hutool.v7.core.text.split.SplitUtil;
+import cn.hutool.v7.extra.mail.Mail;
+import cn.hutool.v7.extra.mail.MailAccount;
+import cn.hutool.v7.extra.mail.UserPassMailAuthenticator;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Session;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
@@ -25,6 +28,7 @@ import java.util.Map.Entry;
 /**
  * 邮件工具类
  */
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MailUtils {
 
@@ -46,7 +50,7 @@ public class MailUtils {
     public static MailAccount getMailAccount(String from, String user, String pass) {
         ACCOUNT.setFrom(StringUtils.blankToDefault(from, ACCOUNT.getFrom()));
         ACCOUNT.setUser(StringUtils.blankToDefault(user, ACCOUNT.getUser()));
-        ACCOUNT.setPass(StringUtils.blankToDefault(pass, ACCOUNT.getPass()));
+        ACCOUNT.setPass(StrUtil.isNotBlank(pass) ? pass.toCharArray() : ACCOUNT.getPass());
         return ACCOUNT;
     }
 
@@ -388,11 +392,11 @@ public class MailUtils {
     public static Session getSession(MailAccount mailAccount, boolean isSingleton) {
         Authenticator authenticator = null;
         if (mailAccount.isAuth()) {
-            authenticator = new JakartaUserPassAuthenticator(mailAccount.getUser(), mailAccount.getPass());
+            authenticator = new UserPassMailAuthenticator(mailAccount);
         }
 
         return isSingleton ? Session.getDefaultInstance(mailAccount.getSmtpProps(), authenticator) //
-            : Session.getInstance(mailAccount.getSmtpProps(), authenticator);
+                : Session.getInstance(mailAccount.getSmtpProps(), authenticator);
     }
 
     // ------------------------------------------------------------------------------------------------------------------------ Private method start
@@ -415,7 +419,7 @@ public class MailUtils {
      */
     private static String send(MailAccount mailAccount, boolean useGlobalSession, Collection<String> tos, Collection<String> ccs, Collection<String> bccs, String subject, String content,
                                Map<String, InputStream> imageMap, boolean isHtml, File... files) {
-        final JakartaMail mail = JakartaMail.create(mailAccount).setUseGlobalSession(useGlobalSession);
+        final Mail mail = Mail.of(mailAccount).setUseGlobalSession(useGlobalSession);
 
         // 可选抄送人
         if (CollUtil.isNotEmpty(ccs)) {
@@ -430,14 +434,18 @@ public class MailUtils {
         mail.setTitle(subject);
         mail.setContent(content);
         mail.setHtml(isHtml);
-        mail.setFiles(files);
+        mail.addFiles(files);
 
         // 图片
         if (MapUtil.isNotEmpty(imageMap)) {
             for (Entry<String, InputStream> entry : imageMap.entrySet()) {
                 mail.addImage(entry.getKey(), entry.getValue());
                 // 关闭流
-                IoUtil.close(entry.getValue());
+                try {
+                    entry.getValue().close();
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                }
             }
         }
 
@@ -457,11 +465,11 @@ public class MailUtils {
 
         List<String> result;
         if (StrUtil.contains(addresses, CharUtil.COMMA)) {
-            result = StrUtil.splitTrim(addresses, CharUtil.COMMA);
+            result = SplitUtil.splitTrim(addresses, StrUtil.COMMA);
         } else if (StrUtil.contains(addresses, ';')) {
-            result = StrUtil.splitTrim(addresses, ';');
+            result = SplitUtil.splitTrim(addresses, ";");
         } else {
-            result = CollUtil.newArrayList(addresses);
+            result = ListUtil.of(addresses);
         }
         return result;
     }

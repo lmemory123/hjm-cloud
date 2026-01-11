@@ -1,6 +1,6 @@
 package org.dromara.gateway.utils;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.json.utils.JsonUtils;
@@ -83,7 +83,7 @@ public class WebFluxUtils {
      */
     public static String resolveBodyFromCacheRequest(ServerWebExchange exchange) {
         Object obj = exchange.getAttributes().get(ServerWebExchangeUtils.CACHED_REQUEST_BODY_ATTR);
-        if (ObjectUtil.isNull(obj)) {
+        if (ObjUtil.isNull(obj)) {
             return null;
         }
         DataBuffer buffer = (DataBuffer) obj;

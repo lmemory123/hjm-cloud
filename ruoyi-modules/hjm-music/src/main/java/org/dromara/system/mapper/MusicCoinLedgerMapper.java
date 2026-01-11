@@ -1,8 +1,8 @@
 package org.dromara.system.mapper;
 
+import org.dromara.common.mybatisflex.core.mapper.BaseMapperPlus;
 import org.dromara.system.domain.MusicCoinLedger;
 import org.dromara.system.domain.vo.MusicCoinLedgerVo;
-import org.dromara.common.mybatisflex.core.mapper.BaseMapperPlus;
 
 /**
  * 哈气金流水Mapper接口

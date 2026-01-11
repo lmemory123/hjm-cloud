@@ -1,7 +1,7 @@
 package org.dromara.job.snailjob;
 
 import cn.hutool.core.thread.ThreadUtil;
-import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.v7.extra.spring.SpringUtil;
 import com.aizuda.snailjob.client.job.core.MapHandler;
 import com.aizuda.snailjob.client.job.core.annotation.JobExecutor;
 import com.aizuda.snailjob.client.job.core.annotation.MapExecutor;

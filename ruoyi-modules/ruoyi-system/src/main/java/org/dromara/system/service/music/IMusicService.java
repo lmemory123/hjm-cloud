@@ -1,9 +1,9 @@
 package org.dromara.system.service.music;
 
-import org.dromara.system.domain.vo.MusicVo;
-import org.dromara.system.domain.bo.MusicBo;
-import org.dromara.common.mybatisflex.core.page.TableDataInfo;
 import org.dromara.common.mybatisflex.core.page.PageQuery;
+import org.dromara.common.mybatisflex.core.page.TableDataInfo;
+import org.dromara.system.domain.bo.MusicBo;
+import org.dromara.system.domain.vo.MusicVo;
 
 import java.util.Collection;
 import java.util.List;

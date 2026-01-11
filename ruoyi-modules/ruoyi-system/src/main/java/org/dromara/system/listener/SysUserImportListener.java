@@ -1,9 +1,9 @@
 package org.dromara.system.listener;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.digest.BCrypt;
-import cn.hutool.http.HtmlUtil;
+import cn.hutool.v7.core.util.ObjUtil;
+import cn.hutool.v7.http.html.HtmlUtil;
 import cn.idev.excel.context.AnalysisContext;
 import cn.idev.excel.event.AnalysisEventListener;
 import jakarta.validation.ConstraintViolation;
@@ -58,7 +58,7 @@ public class SysUserImportListener extends AnalysisEventListener<SysUserImportVo
         SysUserVo sysUser = this.userService.selectUserByUserName(userVo.getUserName());
         try {
             // 验证是否存在这个用户
-            if (ObjectUtil.isNull(sysUser)) {
+            if (ObjUtil.isNull(sysUser)) {
                 SysUserBo user = BeanUtil.toBean(userVo, SysUserBo.class);
                 ValidatorUtils.validate(user);
                 user.setPassword(password);

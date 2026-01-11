@@ -1,7 +1,8 @@
 package org.dromara.common.oss.core;
 
-import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.util.IdUtil;
+import cn.hutool.v7.core.data.id.IdUtil;
+import cn.hutool.v7.core.io.IoUtil;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.constant.Constants;
@@ -50,7 +51,11 @@ public class OssClient {
 
     /**
      * 服务商
+     * -- GETTER --
+     *  服务商
+
      */
+    @Getter
     private final String configKey;
 
     /**
@@ -391,7 +396,7 @@ public class OssClient {
         // 创建输入流
         InputStream inputStream = Files.newInputStream(tempFilePath);
         // 删除临时文件
-        FileUtils.del(tempFilePath);
+        FileUtils.del(path);
         // 返回对象内容的输入流
         return inputStream;
     }
@@ -495,13 +500,6 @@ public class OssClient {
      */
     public String removeBaseUrl(String path) {
         return path.replace(getUrl() + StringUtils.SLASH, "");
-    }
-
-    /**
-     * 服务商
-     */
-    public String getConfigKey() {
-        return configKey;
     }
 
     /**

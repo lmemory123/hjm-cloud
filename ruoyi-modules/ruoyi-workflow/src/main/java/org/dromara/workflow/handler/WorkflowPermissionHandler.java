@@ -1,7 +1,7 @@
 package org.dromara.workflow.handler;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.StreamUtils;
@@ -60,7 +60,7 @@ public class WorkflowPermissionHandler implements PermissionHandler {
         }
         String storageIds = CollUtil.join(permissions, StringUtils.SEPARATOR);
         List<RemoteUserVo> users = flwTaskAssigneeService.fetchUsersByStorageIds(storageIds);
-        return StreamUtils.toList(users, userDTO -> Convert.toStr(userDTO.getUserId()));
+        return StreamUtils.toList(users, userDTO -> ConvertUtil.toStr(userDTO.getUserId()));
     }
 
 }

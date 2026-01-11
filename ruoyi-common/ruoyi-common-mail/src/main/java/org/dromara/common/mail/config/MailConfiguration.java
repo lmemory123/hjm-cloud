@@ -1,6 +1,6 @@
 package org.dromara.common.mail.config;
 
-import cn.hutool.extra.mail.MailAccount;
+import cn.hutool.v7.extra.mail.MailAccount;
 import org.dromara.common.mail.config.properties.MailProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -25,7 +25,7 @@ public class MailConfiguration {
         account.setAuth(mailProperties.getAuth());
         account.setFrom(mailProperties.getFrom());
         account.setUser(mailProperties.getUser());
-        account.setPass(mailProperties.getPass());
+        account.setPass(mailProperties.getPass().toCharArray());
         account.setSocketFactoryPort(mailProperties.getPort());
         account.setStarttlsEnable(mailProperties.getStarttlsEnable());
         account.setSslEnable(mailProperties.getSslEnable());

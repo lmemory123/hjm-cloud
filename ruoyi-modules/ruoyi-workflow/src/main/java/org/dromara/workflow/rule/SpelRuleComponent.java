@@ -1,6 +1,6 @@
 package org.dromara.workflow.rule;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.exception.ServiceException;
@@ -29,7 +29,7 @@ public class SpelRuleComponent {
      */
     public Long selectDeptLeaderById(Long initiatorDeptId) {
         Long leaderId = deptService.selectDeptLeaderById(initiatorDeptId);
-        if (ObjectUtil.isNull(leaderId)) {
+        if (ObjUtil.isNull(leaderId)) {
             throw new ServiceException("当前部门未设置负责人，请联系管理员操作。");
         }
         return leaderId;

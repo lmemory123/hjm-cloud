@@ -1,6 +1,6 @@
 package org.dromara.common.excel.core;
 
-import cn.hutool.core.collection.CollUtil;
+import cn.hutool.v7.core.collection.CollUtil;
 import cn.idev.excel.metadata.Head;
 import cn.idev.excel.write.handler.SheetWriteHandler;
 import cn.idev.excel.write.merge.AbstractMergeStrategy;

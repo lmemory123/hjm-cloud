@@ -1,6 +1,6 @@
 package org.dromara.system.service;
 
-import cn.hutool.core.lang.tree.Tree;
+import cn.hutool.v7.core.tree.MapTree;
 import org.dromara.common.mybatisflex.core.page.PageQuery;
 import org.dromara.common.mybatisflex.core.page.TableDataInfo;
 import org.dromara.system.domain.bo.SysDeptBo;
@@ -38,7 +38,7 @@ public interface ISysDeptService {
      * @param dept 部门信息
      * @return 部门树信息集合
      */
-    List<Tree<Long>> selectDeptTreeList(SysDeptBo dept);
+    List<MapTree<Long>> selectDeptTreeList(SysDeptBo dept);
 
     /**
      * 构建前端所需要下拉树结构
@@ -46,7 +46,7 @@ public interface ISysDeptService {
      * @param depts 部门列表
      * @return 下拉树结构列表
      */
-    List<Tree<Long>> buildDeptTreeSelect(List<SysDeptVo> depts);
+    List<MapTree<Long>> buildDeptTreeSelect(List<SysDeptVo> depts);
 
     /**
      * 根据角色ID查询部门树信息

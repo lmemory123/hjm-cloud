@@ -1,6 +1,6 @@
 package org.dromara.common.encrypt.filter;
 
-import cn.hutool.core.util.RandomUtil;
+import cn.hutool.v7.core.util.RandomUtil;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.WriteListener;
 import jakarta.servlet.http.HttpServletResponse;

@@ -21,10 +21,6 @@
             <artifactId>ruoyi-common-nacos</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-captcha</artifactId>
-        </dependency>
 
         <!-- RuoYi Common Security-->
         <dependency>
@@ -110,10 +106,6 @@
 <!--            <groupId>org.dromara</groupId>-->
 <!--            <artifactId>ruoyi-common-prometheus</artifactId>-->
 <!--        </dependency>-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-jackson2</artifactId>
-        </dependency>
     </dependencies>
 
     <build>

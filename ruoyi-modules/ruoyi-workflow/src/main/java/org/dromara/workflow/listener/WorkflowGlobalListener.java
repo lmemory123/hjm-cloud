@@ -1,11 +1,11 @@
 package org.dromara.workflow.listener;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -85,7 +85,7 @@ public class WorkflowGlobalListener implements GlobalListener {
             if (CollUtil.isNotEmpty(copyList)) {
                 List<FlowCopyBo> list = StreamUtils.toList(copyList, x -> {
                     FlowCopyBo bo = new FlowCopyBo();
-                    Long id = Convert.toLong(x);
+                    Long id = ConvertUtil.toLong(x);
                     bo.setUserId(id);
                     bo.setUserName(remoteUserService.selectUserNameById(id));
                     return bo;
@@ -180,7 +180,7 @@ public class WorkflowGlobalListener implements GlobalListener {
         Map<String, Object> params = new HashMap<>();
         FlowParams flowParams = listenerVariable.getFlowParams();
         Map<String, Object> variable = new HashMap<>();
-        if (ObjectUtil.isNotNull(flowParams)) {
+        if (ObjUtil.isNotNull(flowParams)) {
             // 历史任务扩展(通常为附件)
             params.put("hisTaskExt", flowParams.getHisTaskExt());
             // 办理人
@@ -217,14 +217,14 @@ public class WorkflowGlobalListener implements GlobalListener {
                 flowProcessEventHandler.processTaskHandler(definition.getFlowCode(), instance, nextTask, params);
             }
         }
-        if (ObjectUtil.isNull(flowParams)) {
+        if (ObjUtil.isNull(flowParams)) {
             return;
         }
         // 只有办理或者退回的时候才执行消息通知和抄送
         if (!TaskStatusEnum.isPassOrBack(flowParams.getHisStatus())) {
             return;
         }
-        if (ObjectUtil.isNull(variable)) {
+        if (ObjUtil.isNull(variable)) {
             return;
         }
 

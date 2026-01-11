@@ -1,7 +1,7 @@
 package org.dromara.workflow.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -89,7 +89,7 @@ public class FlwCommonServiceImpl implements IFlwCommonService {
 
         for (String code : messageType) {
             MessageTypeEnum messageTypeEnum = MessageTypeEnum.getByCode(code);
-            if (ObjectUtil.isEmpty(messageTypeEnum)) {
+            if (ObjUtil.isEmpty(messageTypeEnum)) {
                 continue;
             }
             try {

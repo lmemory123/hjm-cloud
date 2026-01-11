@@ -1,6 +1,6 @@
 package org.dromara.common.sms.handler;
 
-import cn.hutool.http.HttpStatus;
+import cn.hutool.v7.http.meta.HttpStatus;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.domain.R;

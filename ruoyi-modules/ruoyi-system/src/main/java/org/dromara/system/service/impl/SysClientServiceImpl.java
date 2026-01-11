@@ -1,7 +1,7 @@
 package org.dromara.system.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.crypto.SecureUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.crypto.SecureUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;

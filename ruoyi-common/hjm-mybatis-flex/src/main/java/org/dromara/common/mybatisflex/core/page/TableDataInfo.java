@@ -1,7 +1,8 @@
 package org.dromara.common.mybatisflex.core.page;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.http.HttpStatus;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.collection.ListUtil;
+import cn.hutool.v7.http.meta.HttpStatus;
 import com.mybatisflex.core.paginate.Page;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -100,7 +101,7 @@ public class TableDataInfo<T> implements Serializable {
         if (CollUtil.isEmpty(list)) {
             return TableDataInfo.build();
         }
-        List<T> pageList = CollUtil.page((int) page.getPageNumber() - 1, (int) page.getPageSize(), list);
+        List<T> pageList = ListUtil.page(list,(int) page.getPageNumber() - 1, (int) page.getPageSize());
         return new TableDataInfo<>(pageList, list.size());
     }
 

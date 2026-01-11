@@ -2,8 +2,8 @@ package org.dromara.auth.controller;
 
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.hutool.core.codec.Base64;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -92,7 +92,7 @@ public class TokenController {
         RemoteClientVo clientVo = remoteClientService.queryByClientId(clientId);
 
         // 查询不到 client 或 client 内不包含 grantType
-        if (ObjectUtil.isNull(clientVo) || !Strings.CS.contains(clientVo.getGrantType(), grantType)) {
+        if (ObjUtil.isNull(clientVo) || !Strings.CS.contains(clientVo.getGrantType(), grantType)) {
             log.info("客户端id: {} 认证类型：{} 异常!.", clientId, grantType);
             return R.fail(MessageUtils.message("auth.grant.type.error"));
         } else if (!SystemConstants.NORMAL.equals(clientVo.getStatus())) {
@@ -120,7 +120,7 @@ public class TokenController {
     public R<String> authBinding(@PathVariable("source") String source,
                                  @RequestParam String tenantId, @RequestParam String domain) {
         SocialLoginConfigProperties obj = socialProperties.getType().get(source);
-        if (ObjectUtil.isNull(obj)) {
+        if (ObjUtil.isNull(obj)) {
             return R.fail(source + "平台账号暂不支持");
         }
         AuthRequest authRequest = SocialUtils.getAuthRequest(source, socialProperties);

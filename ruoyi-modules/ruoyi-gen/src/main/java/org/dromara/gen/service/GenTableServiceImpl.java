@@ -1,9 +1,9 @@
 package org.dromara.gen.service;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.IoUtil;
-import cn.hutool.core.lang.Dict;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.map.Dict;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import com.mybatisflex.core.paginate.Page;
@@ -48,7 +48,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import static org.dromara.gen.domain.table.GenTableColumnTableDef.GEN_TABLE_COLUMN;
-import static org.dromara.gen.domain.table.GenTableTableDef.GEN_TABLE;
 
 
 /**
@@ -171,7 +170,7 @@ public class GenTableServiceImpl implements IGenTableService {
                 gen.setTableName(x.getName());
                 gen.setTableComment(x.getComment());
                 // postgresql的表元数据没有创建时间这个东西(好奇葩) 只能new Date代替
-                gen.setCreateTime(ObjectUtil.defaultIfNull(x.getCreateTime(), new Date()));
+                gen.setCreateTime(ObjUtil.defaultIfNull(x.getCreateTime(), new Date()));
                 gen.setUpdateTime(x.getUpdateTime());
                 return gen;
             }).sorted(Comparator.comparing(GenTable::getCreateTime).reversed())
@@ -299,7 +298,7 @@ public class GenTableServiceImpl implements IGenTableService {
     @Override
     public List<GenTableColumn> selectDbTableColumnsByName(String tableName, String dataName) {
         Table<?> table = ServiceProxy.metadata().table(tableName);
-        if (ObjectUtil.isNull(table)) {
+        if (ObjUtil.isNull(table)) {
             return new ArrayList<>();
         }
         LinkedHashMap<String, Column> columns = table.getColumns();
@@ -541,7 +540,7 @@ public class GenTableServiceImpl implements IGenTableService {
                 break;
             }
         }
-        if (ObjectUtil.isNull(table.getPkColumn())) {
+        if (ObjUtil.isNull(table.getPkColumn())) {
             table.setPkColumn(table.getColumns().get(0));
         }
 
@@ -554,7 +553,7 @@ public class GenTableServiceImpl implements IGenTableService {
      */
     public void setTableFromOptions(GenTable genTable) {
         Dict paramsObj = JsonUtils.parseMap(genTable.getOptions());
-        if (ObjectUtil.isNotNull(paramsObj)) {
+        if (ObjUtil.isNotNull(paramsObj)) {
             String treeCode = paramsObj.getStr(GenConstants.TREE_CODE);
             String treeParentCode = paramsObj.getStr(GenConstants.TREE_PARENT_CODE);
             String treeName = paramsObj.getStr(GenConstants.TREE_NAME);

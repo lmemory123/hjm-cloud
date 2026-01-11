@@ -1,8 +1,8 @@
 package org.dromara.system.mapper;
 
+import org.dromara.common.mybatisflex.core.mapper.BaseMapperPlus;
 import org.dromara.system.domain.MusicAuditLog;
 import org.dromara.system.domain.vo.MusicAuditLogVo;
-import org.dromara.common.mybatisflex.core.mapper.BaseMapperPlus;
 
 /**
  * 音乐审核流水日志Mapper接口

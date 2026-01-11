@@ -3,9 +3,9 @@ package org.dromara.auth.listener;
 import cn.dev33.satoken.listener.SaTokenListener;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.http.useragent.UserAgent;
-import cn.hutool.http.useragent.UserAgentUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.http.useragent.UserAgent;
+import cn.hutool.v7.http.useragent.UserAgentUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -85,7 +85,7 @@ public class UserActionListener implements SaTokenListener {
      */
     @Override
     public void doLogout(String loginType, Object loginId, String tokenValue) {
-        String tenantId = Convert.toStr(StpUtil.getExtra(tokenValue, LoginHelper.TENANT_KEY));
+        String tenantId = ConvertUtil.toStr(StpUtil.getExtra(tokenValue, LoginHelper.TENANT_KEY));
         TenantHelper.dynamic(tenantId, () -> {
             RedisUtils.deleteObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue);
         });
@@ -97,7 +97,7 @@ public class UserActionListener implements SaTokenListener {
      */
     @Override
     public void doKickout(String loginType, Object loginId, String tokenValue) {
-        String tenantId = Convert.toStr(StpUtil.getExtra(tokenValue, LoginHelper.TENANT_KEY));
+        String tenantId = ConvertUtil.toStr(StpUtil.getExtra(tokenValue, LoginHelper.TENANT_KEY));
         TenantHelper.dynamic(tenantId, () -> {
             RedisUtils.deleteObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue);
         });
@@ -109,7 +109,7 @@ public class UserActionListener implements SaTokenListener {
      */
     @Override
     public void doReplaced(String loginType, Object loginId, String tokenValue) {
-        String tenantId = Convert.toStr(StpUtil.getExtra(tokenValue, LoginHelper.TENANT_KEY));
+        String tenantId = ConvertUtil.toStr(StpUtil.getExtra(tokenValue, LoginHelper.TENANT_KEY));
         TenantHelper.dynamic(tenantId, () -> {
             RedisUtils.deleteObject(CacheConstants.ONLINE_TOKEN_KEY + tokenValue);
         });

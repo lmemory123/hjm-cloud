@@ -1,10 +1,10 @@
 package org.dromara.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.hutool.core.lang.tree.Tree;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.crypto.digest.BCrypt;
+import cn.hutool.v7.core.array.ArrayUtil;
+import cn.hutool.v7.core.tree.MapTree;
+import cn.hutool.v7.core.util.ObjUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -113,7 +113,7 @@ public class SysUserController extends BaseController {
             TenantHelper.clearDynamic();
         }
         SysUserVo user = DataPermissionHelper.ignore(() -> userService.selectUserById(loginUser.getUserId()));
-        if (ObjectUtil.isNull(user)) {
+        if (ObjUtil.isNull(user)) {
             return R.fail("没有权限访问用户数据!");
         }
         user.setRoles(roleService.selectRolesByUserId(user.getUserId()));
@@ -132,13 +132,13 @@ public class SysUserController extends BaseController {
     @GetMapping(value = {"/", "/{userId}"})
     public R<SysUserInfoVo> getInfo(@PathVariable(value = "userId", required = false) Long userId) {
         SysUserInfoVo userInfoVo = new SysUserInfoVo();
-        if (ObjectUtil.isNotNull(userId)) {
+        if (ObjUtil.isNotNull(userId)) {
             userService.checkUserDataScope(userId);
             SysUserVo sysUser = userService.selectUserById(userId);
             userInfoVo.setUser(sysUser);
             userInfoVo.setRoleIds(roleService.selectRoleListByUserId(userId));
             Long deptId = sysUser.getDeptId();
-            if (ObjectUtil.isNotNull(deptId)) {
+            if (ObjUtil.isNotNull(deptId)) {
                 SysPostBo postBo = new SysPostBo();
                 postBo.setDeptId(deptId);
                 userInfoVo.setPosts(postService.selectPostList(postBo));
@@ -292,7 +292,7 @@ public class SysUserController extends BaseController {
      */
     @SaCheckPermission("system:user:list")
     @GetMapping("/deptTree")
-    public R<List<Tree<Long>>> deptTree(SysDeptBo dept) {
+    public R<List<MapTree<Long>>> deptTree(SysDeptBo dept) {
         return R.ok(deptService.selectDeptTreeList(dept));
     }
 

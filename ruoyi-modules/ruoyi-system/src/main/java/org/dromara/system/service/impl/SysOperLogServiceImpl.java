@@ -1,6 +1,6 @@
 package org.dromara.system.service.impl;
 
-import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.v7.core.array.ArrayUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;

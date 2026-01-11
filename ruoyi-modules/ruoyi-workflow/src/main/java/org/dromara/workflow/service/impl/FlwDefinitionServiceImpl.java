@@ -1,9 +1,9 @@
 package org.dromara.workflow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -105,8 +105,8 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
         wrapper.like(StringUtils.isNotBlank(flowDefinition.getFlowCode()), FlowDefinition::getFlowCode, flowDefinition.getFlowCode());
         wrapper.like(StringUtils.isNotBlank(flowDefinition.getFlowName()), FlowDefinition::getFlowName, flowDefinition.getFlowName());
         if (StringUtils.isNotBlank(flowDefinition.getCategory())) {
-            List<Long> categoryIds = flwCategoryMapper.selectCategoryIdsByParentId(Convert.toLong(flowDefinition.getCategory()));
-            wrapper.in(FlowDefinition::getCategory, StreamUtils.toList(categoryIds, Convert::toStr));
+            List<Long> categoryIds = flwCategoryMapper.selectCategoryIdsByParentId(ConvertUtil.toLong(flowDefinition.getCategory()));
+            wrapper.in(FlowDefinition::getCategory, StreamUtils.toList(categoryIds, ConvertUtil::toStr));
         }
         wrapper.orderByDesc(FlowDefinition::getCreateTime);
         return wrapper;
@@ -234,7 +234,7 @@ public class FlwDefinitionServiceImpl implements IFlwDefinitionService {
             flowDefinition.setId(null);
             flowDefinition.setTenantId(tenantId);
             flowDefinition.setIsPublish(0);
-            flowDefinition.setCategory(Convert.toStr(flowCategory.getCategoryId()));
+            flowDefinition.setCategory(ConvertUtil.toStr(flowCategory.getCategoryId()));
             int insert = flowDefinitionMapper.insert(flowDefinition);
             if (insert <= 0) {
                 log.info("同步流程定义【{}】失败！", definition.getFlowCode());

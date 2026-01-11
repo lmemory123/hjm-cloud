@@ -1,7 +1,7 @@
 package org.dromara.workflow.domain.bo;
 
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.dromara.common.core.validate.AddGroup;
@@ -60,7 +60,7 @@ public class StartProcessBo implements Serializable {
     }
 
     public FlowInstanceBizExt getBizExt() {
-        if (ObjectUtil.isNull(bizExt)) {
+        if (ObjUtil.isNull(bizExt)) {
             bizExt = new FlowInstanceBizExt();
         }
         return bizExt;

@@ -1,10 +1,10 @@
 package org.dromara.workflow.service.impl;
 
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -127,7 +127,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
         long day = DateUtil.betweenDay(bo.getStartDate(), bo.getEndDate(), true);
         // 截止日期也算一天
         bo.setLeaveDays((int) day + 1);
-        if (ObjectUtil.isNull(bo.getId())) {
+        if (ObjUtil.isNull(bo.getId())) {
             bo.setApplyCode(System.currentTimeMillis() + StrUtil.EMPTY);
         }
         TestLeave leave = MapstructUtils.convert(bo, TestLeave.class);
@@ -183,17 +183,17 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
     public void processHandler(ProcessEvent processEvent) {
         TenantHelper.dynamic(processEvent.getTenantId(), () -> {
             log.info("当前任务执行了{}", processEvent.toString());
-            TestLeave testLeave = baseMapper.selectById(Convert.toLong(processEvent.getBusinessId()));
+            TestLeave testLeave = baseMapper.selectById(ConvertUtil.toLong(processEvent.getBusinessId()));
             testLeave.setStatus(processEvent.getStatus());
             // 用于例如审批附件 审批意见等 存储到业务表内 自行根据业务实现存储流程
             Map<String, Object> params = processEvent.getParams();
             if (MapUtil.isNotEmpty(params)) {
                 // 历史任务扩展(通常为附件)
-                String hisTaskExt = Convert.toStr(params.get("hisTaskExt"));
+                String hisTaskExt = ConvertUtil.toStr(params.get("hisTaskExt"));
                 // 办理人
-                String handler = Convert.toStr(params.get("handler"));
+                String handler = ConvertUtil.toStr(params.get("handler"));
                 // 办理意见
-                String message = Convert.toStr(params.get("message"));
+                String message = ConvertUtil.toStr(params.get("message"));
             }
             if (processEvent.getSubmit()) {
                 if (StringUtils.isBlank(testLeave.getApplyCode())) {
@@ -235,7 +235,7 @@ public class TestLeaveServiceImpl implements ITestLeaveService {
         TenantHelper.dynamic(processDeleteEvent.getTenantId(), () -> {
             log.info("监听删除流程事件，当前任务执行了{}", processDeleteEvent.toString());
             TestLeave testLeave = baseMapper.selectById(Long.valueOf(processDeleteEvent.getBusinessId()));
-            if (ObjectUtil.isNull(testLeave)) {
+            if (ObjUtil.isNull(testLeave)) {
                 return;
             }
             baseMapper.deleteById(testLeave.getId());

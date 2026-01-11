@@ -1,8 +1,8 @@
 package org.dromara.gateway.filter;
 
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.array.ArrayUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.SystemConstants;
@@ -60,7 +60,7 @@ public class GlobalLogFilter implements GlobalFilter, Ordered {
         // 打印请求参数
         if (WebFluxUtils.isJsonRequest(exchange)) {
             if (apiDecryptProperties.getEnabled()
-                && ObjectUtil.isNotNull(request.getHeaders().getFirst(apiDecryptProperties.getHeaderFlag()))) {
+                && ObjUtil.isNotNull(request.getHeaders().getFirst(apiDecryptProperties.getHeaderFlag()))) {
                 log.info("[PLUS]开始请求 => URL[{}],参数类型[encrypt]", url);
             } else {
                 String jsonParam = WebFluxUtils.resolveBodyFromCacheRequest(exchange);

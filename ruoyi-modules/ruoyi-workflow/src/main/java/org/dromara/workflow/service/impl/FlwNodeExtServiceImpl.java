@@ -1,8 +1,8 @@
 package org.dromara.workflow.service.impl;
 
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.lang.Dict;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.map.Dict;
+import cn.hutool.v7.core.util.ObjUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -119,7 +119,7 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
                 }
                 return null;
             })
-            .filter(ObjectUtil::isNotNull)
+            .filter(ObjUtil::isNotNull)
             .toList()
         );
         return nodeExt;
@@ -141,15 +141,15 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
         // 编码，此json中唯
         childNode.setCode(simpleName);
         // label名称
-        childNode.setLabel(Convert.toStr(map.get("label")));
+        childNode.setLabel(ConvertUtil.toStr(map.get("label")));
         // 1：输入框 2：文本域 3：下拉框 4：选择框 5：用户选择器
-        childNode.setType(Convert.toInt(map.get("type"), 1));
+        childNode.setType(ConvertUtil.toInt(map.get("type"), 1));
         // 是否必填
-        childNode.setMust(Convert.toBool(map.get("must"), false));
+        childNode.setMust(ConvertUtil.toBoolean(map.get("must"), false));
         // 是否多选
-        childNode.setMultiple(Convert.toBool(map.get("multiple"), true));
+        childNode.setMultiple(ConvertUtil.toBoolean(map.get("multiple"), true));
         // 描述
-        childNode.setDesc(Convert.toStr(map.get("desc"), null));
+        childNode.setDesc(ConvertUtil.toStr(map.get("desc"), null));
         // 字典，下拉框和复选框时用到
         childNode.setDict(Arrays.stream(enumClass.getEnumConstants())
             .map(NodeExtEnum.class::cast)
@@ -167,7 +167,7 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
      */
     private NodeExt.ChildNode buildChildNode(String dictType) {
         RemoteDictTypeVo dictTypeDTO = remoteDictService.selectDictTypeByType(dictType);
-        if (ObjectUtil.isNull(dictTypeDTO)) {
+        if (ObjUtil.isNull(dictTypeDTO)) {
             return null;
         }
         NodeExt.ChildNode childNode = new NodeExt.ChildNode();
@@ -186,7 +186,7 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
         // 字典，下拉框和复选框时用到
         childNode.setDict(remoteDictService.selectDictDataByType(dictType)
             .stream().map(x ->
-                new NodeExt.DictItem(x.getDictLabel(), x.getDictValue(), Convert.toBool(x.getIsDefault(), false))
+                new NodeExt.DictItem(x.getDictLabel(), x.getDictValue(), ConvertUtil.toBoolean(x.getIsDefault(), false))
             ).toList());
         return childNode;
     }
@@ -216,7 +216,7 @@ public class FlwNodeExtServiceImpl implements NodeExtService, IFlwNodeExtService
 
         // 解析 JSON 为 Dict 列表
         List<Dict> nodeExtMap = JsonUtils.parseArrayMap(ext);
-        if (ObjectUtil.isEmpty(nodeExtMap)) {
+        if (ObjUtil.isEmpty(nodeExtMap)) {
             return nodeExtVo;
         }
 

@@ -1,7 +1,7 @@
 package org.dromara.common.redis.utils;
 
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.date.DatePattern;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.date.DateFormatPool;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.utils.SpringUtils;
@@ -120,7 +120,7 @@ public class SequenceUtils {
      * @return 唯一id
      */
     public static String getNextIdString(String key, Duration expireTime, long initValue, long stepValue) {
-        return Convert.toStr(getNextId(key, expireTime, initValue, stepValue));
+        return ConvertUtil.toStr(getNextId(key, expireTime, initValue, stepValue));
     }
 
     /**
@@ -131,7 +131,7 @@ public class SequenceUtils {
      * @return 唯一id
      */
     public static String getNextIdString(String key, Duration expireTime) {
-        return Convert.toStr(getNextId(key, expireTime));
+        return ConvertUtil.toStr(getNextId(key, expireTime));
     }
 
     /**
@@ -226,7 +226,7 @@ public class SequenceUtils {
      * @return 唯一id
      */
     public static String getDateId(String prefix, boolean isWithPrefix, int minIdCapacityBits, LocalDate time, long initValue, long stepValue) {
-        return getDatePatternId(prefix, isWithPrefix, minIdCapacityBits, time, DatePattern.PURE_DATE_FORMATTER, DEFAULT_EXPIRE_TIME_DAY, initValue, stepValue);
+        return getDatePatternId(prefix, isWithPrefix, minIdCapacityBits, time, DateFormatPool.PURE_DATE_FORMATTER, DEFAULT_EXPIRE_TIME_DAY, initValue, stepValue);
     }
 
     /**
@@ -308,7 +308,7 @@ public class SequenceUtils {
      * @return 唯一id
      */
     public static String getDateTimeId(String prefix, boolean isWithPrefix, int minIdCapacityBits, LocalDateTime time, long initValue, long stepValue) {
-        return getDatePatternId(prefix, isWithPrefix, minIdCapacityBits, time, DatePattern.PURE_DATETIME_FORMATTER, DEFAULT_EXPIRE_TIME_MINUTE, initValue, stepValue);
+        return getDatePatternId(prefix, isWithPrefix, minIdCapacityBits, time, DateFormatPool.PURE_DATETIME_FORMATTER, DEFAULT_EXPIRE_TIME_MINUTE, initValue, stepValue);
     }
 
     /**

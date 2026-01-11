@@ -1,8 +1,8 @@
 package org.dromara.common.excel.convert;
 
-import cn.hutool.core.annotation.AnnotationUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.annotation.AnnotationUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import cn.idev.excel.converters.Converter;
 import cn.idev.excel.enums.CellDataTypeEnum;
 import cn.idev.excel.metadata.GlobalConfiguration;
@@ -46,7 +46,7 @@ public class ExcelEnumConvert implements Converter<Object> {
             default -> throw new IllegalArgumentException("单元格类型异常!");
         };
         // 如果是空值
-        if (ObjectUtil.isNull(textValue)) {
+        if (ObjUtil.isNull(textValue)) {
             return null;
         }
         Map<Object, String> enumCodeToTextMap = beforeConvert(contentProperty);
@@ -56,16 +56,16 @@ public class ExcelEnumConvert implements Converter<Object> {
         enumCodeToTextMap.forEach((key, value) -> enumTextToCodeMap.put(value, key));
         // 应该从text -> code中查找
         Object codeValue = enumTextToCodeMap.get(textValue);
-        return Convert.convert(contentProperty.getField().getType(), codeValue);
+        return ConvertUtil.convert(contentProperty.getField().getType(), codeValue);
     }
 
     @Override
     public WriteCellData<String> convertToExcelData(Object object, ExcelContentProperty contentProperty, GlobalConfiguration globalConfiguration) {
-        if (ObjectUtil.isNull(object)) {
+        if (ObjUtil.isNull(object)) {
             return new WriteCellData<>("");
         }
         Map<Object, String> enumValueMap = beforeConvert(contentProperty);
-        String value = Convert.toStr(enumValueMap.get(object), "");
+        String value = ConvertUtil.toStr(enumValueMap.get(object), "");
         return new WriteCellData<>(value);
     }
 

@@ -1,7 +1,7 @@
 package org.dromara.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
@@ -76,7 +76,7 @@ public class SysDictDataController extends BaseController {
     @GetMapping(value = "/type/{dictType}")
     public R<List<SysDictDataVo>> dictType(@PathVariable String dictType) {
         List<SysDictDataVo> data = dictTypeService.selectDictDataByType(dictType);
-        if (ObjectUtil.isNull(data)) {
+        if (ObjUtil.isNull(data)) {
             data = new ArrayList<>();
         }
         return R.ok(data);

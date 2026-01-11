@@ -1,9 +1,9 @@
 package org.dromara.auth.config;
 
-import cn.hutool.captcha.CaptchaUtil;
-import cn.hutool.captcha.CircleCaptcha;
-import cn.hutool.captcha.LineCaptcha;
-import cn.hutool.captcha.ShearCaptcha;
+import cn.hutool.v7.swing.captcha.CaptchaUtil;
+import cn.hutool.v7.swing.captcha.CircleCaptcha;
+import cn.hutool.v7.swing.captcha.LineCaptcha;
+import cn.hutool.v7.swing.captcha.ShearCaptcha;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -29,7 +29,7 @@ public class CaptchaConfig {
     @Lazy
     @Bean
     public CircleCaptcha circleCaptcha() {
-        CircleCaptcha captcha = CaptchaUtil.createCircleCaptcha(WIDTH, HEIGHT);
+        CircleCaptcha captcha = CaptchaUtil.ofCircleCaptcha(WIDTH, HEIGHT);
         captcha.setBackground(BACKGROUND);
         captcha.setFont(FONT);
         return captcha;
@@ -41,7 +41,7 @@ public class CaptchaConfig {
     @Lazy
     @Bean
     public LineCaptcha lineCaptcha() {
-        LineCaptcha captcha = CaptchaUtil.createLineCaptcha(WIDTH, HEIGHT);
+        LineCaptcha captcha = CaptchaUtil.ofLineCaptcha(WIDTH, HEIGHT);
         captcha.setBackground(BACKGROUND);
         captcha.setFont(FONT);
         return captcha;
@@ -53,7 +53,7 @@ public class CaptchaConfig {
     @Lazy
     @Bean
     public ShearCaptcha shearCaptcha() {
-        ShearCaptcha captcha = CaptchaUtil.createShearCaptcha(WIDTH, HEIGHT);
+        ShearCaptcha captcha = CaptchaUtil.ofShearCaptcha(WIDTH, HEIGHT);
         captcha.setBackground(BACKGROUND);
         captcha.setFont(FONT);
         return captcha;

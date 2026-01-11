@@ -1,9 +1,9 @@
 package org.dromara.system.dubbo;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Opt;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -40,6 +40,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static org.dromara.system.domain.table.SysUserTableDef.SYS_USER;
+
 /**
  * 用户服务
  *
@@ -71,7 +73,7 @@ public class RemoteUserServiceImpl implements RemoteUserService {
     public LoginUser getUserInfo(String username, String tenantId) throws UserException {
         return TenantHelper.dynamic(tenantId, () -> {
             SysUserVo sysUser = userMapper.selectVoOne(QueryWrapper.create().eq(SysUser::getUserName, username));
-            if (ObjectUtil.isNull(sysUser)) {
+            if (ObjUtil.isNull(sysUser)) {
                 throw new UserException("user.not.exists", username);
             }
             if (UserStatus.DISABLE.getCode().equals(sysUser.getStatus())) {
@@ -94,7 +96,7 @@ public class RemoteUserServiceImpl implements RemoteUserService {
     public LoginUser getUserInfo(Long userId, String tenantId) throws UserException {
         return TenantHelper.dynamic(tenantId, () -> {
             SysUserVo sysUser = userMapper.selectVoById(userId);
-            if (ObjectUtil.isNull(sysUser)) {
+            if (ObjUtil.isNull(sysUser)) {
                 throw new UserException("user.not.exists", "");
             }
             if (UserStatus.DISABLE.getCode().equals(sysUser.getStatus())) {
@@ -117,7 +119,7 @@ public class RemoteUserServiceImpl implements RemoteUserService {
     public LoginUser getUserInfoByPhonenumber(String phonenumber, String tenantId) throws UserException {
         return TenantHelper.dynamic(tenantId, () -> {
             SysUserVo sysUser = userMapper.selectVoOne(QueryWrapper.create().eq(SysUser::getPhonenumber, phonenumber));
-            if (ObjectUtil.isNull(sysUser)) {
+            if (ObjUtil.isNull(sysUser)) {
                 throw new UserException("user.not.exists", phonenumber);
             }
             if (UserStatus.DISABLE.getCode().equals(sysUser.getStatus())) {
@@ -140,7 +142,7 @@ public class RemoteUserServiceImpl implements RemoteUserService {
     public LoginUser getUserInfoByEmail(String email, String tenantId) throws UserException {
         return TenantHelper.dynamic(tenantId, () -> {
             SysUserVo user = userMapper.selectVoOne(QueryWrapper.create().eq(SysUser::getEmail, email));
-            if (ObjectUtil.isNull(user)) {
+            if (ObjUtil.isNull(user)) {
                 throw new UserException("user.not.exists", email);
             }
             if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
@@ -162,7 +164,7 @@ public class RemoteUserServiceImpl implements RemoteUserService {
     public XcxLoginUser getUserInfoByOpenid(String openid) throws UserException {
         // todo 自行实现 userService.selectUserByOpenid(openid);
         SysUser sysUser = new SysUser();
-        if (ObjectUtil.isNull(sysUser)) {
+        if (ObjUtil.isNull(sysUser)) {
             // todo 用户不存在 业务逻辑自行实现
         }
         if (UserStatus.DISABLE.getCode().equals(sysUser.getStatus())) {
@@ -272,7 +274,7 @@ public class RemoteUserServiceImpl implements RemoteUserService {
         loginUser.setUserType(userVo.getUserType());
         loginUser.setMenuPermission(permissionService.getMenuPermission(userId));
         loginUser.setRolePermission(permissionService.getRolePermission(userId));
-        if (ObjectUtil.isNotNull(userVo.getDeptId())) {
+        if (ObjUtil.isNotNull(userVo.getDeptId())) {
             Opt<SysDeptVo> deptOpt = Opt.of(userVo.getDeptId()).map(deptService::selectDeptById);
             loginUser.setDeptName(deptOpt.map(SysDeptVo::getDeptName).orElse(StringUtils.EMPTY));
             loginUser.setDeptCategory(deptOpt.map(SysDeptVo::getDeptCategory).orElse(StringUtils.EMPTY));
@@ -311,13 +313,15 @@ public class RemoteUserServiceImpl implements RemoteUserService {
         if (CollUtil.isEmpty(userIds)) {
             return new ArrayList<>();
         }
-        List<SysUserVo> list = userMapper.selectVoList(QueryWrapper.create()
-            .select(SysUser::getUserId, SysUser::getDeptId, SysUser::getUserName,
-                SysUser::getNickName, SysUser::getUserType, SysUser::getEmail,
-                SysUser::getPhonenumber, SysUser::getSex, SysUser::getStatus,
-                SysUser::getCreateTime)
-            .eq(SysUser::getStatus, SystemConstants.NORMAL)
-            .in(SysUser::getUserId, userIds));
+        List<SysUserVo> list = userMapper.selectVoList(
+            QueryWrapper.create()
+                .select(SYS_USER.USER_ID, SYS_USER.DEPT_ID, SYS_USER.USER_NAME,
+                    SYS_USER.NICK_NAME, SYS_USER.USER_TYPE, SYS_USER.EMAIL,
+                    SYS_USER.PHONENUMBER, SYS_USER.SEX, SYS_USER.STATUS,
+                    SYS_USER.CREATE_TIME)
+                .where(SYS_USER.USER_ID.eq(SystemConstants.NORMAL)
+                    .and(SYS_USER.USER_ID.in(userIds))
+                ));
         return MapstructUtils.convert(list, RemoteUserVo.class);
     }
 
@@ -369,9 +373,14 @@ public class RemoteUserServiceImpl implements RemoteUserService {
             return List.of();
         }
         List<SysUserVo> list = userMapper.selectVoList(QueryWrapper.create()
-            .select(SysUser::getUserId, SysUser::getUserName, SysUser::getNickName, SysUser::getEmail, SysUser::getPhonenumber)
-            .eq(SysUser::getStatus, SystemConstants.NORMAL)
-            .in(SysUser::getDeptId, deptIds));
+            .select(
+                SYS_USER.USER_ID,SYS_USER.USER_NAME, SYS_USER.NICK_NAME,
+                SYS_USER.EMAIL, SYS_USER.PHONENUMBER
+            ).where(
+                SYS_USER.STATUS.eq(SystemConstants.NORMAL)
+                    .and(SYS_USER.DEPT_ID.in(deptIds))
+
+            ));
         return BeanUtil.copyToList(list, RemoteUserVo.class);
     }
 
@@ -409,8 +418,8 @@ public class RemoteUserServiceImpl implements RemoteUserService {
         }
         List<SysUser> list = userMapper.selectListByQuery(
             QueryWrapper.create()
-                .select(SysUser::getUserId, SysUser::getNickName)
-                .in(SysUser::getUserId, userIds)
+                .select(SYS_USER.USER_ID, SYS_USER.NICK_NAME)
+                .where(SYS_USER.USER_ID.in(userIds))
         );
         return StreamUtils.toMap(list, SysUser::getUserId, SysUser::getNickName);
     }

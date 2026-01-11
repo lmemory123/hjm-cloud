@@ -1,7 +1,7 @@
 package org.dromara.common.encrypt.core;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.reflect.ConstructorUtil;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
@@ -73,7 +73,7 @@ public class EncryptorManager {
         if (encryptorMap.containsKey(key)) {
             return encryptorMap.get(key);
         }
-        IEncryptor encryptor = ReflectUtil.newInstance(encryptContext.getAlgorithm().getClazz(), encryptContext);
+        IEncryptor encryptor = ConstructorUtil.newInstance(encryptContext.getAlgorithm().getClazz(), encryptContext);
         encryptorMap.put(key, encryptor);
         return encryptor;
     }

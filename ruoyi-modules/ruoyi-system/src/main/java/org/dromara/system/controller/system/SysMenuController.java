@@ -3,7 +3,7 @@ package org.dromara.system.controller.system;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.annotation.SaMode;
-import cn.hutool.core.lang.tree.Tree;
+import cn.hutool.v7.core.tree.MapTree;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.SystemConstants;
 import org.dromara.common.core.constant.TenantConstants;
@@ -83,7 +83,7 @@ public class SysMenuController extends BaseController {
      */
     @SaCheckPermission("system:menu:query")
     @GetMapping("/treeselect")
-    public R<List<Tree<Long>>> treeselect(SysMenuBo menu) {
+    public R<List<MapTree<Long>>> treeselect(SysMenuBo menu) {
         List<SysMenuVo> menus = menuService.selectMenuList(menu, LoginHelper.getUserId());
         return R.ok(menuService.buildMenuTreeSelect(menus));
     }
@@ -113,7 +113,7 @@ public class SysMenuController extends BaseController {
     @GetMapping(value = "/tenantPackageMenuTreeselect/{packageId}")
     public R<MenuTreeSelectVo> tenantPackageMenuTreeselect(@PathVariable("packageId") Long packageId) {
         List<SysMenuVo> menus = menuService.selectMenuList(LoginHelper.getUserId());
-        List<Tree<Long>> list = menuService.buildMenuTreeSelect(menus);
+        List<MapTree<Long>> list = menuService.buildMenuTreeSelect(menus);
         // 删除租户管理菜单
         list.removeIf(menu -> menu.getId() == 6L);
         List<Long> ids = new ArrayList<>();
@@ -185,7 +185,7 @@ public class SysMenuController extends BaseController {
      * @param checkedKeys 选中菜单列表
      * @param menus       菜单下拉树结构列表
      */
-    public record MenuTreeSelectVo(List<Long> checkedKeys, List<Tree<Long>> menus) {
+    public record MenuTreeSelectVo(List<Long> checkedKeys, List<MapTree<Long>> menus) {
     }
 
     /**

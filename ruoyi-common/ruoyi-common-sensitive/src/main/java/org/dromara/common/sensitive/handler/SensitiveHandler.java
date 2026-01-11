@@ -1,6 +1,6 @@
 package org.dromara.common.sensitive.handler;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.sensitive.annotation.Sensitive;
@@ -30,7 +30,7 @@ public class SensitiveHandler extends ValueSerializer<String> {
     public void serialize(String value, JsonGenerator gen, SerializationContext serializers) {
         try {
             SensitiveService sensitiveService = SpringUtils.getBean(SensitiveService.class);
-            if (ObjectUtil.isNotNull(sensitiveService) && sensitiveService.isSensitive(roleKey, perms)) {
+            if (ObjUtil.isNotNull(sensitiveService) && sensitiveService.isSensitive(roleKey, perms)) {
                 gen.writeString(strategy.desensitizer().apply(value));
             } else {
                 gen.writeString(value);

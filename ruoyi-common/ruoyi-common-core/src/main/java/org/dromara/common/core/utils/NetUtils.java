@@ -1,7 +1,7 @@
 package org.dromara.common.core.utils;
 
-import cn.hutool.core.lang.PatternPool;
-import cn.hutool.core.net.NetUtil;
+import cn.hutool.v7.core.net.NetUtil;
+import cn.hutool.v7.core.regex.PatternPool;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,13 +1,11 @@
 package org.dromara.gen.domain;
 
-import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.Strings;
-import org.apache.ibatis.type.JdbcType;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.mybatisflex.core.domain.BaseEntity;
 

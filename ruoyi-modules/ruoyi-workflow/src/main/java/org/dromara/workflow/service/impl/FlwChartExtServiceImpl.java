@@ -1,8 +1,9 @@
 package org.dromara.workflow.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.collection.ListUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
@@ -78,7 +79,7 @@ public class FlwChartExtServiceImpl implements ChartExtService {
         Map<String, List<FlowHisTask>> groupedByNode = StreamUtils.groupByKey(flowHisTasks, FlowHisTask::getNodeCode);
 
         // 批量查询所有审批人的用户信息
-        List<RemoteUserVo> userDTOList = remoteUserService.selectListByIds(StreamUtils.toList(flowHisTasks, e -> Convert.toLong(e.getApprover())));
+        List<RemoteUserVo> userDTOList = remoteUserService.selectListByIds(StreamUtils.toList(flowHisTasks, e -> ConvertUtil.toLong(e.getApprover())));
 
         // 将查询到的用户列表转换为以用户ID为key的映射
         Map<Long, RemoteUserVo> userMap = StreamUtils.toIdentityMap(userDTOList, RemoteUserVo::getUserId);
@@ -126,7 +127,7 @@ public class FlwChartExtServiceImpl implements ChartExtService {
                 new PromptContent()
                     // 提示信息
                     .setInfo(
-                        CollUtil.newArrayList(
+                        ListUtil.of(
                             new PromptContent.InfoItem()
                                 .setPrefix("任务名称: ")
                                 .setContent(nodeJson.getNodeName())
@@ -181,13 +182,13 @@ public class FlwChartExtServiceImpl implements ChartExtService {
 
         // 遍历所有任务记录，构建提示内容
         for (FlowHisTask task : taskList) {
-            RemoteUserVo userDTO = userMap.get(Convert.toLong(task.getApprover()));
-            if (ObjectUtil.isEmpty(userDTO)) {
+            RemoteUserVo userDTO = userMap.get(ConvertUtil.toLong(task.getApprover()));
+            if (ObjUtil.isEmpty(userDTO)) {
                 continue;
             }
 
             // 查询用户所属部门名称
-            String deptName = remoteDeptService.selectDeptNameByIds(Convert.toStr(userDTO.getDeptId()));
+            String deptName = remoteDeptService.selectDeptNameByIds(ConvertUtil.toStr(userDTO.getDeptId()));
 
             // 添加标题项，如：👤 张三（市场部）
             info.add(new PromptContent.InfoItem()

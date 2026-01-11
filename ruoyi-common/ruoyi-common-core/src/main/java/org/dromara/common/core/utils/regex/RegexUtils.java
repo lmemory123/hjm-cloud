@@ -1,7 +1,7 @@
 package org.dromara.common.core.utils.regex;
 
 
-import cn.hutool.core.util.ReUtil;
+import cn.hutool.v7.core.regex.ReUtil;
 import org.dromara.common.core.constant.RegexConstants;
 
 /**

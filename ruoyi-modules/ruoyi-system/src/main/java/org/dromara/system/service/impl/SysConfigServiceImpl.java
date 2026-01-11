@@ -1,7 +1,7 @@
 package org.dromara.system.service.impl;
 
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -90,7 +90,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
         String configValue = TenantHelper.dynamic(tenantId, () ->
             this.selectConfigByKey("sys.account.registerUser")
         );
-        return Convert.toBool(configValue);
+        return ConvertUtil.toBoolean(configValue);
     }
 
     /**
@@ -200,7 +200,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
     public boolean checkConfigKeyUnique(SysConfigBo config) {
         boolean exist = baseMapper.selectCountByQuery(QueryWrapper.create()
             .eq(SysConfig::getConfigKey, config.getConfigKey())
-            .ne(SysConfig::getConfigId, config.getConfigId(), ObjectUtil.isNotNull(config.getConfigId()))) > 0;
+            .ne(SysConfig::getConfigId, config.getConfigId(), ObjUtil.isNotNull(config.getConfigId()))) > 0;
         return !exist;
     }
 

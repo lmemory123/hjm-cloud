@@ -1,8 +1,7 @@
 package org.dromara.common.social.gitea;
 
-import cn.hutool.core.lang.Dict;
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
+import cn.hutool.v7.core.map.Dict;
+import cn.hutool.v7.http.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.cache.AuthStateCache;
 import me.zhyd.oauth.config.AuthConfig;
@@ -13,6 +12,8 @@ import me.zhyd.oauth.model.AuthUser;
 import me.zhyd.oauth.request.AuthDefaultRequest;
 import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.json.utils.JsonUtils;
+
+import java.util.Map;
 
 /**
  * @author lcry
@@ -56,14 +57,15 @@ public class AuthGiteaRequest extends AuthDefaultRequest {
 
     @Override
     protected String doPostAuthorizationCode(String code) {
-        HttpRequest request = HttpRequest.post(source.accessToken())
-                .form("client_id", config.getClientId())
-                .form("client_secret", config.getClientSecret())
-                .form("grant_type", "authorization_code")
-                .form("code", code)
-                .form("redirect_uri", config.getRedirectUri());
-        HttpResponse response = request.execute();
-        return response.body();
+        Map<String,Object> parms = Map.of(
+                "client_id", config.getClientId(),
+                "client_secret", config.getClientSecret(),
+                "grant_type", "authorization_code",
+                "code", code,
+                "redirect_uri", config.getRedirectUri()
+        );
+       return HttpUtil.post(source.accessToken(),parms);
+
     }
 
     @Override

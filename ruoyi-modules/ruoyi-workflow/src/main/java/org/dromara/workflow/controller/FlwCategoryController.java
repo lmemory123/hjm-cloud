@@ -1,7 +1,7 @@
 package org.dromara.workflow.controller;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.hutool.core.lang.tree.Tree;
+import cn.hutool.v7.core.tree.MapTree;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -127,7 +127,7 @@ public class FlwCategoryController extends BaseController {
      * @param categoryBo 流程分类
      */
     @GetMapping("/categoryTree")
-    public R<List<Tree<String>>> categoryTree(FlowCategoryBo categoryBo) {
+    public R<List<MapTree<String>>> categoryTree(FlowCategoryBo categoryBo) {
         return R.ok(flwCategoryService.selectCategoryTreeList(categoryBo));
     }
 

@@ -1,9 +1,9 @@
 package org.dromara.common.log.aspect;
 
-import cn.hutool.core.lang.Dict;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.array.ArrayUtil;
+import cn.hutool.v7.core.map.Dict;
+import cn.hutool.v7.core.util.ObjUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -139,7 +139,7 @@ public class LogAspect {
             setRequestValue(joinPoint, operLog, log.excludeParamNames());
         }
         // 是否需要保存response，参数和值
-        if (log.isSaveResponseData() && ObjectUtil.isNotNull(jsonResult)) {
+        if (log.isSaveResponseData() && ObjUtil.isNotNull(jsonResult)) {
             operLog.setJsonResult(StringUtils.substring(JsonUtils.toJsonString(jsonResult), 0, 3800));
         }
     }
@@ -173,7 +173,7 @@ public class LogAspect {
         }
         String[] exclude = ArrayUtil.addAll(excludeParamNames, SystemConstants.EXCLUDE_PROPERTIES);
         for (Object o : paramsArray) {
-            if (ObjectUtil.isNotNull(o) && !isFilterObject(o)) {
+            if (ObjUtil.isNotNull(o) && !isFilterObject(o)) {
                 String str = "";
                 if (o instanceof List<?> list) {
                     List<Dict> list1 = new ArrayList<>();

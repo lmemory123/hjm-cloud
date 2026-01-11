@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "ask": [
+      "Read(!D:\\DM\\java\\hjm-cloud/**)",
+      "Edit(!D:\\DM\\java\\hjm-cloud/**)"
+    ],
+    "allow": [
+      "Read(D:\\DM\\java\\hjm-cloud/**)",
+      "Edit(D:\\DM\\java\\hjm-cloud/**)"
+    ]
+  },
+  "memoryImport": {},
+  "monitoring": {}
+}

@@ -1,6 +1,6 @@
 package org.dromara.common.redis.handler;
 
-import cn.hutool.http.HttpStatus;
+import cn.hutool.v7.http.meta.HttpStatus;
 import com.baomidou.lock.exception.LockFailureException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,6 @@
 package org.dromara.common.encrypt.filter;
 
-import cn.hutool.core.io.IoUtil;
+import cn.hutool.v7.core.io.IoUtil;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;

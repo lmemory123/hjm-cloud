@@ -1,9 +1,10 @@
 package org.dromara.auth.enums;
 
-import cn.hutool.captcha.AbstractCaptcha;
-import cn.hutool.captcha.CircleCaptcha;
-import cn.hutool.captcha.LineCaptcha;
-import cn.hutool.captcha.ShearCaptcha;
+
+import cn.hutool.v7.swing.captcha.AbstractCaptcha;
+import cn.hutool.v7.swing.captcha.CircleCaptcha;
+import cn.hutool.v7.swing.captcha.LineCaptcha;
+import cn.hutool.v7.swing.captcha.ShearCaptcha;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

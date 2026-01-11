@@ -1,6 +1,6 @@
 package org.dromara.system.dubbo;
 
-import cn.hutool.core.lang.Dict;
+import cn.hutool.v7.core.map.Dict;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.dromara.common.json.utils.JsonUtils;

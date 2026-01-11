@@ -1,8 +1,8 @@
 package org.dromara.common.excel.core;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.reflect.FieldUtil;
+import cn.hutool.v7.core.text.StrUtil;
 import cn.idev.excel.annotation.ExcelIgnore;
 import cn.idev.excel.annotation.ExcelIgnoreUnannotated;
 import cn.idev.excel.annotation.ExcelProperty;
@@ -124,7 +124,7 @@ public class CellMergeHandler {
      */
     private Map<Field, FieldColumnIndex> getFieldColumnIndexMap(Class<?> clazz) {
         boolean annotationPresent = clazz.isAnnotationPresent(ExcelIgnoreUnannotated.class);
-        Field[] fields = ReflectUtils.getFields(clazz, field -> {
+        Field[] fields = FieldUtil.getFields(clazz, field -> {
             if ("serialVersionUID".equals(field.getName())) {
                 return false;
             }
@@ -158,8 +158,8 @@ public class CellMergeHandler {
         if (StrUtil.isAllNotBlank(mergeBy)) {
             // 比对当前行和上一行的各个属性值一一比对 如果全为真 则为真
             for (String fieldName : mergeBy) {
-                final Object valCurrent = ReflectUtil.getFieldValue(currentRow, fieldName);
-                final Object valPre = ReflectUtil.getFieldValue(preRow, fieldName);
+                final Object valCurrent = FieldUtil.getFieldValue(currentRow, fieldName);
+                final Object valPre = FieldUtil.getFieldValue(preRow, fieldName);
                 if (!Objects.equals(valPre, valCurrent)) {
                     // 依赖字段如有任一不等值,则标记为不可合并
                     return false;

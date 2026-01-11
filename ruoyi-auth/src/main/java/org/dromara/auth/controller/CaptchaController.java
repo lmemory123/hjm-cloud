@@ -1,8 +1,9 @@
 package org.dromara.auth.controller;
 
-import cn.hutool.captcha.AbstractCaptcha;
-import cn.hutool.captcha.generator.CodeGenerator;
-import cn.hutool.core.util.IdUtil;
+import cn.hutool.v7.core.data.id.IdUtil;
+import cn.hutool.v7.core.reflect.ConstructorUtil;
+import cn.hutool.v7.swing.captcha.AbstractCaptcha;
+import cn.hutool.v7.swing.captcha.generator.CodeGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
@@ -13,7 +14,6 @@ import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.utils.SpringUtils;
-import org.dromara.common.core.utils.reflect.ReflectUtils;
 import org.dromara.common.ratelimiter.annotation.RateLimiter;
 import org.dromara.common.ratelimiter.enums.LimitType;
 import org.dromara.common.redis.utils.RedisUtils;
@@ -66,9 +66,9 @@ public class CaptchaController {
         CaptchaType captchaType = captchaProperties.getType();
         CodeGenerator codeGenerator;
         if (CaptchaType.MATH == captchaType) {
-            codeGenerator = ReflectUtils.newInstance(captchaType.getClazz(), captchaProperties.getNumberLength(), false);
+            codeGenerator = ConstructorUtil.newInstance(captchaType.getClazz(), captchaProperties.getNumberLength(), false);
         } else {
-            codeGenerator = ReflectUtils.newInstance(captchaType.getClazz(), captchaProperties.getCharLength());
+            codeGenerator = ConstructorUtil.newInstance(captchaType.getClazz(), captchaProperties.getCharLength());
         }
         AbstractCaptcha captcha = SpringUtils.getBean(captchaProperties.getCategory().getClazz());
         captcha.setGenerator(codeGenerator);

@@ -1,13 +1,13 @@
 package org.dromara.common.encrypt.utils;
 
-import cn.hutool.core.codec.Base64;
-import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import cn.hutool.crypto.SmUtil;
 import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.RSA;
 import cn.hutool.crypto.asymmetric.SM2;
+import cn.hutool.v7.core.array.ArrayUtil;
+import cn.hutool.v7.core.codec.binary.Base64;
+import cn.hutool.v7.core.text.StrUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;

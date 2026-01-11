@@ -1,7 +1,7 @@
 package org.dromara.system.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -94,10 +94,10 @@ public class SysPostServiceImpl implements ISysPostService {
             queryWrapper.and(SYS_POST.CREATE_TIME.between(params.get("beginTime"), params.get("endTime")));
         }
         // 处理部门筛选
-        if (ObjectUtil.isNotNull(bo.getDeptId())) {
+        if (ObjUtil.isNotNull(bo.getDeptId())) {
             // 优先单部门搜索
             queryWrapper.and(SYS_POST.DEPT_ID.eq(bo.getDeptId()));
-        } else if (ObjectUtil.isNotNull(bo.getBelongDeptId())) {
+        } else if (ObjUtil.isNotNull(bo.getBelongDeptId())) {
             // 部门树搜索
             List<Long> deptIds = deptMapper.selectDeptAndChildById(bo.getBelongDeptId());
             queryWrapper.and(SYS_POST.DEPT_ID.in(deptIds));
@@ -163,7 +163,7 @@ public class SysPostServiceImpl implements ISysPostService {
         boolean exist = baseMapper.selectCountByQuery(QueryWrapper.create()
             .eq(SysPost::getPostName, post.getPostName())
             .eq(SysPost::getDeptId, post.getDeptId())
-            .ne(SysPost::getPostId, post.getPostId(), ObjectUtil.isNotNull(post.getPostId()))) > 0;
+            .ne(SysPost::getPostId, post.getPostId(), ObjUtil.isNotNull(post.getPostId()))) > 0;
         return !exist;
     }
 
@@ -177,7 +177,7 @@ public class SysPostServiceImpl implements ISysPostService {
     public boolean checkPostCodeUnique(SysPostBo post) {
         boolean exist = baseMapper.selectCountByQuery(QueryWrapper.create()
             .eq(SysPost::getPostCode, post.getPostCode())
-            .ne(SysPost::getPostId, post.getPostId(), ObjectUtil.isNotNull(post.getPostId()))) > 0;
+            .ne(SysPost::getPostId, post.getPostId(), ObjUtil.isNotNull(post.getPostId()))) > 0;
         return !exist;
     }
 

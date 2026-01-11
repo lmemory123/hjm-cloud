@@ -1,7 +1,8 @@
 package org.dromara.common.excel.core;
 
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.text.StrUtil;
+import cn.hutool.v7.core.text.split.SplitUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -66,7 +67,7 @@ public class DropDownOptions {
         StringBuilder stringBuffer = new StringBuilder();
         String regex = "^[\\S\\d\\u4e00-\\u9fa5]+$";
         for (int i = 0; i < vars.length; i++) {
-            String var = StrUtil.trimToEmpty(Convert.toStr(vars[i]));
+            String var = StrUtil.trimToEmpty(ConvertUtil.toStr(vars[i]));
             if (!var.matches(regex)) {
                 throw new ServiceException("选项数据不符合规则，仅允许使用中英文字符以及数字");
             }
@@ -89,7 +90,7 @@ public class DropDownOptions {
      * @return 原始的参数
      */
     public static List<String> analyzeOptionValue(String option) {
-        return StrUtil.split(option, DELIMITER, true, true);
+        return SplitUtil.split(option, DELIMITER, true, true);
     }
 
     /**

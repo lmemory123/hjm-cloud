@@ -1,9 +1,10 @@
 package org.dromara.gen.util;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.lang.Dict;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.map.Dict;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.velocity.VelocityContext;
@@ -27,7 +28,7 @@ import java.util.*;
 public class VelocityUtils {
 
     private static final Set<String> BASE_ENTITY_FIELDS = Set.of(
-        "createDept", "createBy", "createTime", "updateBy", "updateTime");
+            "createDept", "createBy", "createTime", "updateBy", "updateTime");
     private static final String TENANT_ID_FIELD = "tenantId";
 
     /**
@@ -272,8 +273,8 @@ public class VelocityUtils {
     public static void addDicts(Set<String> dicts, List<GenTableColumn> columns) {
         for (GenTableColumn column : columns) {
             if (!column.isSuperColumn() && StringUtils.isNotEmpty(column.getDictType()) && StringUtils.equalsAny(
-                column.getHtmlType(),
-                GenConstants.HTML_SELECT, GenConstants.HTML_RADIO, GenConstants.HTML_CHECKBOX)) {
+                    column.getHtmlType(),
+                    GenConstants.HTML_SELECT, GenConstants.HTML_RADIO, GenConstants.HTML_CHECKBOX)) {
                 dicts.add("'" + column.getDictType() + "'");
             }
         }
@@ -301,8 +302,8 @@ public class VelocityUtils {
     public static void addDictList(Set<Map<String, Object>> dicts, List<GenTableColumn> columns) {
         for (GenTableColumn column : columns) {
             if (!column.isSuperColumn() && StringUtils.isNotEmpty(column.getDictType()) && StringUtils.equalsAny(
-                column.getHtmlType(),
-                GenConstants.HTML_SELECT, GenConstants.HTML_RADIO, GenConstants.HTML_CHECKBOX)) {
+                    column.getHtmlType(),
+                    GenConstants.HTML_SELECT, GenConstants.HTML_RADIO, GenConstants.HTML_CHECKBOX)) {
                 Map<String, Object> dict = new HashMap<>();
                 dict.put("type", column.getDictType());
                 dict.put("name", StringUtils.toCamelCase(column.getDictType()));
@@ -330,8 +331,8 @@ public class VelocityUtils {
      * @return 上级菜单ID字段
      */
     public static String getParentMenuId(Dict paramsObj) {
-        if (CollUtil.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.PARENT_MENU_ID)
-            && StringUtils.isNotEmpty(paramsObj.getStr(GenConstants.PARENT_MENU_ID))) {
+        if (ObjUtil.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.PARENT_MENU_ID)
+                && StringUtils.isNotEmpty(paramsObj.getStr(GenConstants.PARENT_MENU_ID))) {
             return paramsObj.getStr(GenConstants.PARENT_MENU_ID);
         }
         return DEFAULT_PARENT_MENU_ID;
@@ -345,7 +346,7 @@ public class VelocityUtils {
      */
     public static String getTreecode(Map<String, Object> paramsObj) {
         if (CollUtil.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_CODE)) {
-            return StringUtils.toCamelCase(Convert.toStr(paramsObj.get(GenConstants.TREE_CODE)));
+            return StringUtils.toCamelCase(ConvertUtil.toStr(paramsObj.get(GenConstants.TREE_CODE)));
         }
         return StringUtils.EMPTY;
     }
@@ -357,7 +358,7 @@ public class VelocityUtils {
      * @return 树父编码
      */
     public static String getTreeParentCode(Dict paramsObj) {
-        if (CollUtil.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_PARENT_CODE)) {
+        if (ObjUtil.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_PARENT_CODE)) {
             return StringUtils.toCamelCase(paramsObj.getStr(GenConstants.TREE_PARENT_CODE));
         }
         return StringUtils.EMPTY;
@@ -370,7 +371,7 @@ public class VelocityUtils {
      * @return 树名称
      */
     public static String getTreeName(Dict paramsObj) {
-        if (CollUtil.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_NAME)) {
+        if (ObjUtil.isNotEmpty(paramsObj) && paramsObj.containsKey(GenConstants.TREE_NAME)) {
             return StringUtils.toCamelCase(paramsObj.getStr(GenConstants.TREE_NAME));
         }
         return StringUtils.EMPTY;

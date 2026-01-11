@@ -1,12 +1,13 @@
 package org.dromara.common.core.utils.file;
 
-import cn.hutool.core.io.FileUtil;
+import cn.hutool.v7.core.io.file.FileUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 
 /**
  * 文件处理工具类
@@ -39,5 +40,13 @@ public class FileUtils extends FileUtil {
     public static String percentEncode(String s) {
         String encode = URLEncoder.encode(s, StandardCharsets.UTF_8);
         return encode.replaceAll("\\+", "%20");
+    }
+
+    /**
+     *  删除文件或目录
+     * @param path  删除的文件
+     */
+    public static void del(Path path){
+        del(path.toUri().getPath());
     }
 }

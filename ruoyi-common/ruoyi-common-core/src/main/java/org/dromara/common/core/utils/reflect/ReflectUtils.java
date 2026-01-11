@@ -1,11 +1,13 @@
 package org.dromara.common.core.utils.reflect;
 
-import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.v7.core.reflect.ReflectUtil;
+import cn.hutool.v7.core.reflect.method.MethodUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.utils.StringUtils;
 
 import java.lang.reflect.Method;
+
 
 /**
  * 反射工具类. 提供调用getter/setter方法, 访问私有变量, 调用私有方法, 获取泛型类型Class, 被AOP过的真实类等工具函数.
@@ -29,7 +31,7 @@ public class ReflectUtils extends ReflectUtil {
         Object object = obj;
         for (String name : StringUtils.split(propertyName, ".")) {
             String getterMethodName = GETTER_PREFIX + StringUtils.capitalize(name);
-            object = invoke(object, getterMethodName);
+            object = MethodUtil.invoke(object, getterMethodName);
         }
         return (E) object;
     }
@@ -44,11 +46,11 @@ public class ReflectUtils extends ReflectUtil {
         for (int i = 0; i < names.length; i++) {
             if (i < names.length - 1) {
                 String getterMethodName = GETTER_PREFIX + StringUtils.capitalize(names[i]);
-                object = invoke(object, getterMethodName);
+                object = MethodUtil.invoke(object, getterMethodName);
             } else {
                 String setterMethodName = SETTER_PREFIX + StringUtils.capitalize(names[i]);
-                Method method = getMethodByName(object.getClass(), setterMethodName);
-                invoke(object, method, value);
+                Method method = MethodUtil.getMethodByName(object.getClass(), setterMethodName);
+                MethodUtil.invoke(object, method, value);
             }
         }
     }

@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="服务" type="CompoundRunConfigurationType">
+    <toRun name="Nacos" type="SpringBootApplicationConfigurationType" />
+    <toRun name="RuoYiAuthApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="RuoYiDemoApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="RuoYiGatewayApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="RuoYiGenApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="RuoYiMonitorApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="RuoYiResourceApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="RuoYiSystemApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="RuoYiTestMqApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="RuoYiWorkflowApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="SeataServerApplication" type="SpringBootApplicationConfigurationType" />
+    <toRun name="SnailJobServerApplication" type="SpringBootApplicationConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>

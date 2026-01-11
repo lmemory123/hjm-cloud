@@ -1,6 +1,6 @@
 package org.dromara.common.core.utils.ip;
 
-import cn.hutool.http.HtmlUtil;
+import cn.hutool.v7.http.html.HtmlUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

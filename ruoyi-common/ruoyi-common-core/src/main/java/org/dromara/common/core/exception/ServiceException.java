@@ -1,6 +1,6 @@
 package org.dromara.common.core.exception;
 
-import cn.hutool.core.text.StrFormatter;
+import cn.hutool.v7.core.text.placeholder.StrFormatter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

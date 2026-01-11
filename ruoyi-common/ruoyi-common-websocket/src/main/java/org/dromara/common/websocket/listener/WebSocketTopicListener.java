@@ -1,6 +1,6 @@
 package org.dromara.common.websocket.listener;
 
-import cn.hutool.core.collection.CollUtil;
+import cn.hutool.v7.core.collection.CollUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.websocket.holder.WebSocketSessionHolder;
 import org.dromara.common.websocket.utils.WebSocketUtils;

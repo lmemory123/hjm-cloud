@@ -1,7 +1,7 @@
 package org.dromara.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.hutool.core.lang.tree.Tree;
+import cn.hutool.v7.core.tree.MapTree;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
@@ -241,7 +241,7 @@ public class SysRoleController extends BaseController {
      * @param checkedKeys 选中部门列表
      * @param depts       下拉树结构列表
      */
-    public record DeptTreeSelectVo(List<Long> checkedKeys, List<Tree<Long>> depts) {}
+    public record DeptTreeSelectVo(List<Long> checkedKeys, List<MapTree<Long>> depts) {}
 
 }
 

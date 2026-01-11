@@ -1,6 +1,6 @@
 package org.dromara.common.social.utils;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import me.zhyd.oauth.config.AuthConfig;
 import me.zhyd.oauth.exception.AuthException;
 import me.zhyd.oauth.model.AuthCallback;
@@ -34,7 +34,7 @@ public class SocialUtils  {
 
     public static AuthRequest getAuthRequest(String source, SocialProperties socialProperties) throws AuthException {
         SocialLoginConfigProperties obj = socialProperties.getType().get(source);
-        if (ObjectUtil.isNull(obj)) {
+        if (ObjUtil.isNull(obj)) {
             throw new AuthException("不支持的第三方登录类型");
         }
         AuthConfig.AuthConfigBuilder builder = AuthConfig.builder()

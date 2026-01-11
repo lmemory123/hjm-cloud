@@ -1,6 +1,6 @@
 package org.dromara.common.translation.core.impl;
 
-import cn.hutool.core.convert.Convert;
+import cn.hutool.v7.core.convert.ConvertUtil;
 import lombok.AllArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.dromara.common.core.constant.CacheNames;
@@ -36,7 +36,7 @@ public class NicknameTranslationImpl implements TranslationInterface<String> {
             return remoteUserService.selectNicknameById(id);
         } else if (key instanceof String ids) {
             List<String> list = new ArrayList<>();
-            for (Long id : StringUtils.splitTo(ids, Convert::toLong)) {
+            for (Long id : StringUtils.splitTo(ids, ConvertUtil::toLong)) {
                 String nickname = CacheUtils.get(CacheNames.SYS_NICKNAME, key);
                 if (StringUtils.isNotBlank(nickname)) {
                     list.add(nickname);

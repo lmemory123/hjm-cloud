@@ -1,6 +1,6 @@
 package org.dromara.system.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -84,7 +84,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
             .select(SysDictData::getDictLabel)
             .eq(SysDictData::getDictType, dictType)
             .eq(SysDictData::getDictValue, dictValue));
-        return ObjectUtil.isNull(dictData) ? StringUtils.EMPTY : dictData.getDictLabel();
+        return ObjUtil.isNull(dictData) ? StringUtils.EMPTY : dictData.getDictLabel();
     }
 
     /**
@@ -155,7 +155,7 @@ public class SysDictDataServiceImpl implements ISysDictDataService {
         boolean exist = baseMapper.selectCountByQuery(QueryWrapper.create()
             .eq(SysDictData::getDictType, dict.getDictType())
             .eq(SysDictData::getDictValue, dict.getDictValue())
-            .ne(SysDictData::getDictCode, dict.getDictCode(), ObjectUtil.isNotNull(dict.getDictCode()))) > 0;
+            .ne(SysDictData::getDictCode, dict.getDictCode(), ObjUtil.isNotNull(dict.getDictCode()))) > 0;
         return !exist;
     }
 

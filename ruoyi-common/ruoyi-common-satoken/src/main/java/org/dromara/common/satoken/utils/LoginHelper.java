@@ -3,9 +3,9 @@ package org.dromara.common.satoken.utils;
 import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.constant.SystemConstants;
@@ -47,14 +47,14 @@ public class LoginHelper {
      * @param model     配置参数
      */
     public static void login(LoginUser loginUser, SaLoginParameter model) {
-        model = ObjectUtil.defaultIfNull(model, new SaLoginParameter());
+        model = ObjUtil.defaultIfNull(model, new SaLoginParameter());
         StpUtil.login(loginUser.getLoginId(),
-            model.setExtra(TENANT_KEY, loginUser.getTenantId())
-                .setExtra(USER_KEY, loginUser.getUserId())
-                .setExtra(USER_NAME_KEY, loginUser.getUsername())
-                .setExtra(DEPT_KEY, loginUser.getDeptId())
-                .setExtra(DEPT_NAME_KEY, loginUser.getDeptName())
-                .setExtra(DEPT_CATEGORY_KEY, loginUser.getDeptCategory())
+                model.setExtra(TENANT_KEY, loginUser.getTenantId())
+                        .setExtra(USER_KEY, loginUser.getUserId())
+                        .setExtra(USER_NAME_KEY, loginUser.getUsername())
+                        .setExtra(DEPT_KEY, loginUser.getDeptId())
+                        .setExtra(DEPT_NAME_KEY, loginUser.getDeptName())
+                        .setExtra(DEPT_CATEGORY_KEY, loginUser.getDeptCategory())
         );
         StpUtil.getTokenSession().set(LOGIN_USER_KEY, loginUser);
     }
@@ -65,7 +65,7 @@ public class LoginHelper {
     @SuppressWarnings("unchecked cast")
     public static <T extends LoginUser> T getLoginUser() {
         SaSession session = StpUtil.getTokenSession();
-        if (ObjectUtil.isNull(session)) {
+        if (ObjUtil.isNull(session)) {
             return null;
         }
         return (T) session.get(LOGIN_USER_KEY);
@@ -77,7 +77,7 @@ public class LoginHelper {
     @SuppressWarnings("unchecked cast")
     public static <T extends LoginUser> T getLoginUser(String token) {
         SaSession session = StpUtil.getTokenSessionByToken(token);
-        if (ObjectUtil.isNull(session)) {
+        if (ObjUtil.isNull(session)) {
             return null;
         }
         return (T) session.get(LOGIN_USER_KEY);
@@ -87,49 +87,49 @@ public class LoginHelper {
      * 获取用户id
      */
     public static Long getUserId() {
-        return Convert.toLong(getExtra(USER_KEY));
+        return ConvertUtil.toLong(getExtra(USER_KEY));
     }
 
     /**
      * 获取用户id
      */
     public static String getUserIdStr() {
-        return Convert.toStr(getExtra(USER_KEY));
+        return ConvertUtil.toStr(getExtra(USER_KEY));
     }
 
     /**
      * 获取用户账户
      */
     public static String getUsername() {
-        return Convert.toStr(getExtra(USER_NAME_KEY));
+        return ConvertUtil.toStr(getExtra(USER_NAME_KEY));
     }
 
     /**
      * 获取租户ID
      */
     public static String getTenantId() {
-        return Convert.toStr(getExtra(TENANT_KEY));
+        return ConvertUtil.toStr(getExtra(TENANT_KEY));
     }
 
     /**
      * 获取部门ID
      */
     public static Long getDeptId() {
-        return Convert.toLong(getExtra(DEPT_KEY));
+        return ConvertUtil.toLong(getExtra(DEPT_KEY));
     }
 
     /**
      * 获取部门名
      */
     public static String getDeptName() {
-        return Convert.toStr(getExtra(DEPT_NAME_KEY));
+        return ConvertUtil.toStr(getExtra(DEPT_NAME_KEY));
     }
 
     /**
      * 获取部门类别编码
      */
     public static String getDeptCategory() {
-        return Convert.toStr(getExtra(DEPT_CATEGORY_KEY));
+        return ConvertUtil.toStr(getExtra(DEPT_CATEGORY_KEY));
     }
 
     /**
@@ -197,7 +197,7 @@ public class LoginHelper {
         if (loginUser == null) {
             return false;
         }
-        return Convert.toBool(isTenantAdmin(loginUser.getRolePermission()));
+        return ConvertUtil.toBoolean(isTenantAdmin(loginUser.getRolePermission()));
     }
 
     /**

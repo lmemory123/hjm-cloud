@@ -1,7 +1,9 @@
 package org.dromara.common.core.utils;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.map.MapUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.collection.ListUtil;
+import cn.hutool.v7.core.collection.set.SetUtil;
+import cn.hutool.v7.core.map.MapUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -28,7 +30,7 @@ public class StreamUtils {
      */
     public static <E> List<E> filter(Collection<E> collection, Predicate<E> function) {
         if (CollUtil.isEmpty(collection)) {
-            return CollUtil.newArrayList();
+            return ListUtil.of();
         }
         return collection.stream()
             .filter(function)
@@ -128,7 +130,7 @@ public class StreamUtils {
      */
     public static <E> List<E> sorted(Collection<E> collection, Comparator<E> comparing) {
         if (CollUtil.isEmpty(collection)) {
-            return CollUtil.newArrayList();
+            return ListUtil.of();
         }
         return collection.stream()
             .filter(Objects::nonNull)
@@ -266,7 +268,7 @@ public class StreamUtils {
      */
     public static <E, T> List<T> toList(Collection<E> collection, Function<E, T> function) {
         if (CollUtil.isEmpty(collection)) {
-            return CollUtil.newArrayList();
+            return ListUtil.of();
         }
         return collection.stream()
             .map(function)
@@ -287,7 +289,7 @@ public class StreamUtils {
      */
     public static <E, T> Set<T> toSet(Collection<E> collection, Function<E, T> function) {
         if (CollUtil.isEmpty(collection)) {
-            return CollUtil.newHashSet();
+            return SetUtil.of();
         }
         return collection.stream()
             .map(function)

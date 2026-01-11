@@ -1,6 +1,6 @@
 package org.dromara.workflow.service;
 
-import cn.hutool.core.lang.tree.Tree;
+import cn.hutool.v7.core.tree.MapTree;
 import org.dromara.workflow.domain.bo.FlowCategoryBo;
 import org.dromara.workflow.domain.vo.FlowCategoryVo;
 
@@ -43,7 +43,7 @@ public interface IFlwCategoryService {
      * @param category 流程分类信息
      * @return 流程分类树信息集合
      */
-    List<Tree<String>> selectCategoryTreeList(FlowCategoryBo category);
+    List<MapTree<String>> selectCategoryTreeList(FlowCategoryBo category);
 
     /**
      * 校验流程分类名称是否唯一

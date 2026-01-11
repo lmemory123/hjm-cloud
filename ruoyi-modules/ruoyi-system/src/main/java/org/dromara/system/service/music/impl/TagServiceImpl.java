@@ -1,23 +1,22 @@
 package org.dromara.system.service.music.impl;
 
-import org.dromara.common.core.utils.MapstructUtils;
-import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.mybatisflex.core.page.TableDataInfo;
-import org.dromara.common.mybatisflex.core.page.PageQuery;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.dromara.system.service.music.ITagService;
-import org.springframework.stereotype.Service;
+import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.mybatisflex.core.page.PageQuery;
+import org.dromara.common.mybatisflex.core.page.TableDataInfo;
+import org.dromara.system.domain.Tag;
 import org.dromara.system.domain.bo.TagBo;
 import org.dromara.system.domain.vo.TagVo;
-import org.dromara.system.domain.Tag;
 import org.dromara.system.mapper.TagMapper;
+import org.dromara.system.service.music.ITagService;
+import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Collection;
 
 import static org.dromara.system.domain.table.TagTableDef.TAG;
 

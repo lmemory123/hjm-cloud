@@ -1,12 +1,15 @@
 package org.dromara.system.domain;
 
-import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
-
-import com.mybatisflex.annotation.*;
+import com.mybatisflex.annotation.Column;
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
+import org.dromara.common.mybatisflex.handler.PgJsonbArrayTypeHandler;
+import org.dromara.common.mybatisflex.handler.PgJsonbTypeHandler;
+
 import java.util.Date;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 
 /**
@@ -111,21 +114,25 @@ public class Music extends QueryBaseEntity {
     /**
      * 原曲关联信息快照
      */
+    @Column(typeHandler = PgJsonbArrayTypeHandler.class)
     private String originalData;
 
     /**
      * 资源展示快照
      */
+    @Column(typeHandler = PgJsonbTypeHandler.class)
     private String resourceData;
 
     /**
      * 标签展示快照
      */
+    @Column(typeHandler = PgJsonbArrayTypeHandler.class)
     private String tagsSnapshot;
 
     /**
      * 扩展字段
      */
+    @Column(typeHandler = PgJsonbTypeHandler.class)
     private String extendData;
 
     /**

@@ -1,9 +1,10 @@
 package org.dromara.workflow.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.lang.tree.Tree;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.collection.ListUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.tree.MapTree;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +52,7 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
     @Override
     public FlowCategoryVo queryById(Long categoryId) {
         FlowCategoryVo category = baseMapper.selectVoById(categoryId);
-        if (ObjectUtil.isNull(category)) {
+        if (ObjUtil.isNull(category)) {
             return null;
         }
         FlowCategoryVo parentCategory = baseMapper.selectVoOne(new LambdaQueryWrapper<FlowCategory>()
@@ -69,7 +70,7 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
     @Cacheable(cacheNames = FlowConstant.FLOW_CATEGORY_NAME, key = "#categoryId")
     @Override
     public String selectCategoryNameById(Long categoryId) {
-        if (ObjectUtil.isNull(categoryId)) {
+        if (ObjUtil.isNull(categoryId)) {
             return null;
         }
         FlowCategory category = baseMapper.selectOne(new LambdaQueryWrapper<FlowCategory>()
@@ -96,18 +97,18 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
      * @return 流程分类树信息集合
      */
     @Override
-    public List<Tree<String>> selectCategoryTreeList(FlowCategoryBo category) {
+    public List<MapTree<String>> selectCategoryTreeList(FlowCategoryBo category) {
         List<FlowCategoryVo> categoryList = this.queryList(category);
         if (CollUtil.isEmpty(categoryList)) {
-            return CollUtil.newArrayList();
+            return ListUtil.of();
         }
         return TreeBuildUtils.buildMultiRoot(
             categoryList,
-            node -> Convert.toStr(node.getCategoryId()),
-            node -> Convert.toStr(node.getParentId()),
+            node -> ConvertUtil.toStr(node.getCategoryId()),
+            node -> ConvertUtil.toStr(node.getParentId()),
             (node, treeNode) -> treeNode
-                .setId(Convert.toStr(node.getCategoryId()))
-                .setParentId(Convert.toStr(node.getParentId()))
+                .setId(ConvertUtil.toStr(node.getCategoryId()))
+                .setParentId(ConvertUtil.toStr(node.getParentId()))
                 .setName(node.getCategoryName())
                 .setWeight(node.getOrderNum())
         );
@@ -122,9 +123,9 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
     public List<org.dromara.warm.flow.core.dto.Tree> queryCategory() {
         List<FlowCategoryVo> list = this.queryList(new FlowCategoryBo());
         return StreamUtils.toList(list, category -> new org.dromara.warm.flow.core.dto.Tree()
-            .setId(Convert.toStr(category.getCategoryId()))
+            .setId(ConvertUtil.toStr(category.getCategoryId()))
             .setName(category.getCategoryName())
-            .setParentId(Convert.toStr(category.getParentId()))
+            .setParentId(ConvertUtil.toStr(category.getParentId()))
         );
     }
 
@@ -139,7 +140,7 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
         boolean exist = baseMapper.exists(new LambdaQueryWrapper<FlowCategory>()
             .eq(FlowCategory::getCategoryName, category.getCategoryName())
             .eq(FlowCategory::getParentId, category.getParentId())
-            .ne(ObjectUtil.isNotNull(category.getCategoryId()), FlowCategory::getCategoryId, category.getCategoryId()));
+            .ne(ObjUtil.isNotNull(category.getCategoryId()), FlowCategory::getCategoryId, category.getCategoryId()));
         return !exist;
     }
 
@@ -171,8 +172,8 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
     private LambdaQueryWrapper<FlowCategory> buildQueryWrapper(FlowCategoryBo bo) {
         LambdaQueryWrapper<FlowCategory> lqw = Wrappers.lambdaQuery();
         lqw.eq(FlowCategory::getDelFlag, SystemConstants.NORMAL);
-        lqw.eq(ObjectUtil.isNotNull(bo.getCategoryId()), FlowCategory::getCategoryId, bo.getCategoryId());
-        lqw.eq(ObjectUtil.isNotNull(bo.getParentId()), FlowCategory::getParentId, bo.getParentId());
+        lqw.eq(ObjUtil.isNotNull(bo.getCategoryId()), FlowCategory::getCategoryId, bo.getCategoryId());
+        lqw.eq(ObjUtil.isNotNull(bo.getParentId()), FlowCategory::getParentId, bo.getParentId());
         lqw.like(StringUtils.isNotBlank(bo.getCategoryName()), FlowCategory::getCategoryName, bo.getCategoryName());
         lqw.orderByAsc(FlowCategory::getAncestors);
         lqw.orderByAsc(FlowCategory::getParentId);
@@ -190,7 +191,7 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
     @Override
     public int insertByBo(FlowCategoryBo bo) {
         FlowCategory info = baseMapper.selectById(bo.getParentId());
-        if (ObjectUtil.isNull(info)) {
+        if (ObjUtil.isNull(info)) {
             throw new ServiceException("父级流程分类不存在!");
         }
         FlowCategory category = MapstructUtils.convert(bo, FlowCategory.class);
@@ -210,12 +211,12 @@ public class FlwCategoryServiceImpl implements IFlwCategoryService, CategoryServ
     public int updateByBo(FlowCategoryBo bo) {
         FlowCategory category = MapstructUtils.convert(bo, FlowCategory.class);
         FlowCategory oldCategory = baseMapper.selectById(category.getCategoryId());
-        if (ObjectUtil.isNull(oldCategory)) {
+        if (ObjUtil.isNull(oldCategory)) {
             throw new ServiceException("流程分类不存在，无法修改");
         }
         if (!oldCategory.getParentId().equals(category.getParentId())) {
             FlowCategory newParentCategory = baseMapper.selectById(category.getParentId());
-            if (ObjectUtil.isNotNull(newParentCategory)) {
+            if (ObjUtil.isNotNull(newParentCategory)) {
                 String newAncestors = newParentCategory.getAncestors() + StringUtils.SEPARATOR + newParentCategory.getCategoryId();
                 String oldAncestors = oldCategory.getAncestors();
                 category.setAncestors(newAncestors);

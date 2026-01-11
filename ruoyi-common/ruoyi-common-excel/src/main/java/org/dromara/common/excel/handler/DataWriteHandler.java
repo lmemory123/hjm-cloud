@@ -1,6 +1,6 @@
 package org.dromara.common.excel.handler;
 
-import cn.hutool.core.collection.CollUtil;
+import cn.hutool.v7.core.collection.CollUtil;
 import cn.idev.excel.annotation.ExcelProperty;
 import cn.idev.excel.metadata.data.DataFormatData;
 import cn.idev.excel.metadata.data.WriteCellData;

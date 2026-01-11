@@ -1,11 +1,12 @@
 package org.dromara.system.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.digest.BCrypt;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.collection.set.SetUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -126,7 +127,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
 
         // 获取所有租户编号
         List<String> tenantIds = baseMapper.selectObjs(QueryWrapper.create()
-                .select(SYS_TENANT.TENANT_ID), Convert::toStr);
+                .select(SYS_TENANT.TENANT_ID), ConvertUtil::toStr);
         String tenantId = generateTenantId(tenantIds);
         assert add != null;
         add.setTenantId(tenantId);
@@ -245,11 +246,11 @@ public class SysTenantServiceImpl implements ISysTenantService {
     private Long createTenantRole(String tenantId, Long packageId) {
         // 获取租户套餐
         SysTenantPackage tenantPackage = tenantPackageMapper.selectOneById(packageId);
-        if (ObjectUtil.isNull(tenantPackage)) {
+        if (ObjUtil.isNull(tenantPackage)) {
             throw new ServiceException("套餐不存在");
         }
         // 获取套餐菜单id
-        List<Long> menuIds = StringUtils.splitTo(tenantPackage.getMenuIds(), Convert::toLong);
+        List<Long> menuIds = StringUtils.splitTo(tenantPackage.getMenuIds(), ConvertUtil::toLong);
 
         // 创建角色
         SysRole role = new SysRole();
@@ -309,7 +310,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
      */
     @Override
     public void checkTenantAllowed(String tenantId) {
-        if (ObjectUtil.isNotNull(tenantId) && TenantConstants.DEFAULT_TENANT_ID.equals(tenantId)) {
+        if (ObjUtil.isNotNull(tenantId) && TenantConstants.DEFAULT_TENANT_ID.equals(tenantId)) {
             throw new ServiceException("不允许操作管理租户");
         }
     }
@@ -336,7 +337,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
     public boolean checkCompanyNameUnique(SysTenantBo bo) {
         boolean exist = baseMapper.selectCountByQuery(QueryWrapper.create()
                 .eq(SysTenant::getCompanyName, bo.getCompanyName())
-                .ne(SysTenant::getTenantId, bo.getTenantId(), ObjectUtil.isNotNull(bo.getTenantId()))) > 0;
+                .ne(SysTenant::getTenantId, bo.getTenantId(), ObjUtil.isNotNull(bo.getTenantId()))) > 0;
         return !exist;
     }
 
@@ -362,7 +363,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
     public boolean checkExpireTime(String tenantId) {
         SysTenantVo tenant = SpringUtils.getAopProxy(this).queryByTenantId(tenantId);
         // 如果未设置过期时间代表不限制
-        if (ObjectUtil.isNull(tenant.getExpireTime())) {
+        if (ObjUtil.isNull(tenant.getExpireTime())) {
             return true;
         }
         // 如果当前时间在过期时间之前则通过
@@ -379,7 +380,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
         List<SysRole> roles = roleMapper.selectListByQuery(QueryWrapper.create()
                 .eq(SysRole::getTenantId, tenantId));
         List<Long> roleIds = new ArrayList<>(roles.size() - 1);
-        List<Long> menuIds = StringUtils.splitTo(tenantPackage.getMenuIds(), Convert::toLong);
+        List<Long> menuIds = StringUtils.splitTo(tenantPackage.getMenuIds(), ConvertUtil::toLong);
         roles.forEach(item -> {
             if (TenantConstants.TENANT_ADMIN_ROLE_KEY.equals(item.getRoleKey())) {
                 List<SysRoleMenu> roleMenus = new ArrayList<>(menuIds.size());
@@ -430,7 +431,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
         // 获取所有租户编号
         List<String> tenantIds = baseMapper.selectObjs(QueryWrapper.create()
                 .select(SYS_TENANT.TENANT_ID)
-                .where(SYS_TENANT.STATUS.eq(SystemConstants.NORMAL)), Convert::toStr);
+                .where(SYS_TENANT.STATUS.eq(SystemConstants.NORMAL)), ConvertUtil::toStr);
         // 待入库的字典类型和字典数据
         List<SysDictType> saveTypeList = new ArrayList<>();
         List<SysDictData> saveDataList = new ArrayList<>();
@@ -449,7 +450,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
                 // 根据字典类型获取默认租户的字典数据
                 List<SysDictData> defaultDictDataList = defaultDictDataMap.get(dictType.getDictType());
                 // 排除不需要同步的字典数据
-                Set<String> excludeDictDataSet = CollUtil.newHashSet();
+                Set<String> excludeDictDataSet = SetUtil.of();
                 // 处理 存在type不存在data 的情况
                 if (typeList.contains(dictType.getDictType())) {
                     // 获取租户字典数据
@@ -527,7 +528,7 @@ public class SysTenantServiceImpl implements ISysTenantService {
         // 获取所有租户编号
         List<String> tenantIds = baseMapper.selectObjs(QueryWrapper.create()
                 .select(SYS_TENANT.TENANT_ID)
-                .where(SYS_TENANT.STATUS.eq(SystemConstants.NORMAL)), Convert::toStr);
+                .where(SYS_TENANT.STATUS.eq(SystemConstants.NORMAL)), ConvertUtil::toStr);
         // 待入库的字典类型和字典数据
         List<SysConfig> saveConfigList = new ArrayList<>();
         // 待同步的租户编号（用于清除对于租户的字典缓存）

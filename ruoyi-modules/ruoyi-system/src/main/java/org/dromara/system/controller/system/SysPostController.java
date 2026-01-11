@@ -1,8 +1,8 @@
 package org.dromara.system.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.hutool.core.lang.tree.Tree;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.tree.MapTree;
+import cn.hutool.v7.core.util.ObjUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.SystemConstants;
@@ -128,7 +128,7 @@ public class SysPostController extends BaseController {
     @GetMapping("/optionselect")
     public R<List<SysPostVo>> optionselect(@RequestParam(required = false) Long[] postIds, @RequestParam(required = false) Long deptId) {
         List<SysPostVo> list = new ArrayList<>();
-        if (ObjectUtil.isNotNull(deptId)) {
+        if (ObjUtil.isNotNull(deptId)) {
             SysPostBo post = new SysPostBo();
             post.setDeptId(deptId);
             list = postService.selectPostList(post);
@@ -143,7 +143,7 @@ public class SysPostController extends BaseController {
      */
     @SaCheckPermission("system:post:list")
     @GetMapping("/deptTree")
-    public R<List<Tree<Long>>> deptTree(SysDeptBo dept) {
+    public R<List<MapTree<Long>>> deptTree(SysDeptBo dept) {
         return R.ok(deptService.selectDeptTreeList(dept));
     }
 

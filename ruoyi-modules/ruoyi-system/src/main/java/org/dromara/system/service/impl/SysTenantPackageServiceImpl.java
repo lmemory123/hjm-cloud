@@ -1,7 +1,7 @@
 package org.dromara.system.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.v7.core.collection.CollUtil;
+import cn.hutool.v7.core.util.ObjUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -118,7 +118,7 @@ public class SysTenantPackageServiceImpl implements ISysTenantPackageService {
     public boolean checkPackageNameUnique(SysTenantPackageBo bo) {
         boolean exist = baseMapper.selectCountByQuery(QueryWrapper.create()
             .eq(SysTenantPackage::getPackageName, bo.getPackageName())
-            .ne(SysTenantPackage::getPackageId, bo.getPackageId(), ObjectUtil.isNotNull(bo.getPackageId()))) > 0;
+            .ne(SysTenantPackage::getPackageId, bo.getPackageId(), ObjUtil.isNotNull(bo.getPackageId()))) > 0;
         return !exist;
     }
 
