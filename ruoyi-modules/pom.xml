@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.1.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 http://maven.apache.org/xsd/maven-4.1.0.xsd">
     <parent>
         <groupId>org.dromara</groupId>
         <artifactId>ruoyi-cloud-plus</artifactId>
-        <version>${revision}</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.1.0</modelVersion>
 
-    <modules>
-        <module>ruoyi-system</module>
-        <module>ruoyi-gen</module>
-        <module>ruoyi-job</module>
-        <module>ruoyi-resource</module>
-        <module>ruoyi-workflow</module>
-        <module>hjm-music</module>
-    </modules>
+    <subprojects>
+        <subproject>ruoyi-system</subproject>
+        <subproject>ruoyi-gen</subproject>
+        <subproject>ruoyi-job</subproject>
+        <subproject>ruoyi-resource</subproject>
+        <subproject>ruoyi-workflow</subproject>
+        <subproject>hjm-music</subproject>
+    </subprojects>
 
     <artifactId>ruoyi-modules</artifactId>
     <packaging>pom</packaging>

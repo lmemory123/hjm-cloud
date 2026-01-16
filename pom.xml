@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.1.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 http://maven.apache.org/xsd/maven-4.1.0.xsd" root="true">
+    <modelVersion>4.1.0</modelVersion>
 
     <groupId>org.dromara</groupId>
     <artifactId>ruoyi-cloud-plus</artifactId>
@@ -65,7 +65,12 @@
         <!-- 插件版本 -->
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
-        <flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
+        <maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
+        <maven-common-plugin.version>3.14.1</maven-common-plugin.version>
+        <maven-resources-plugin.version>3.4.0</maven-resources-plugin.version>
+        <maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
+        <maven-install-plugin.version>3.1.4</maven-install-plugin.version>
+        <maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
         <!-- 打包默认跳过测试 -->
         <skipTests>true</skipTests>
     </properties>
@@ -417,15 +422,15 @@
         </dependencies>
     </dependencyManagement>
 
-    <modules>
-        <module>ruoyi-auth</module>
-        <module>ruoyi-gateway</module>
-        <module>ruoyi-visual</module>
-        <module>ruoyi-modules</module>
-        <module>ruoyi-api</module>
-        <module>ruoyi-common</module>
-        <module>ruoyi-example</module>
-    </modules>
+    <subprojects>
+        <subproject>ruoyi-auth</subproject>
+        <subproject>ruoyi-gateway</subproject>
+        <subproject>ruoyi-visual</subproject>
+        <subproject>ruoyi-modules</subproject>
+        <subproject>ruoyi-api</subproject>
+        <subproject>ruoyi-common</subproject>
+        <subproject>ruoyi-example</subproject>
+    </subprojects>
     <packaging>pom</packaging>
 
     <dependencies>
@@ -455,7 +460,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
+                <version>${maven-common-plugin.version}</version>
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <annotationProcessorPaths>
@@ -509,32 +514,6 @@
                     <excludedGroups>exclude</excludedGroups>
                 </configuration>
             </plugin>
-            <!-- 统一版本号管理 -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>flatten-maven-plugin</artifactId>
-                <version>${flatten-maven-plugin.version}</version>
-                <configuration>
-                    <updatePomFile>true</updatePomFile>
-                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>flatten</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>flatten</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>flatten.clean</id>
-                        <phase>clean</phase>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
         <resources>
             <resource>
@@ -557,16 +536,60 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
+        <pluginManagement>
+            <plugins>
+                <!-- 锁定核心插件版本，消除警告 -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${maven-clean-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven-resources-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven-jar-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-install-plugin</artifactId>
+                    <version>${maven-install-plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${maven-deploy-plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
     <repositories>
         <repository>
-            <id>gitlab-maven</id>
-            <url>https://gitlab.xuxiaowei.com.cn/api/v4/projects/430/packages/maven</url>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/alibaba/spring-cloud-alibaba</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
-
-
 
 
 <!--    <distributionManagement>-->
