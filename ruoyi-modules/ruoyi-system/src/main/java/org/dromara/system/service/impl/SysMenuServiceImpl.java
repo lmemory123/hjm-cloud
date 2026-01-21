@@ -378,7 +378,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
         Long parentId = menu.getParentId();
         String path = menu.getPath();
         String routeName = StringUtils.isEmpty(menu.getRouteName()) ? path : menu.getRouteName();
-
         List<SysMenu> sysMenuList = baseMapper.selectListByQuery(QueryWrapper.create()
             .where(
                 SYS_MENU.MENU_TYPE.in(SystemConstants.TYPE_DIR, SystemConstants.TYPE_MENU)
