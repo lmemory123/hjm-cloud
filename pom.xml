@@ -47,7 +47,7 @@
         <mapstruct-plus.lombok.version>0.2.0</mapstruct-plus.lombok.version>
         <justauth.version>1.18.2</justauth.version>
         <!-- 离线IP地址定位库 -->
-        <ip2region.version>3.3.2</ip2region.version>
+        <ip2region.version>3.3.4</ip2region.version>
         <!-- 临时修复 fastjson 漏洞 -->
         <fastjson.version>2.0.60</fastjson.version>
         <!-- OSS 配置 -->
