@@ -456,6 +456,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-common-plugin.version}</version>
                 <configuration>
+                    <release>${java.version}</release>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <annotationProcessorPaths>
                         <path>
@@ -492,7 +493,6 @@
                     <compilerArgs>
                         <arg>-parameters</arg>
                     </compilerArgs>
-          <release>${java.version}</release>
                 </configuration>
             </plugin>
             <!-- 单元测试使用 -->
