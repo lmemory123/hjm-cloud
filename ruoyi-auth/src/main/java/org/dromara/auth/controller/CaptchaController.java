@@ -1,14 +1,14 @@
 package org.dromara.auth.controller;
 
 import cn.hutool.v7.core.data.id.IdUtil;
-import cn.hutool.v7.core.reflect.ConstructorUtil;
-import cn.hutool.v7.swing.captcha.AbstractCaptcha;
 import cn.hutool.v7.swing.captcha.generator.CodeGenerator;
+import cn.hutool.v7.swing.captcha.generator.MathGenerator;
+import cn.hutool.v7.swing.captcha.generator.RandomGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Strings;
+import org.dromara.auth.config.WaveAndCircleCaptcha;
 import org.dromara.auth.domain.vo.CaptchaVo;
-import org.dromara.auth.enums.CaptchaType;
 import org.dromara.auth.properties.CaptchaProperties;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
@@ -24,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.awt.*;
 import java.time.Duration;
 
 /**
@@ -63,19 +64,21 @@ public class CaptchaController {
         String uuid = IdUtil.simpleUUID();
         String verifyKey = GlobalConstants.CAPTCHA_CODE_KEY + uuid;
         // 生成验证码
-        CaptchaType captchaType = captchaProperties.getType();
+        String captchaType = captchaProperties.getType();
         CodeGenerator codeGenerator;
-        if (CaptchaType.MATH == captchaType) {
-            codeGenerator = ConstructorUtil.newInstance(captchaType.getClazz(), captchaProperties.getNumberLength(), false);
+        if ("math".equals(captchaType)) {
+            codeGenerator = new MathGenerator(captchaProperties.getNumberLength(), false);
         } else {
-            codeGenerator = ConstructorUtil.newInstance(captchaType.getClazz(), captchaProperties.getCharLength());
+            codeGenerator = new RandomGenerator(captchaProperties.getCharLength());
         }
-        AbstractCaptcha captcha = SpringUtils.getBean(captchaProperties.getCategory().getClazz());
+        WaveAndCircleCaptcha captcha = new WaveAndCircleCaptcha(160, 60);
+        // captcha.setBackground(Color.WHITE); // 不设置就是透明底
+        captcha.setFont(new Font("Arial", Font.BOLD, 45));
         captcha.setGenerator(codeGenerator);
         captcha.createCode();
         // 如果是数学验证码，使用SpEL表达式处理验证码结果
         String code = captcha.getCode();
-        if (CaptchaType.MATH == captchaType) {
+        if ("math".equals(captchaType)) {
             ExpressionParser parser = new SpelExpressionParser();
             Expression exp = parser.parseExpression(Strings.CS.remove(code, "="));
             code = exp.getValue(String.class);

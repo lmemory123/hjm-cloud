@@ -2,6 +2,7 @@ package org.dromara.resource.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.v7.core.util.ObjUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
@@ -20,20 +21,34 @@ import org.dromara.common.oss.core.OssClient;
 import org.dromara.common.oss.entity.UploadResult;
 import org.dromara.common.oss.enums.AccessPolicyType;
 import org.dromara.common.oss.factory.OssFactory;
+import org.dromara.common.oss.exception.OssException;
 import org.dromara.resource.domain.SysOss;
 import org.dromara.resource.domain.SysOssExt;
 import org.dromara.resource.domain.bo.SysOssBo;
+import org.dromara.resource.domain.bo.SysOssCompleteBo;
+import org.dromara.resource.domain.bo.SysOssMultipartAbortBo;
+import org.dromara.resource.domain.bo.SysOssMultipartCompleteBo;
+import org.dromara.resource.domain.bo.SysOssMultipartInitBo;
+import org.dromara.resource.domain.bo.SysOssMultipartPartBo;
+import org.dromara.resource.domain.bo.SysOssPresignBo;
+import org.dromara.resource.domain.vo.SysOssMultipartInitVo;
+import org.dromara.resource.domain.vo.SysOssMultipartPartVo;
+import org.dromara.resource.domain.vo.SysOssPresignVo;
+import org.dromara.resource.domain.vo.SysOssUploadVo;
 import org.dromara.resource.domain.vo.SysOssVo;
 import org.dromara.resource.mapper.SysOssMapper;
+import org.dromara.resource.service.ISysOssConfigService;
 import org.dromara.resource.service.ISysOssService;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.model.CompletedPart;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -50,6 +65,7 @@ import java.util.stream.Collectors;
 public class SysOssServiceImpl implements ISysOssService {
 
     private final SysOssMapper baseMapper;
+    private final ISysOssConfigService ossConfigService;
 
     /**
      * 查询OSS对象存储列表
@@ -169,7 +185,7 @@ public class SysOssServiceImpl implements ISysOssService {
         }
         FileUtils.setAttachmentResponseHeader(response, sysOss.getOriginalName());
         response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE + "; charset=UTF-8");
-        OssClient storage = OssFactory.instance(sysOss.getService());
+        OssClient storage = getOssClient(sysOss.getService());
         storage.download(sysOss.getFileName(), response.getOutputStream(), response::setContentLengthLong);
     }
 
@@ -187,7 +203,7 @@ public class SysOssServiceImpl implements ISysOssService {
         }
         String originalfileName = file.getOriginalFilename();
         String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
-        OssClient storage = OssFactory.instance();
+        OssClient storage = getOssClient(null);
         UploadResult uploadResult;
         try {
             uploadResult = storage.uploadSuffix(file.getBytes(), suffix, file.getContentType());
@@ -214,13 +230,123 @@ public class SysOssServiceImpl implements ISysOssService {
         }
         String originalfileName = file.getName();
         String suffix = StringUtils.substring(originalfileName, originalfileName.lastIndexOf("."), originalfileName.length());
-        OssClient storage = OssFactory.instance();
+        OssClient storage = getOssClient(null);
         long length = file.length();
         UploadResult uploadResult = storage.uploadSuffix(file, suffix);
         SysOssExt ext1 = new SysOssExt();
         ext1.setFileSize(length);
         // 保存文件信息
         return buildResultEntity(originalfileName, suffix, storage.getConfigKey(), uploadResult, ext1);
+    }
+
+    @Override
+    public SysOssPresignVo presign(SysOssPresignBo bo) {
+        if (ObjUtil.isNull(bo) || StringUtils.isBlank(bo.getFileName())) {
+            throw new ServiceException("文件名不能为空");
+        }
+        OssClient storage = getOssClient(bo.getService());
+        String suffix = getSuffix(bo.getFileName());
+        String objectKey = buildObjectKey(storage, bo.getBizType(), suffix);
+        Duration expire = Duration.ofMinutes(10);
+        String uploadUrl = storage.getPresignedPutUrl(objectKey, expire, bo.getContentType());
+        SysOssPresignVo vo = new SysOssPresignVo();
+        vo.setUploadUrl(uploadUrl);
+        vo.setObjectKey(objectKey);
+        vo.setExpireAt(System.currentTimeMillis() + expire.toMillis());
+        vo.setMethod("PUT");
+        return vo;
+    }
+
+    @Override
+    public SysOssUploadVo complete(SysOssCompleteBo bo) {
+        if (ObjUtil.isNull(bo) || StringUtils.isBlank(bo.getObjectKey())) {
+            throw new ServiceException("objectKey不能为空");
+        }
+        OssClient storage = getOssClient(bo.getService());
+        String objectKey = normalizeObjectKey(storage, bo.getObjectKey());
+        if (!storage.exists(objectKey)) {
+            throw new ServiceException("对象不存在或未上传完成");
+        }
+        String originalName = StringUtils.isNotBlank(bo.getOriginalName()) ? bo.getOriginalName() : objectKey;
+        String suffix = getSuffix(originalName);
+        UploadResult uploadResult = UploadResult.builder()
+            .filename(objectKey)
+            .url(storage.getUrl() + StringUtils.SLASH + objectKey)
+            .build();
+        SysOssExt ext1 = new SysOssExt();
+        ext1.setFileSize(bo.getFileSize());
+        ext1.setContentType(bo.getContentType());
+        SysOssVo oss = buildResultEntity(originalName, suffix, storage.getConfigKey(), uploadResult, ext1);
+        return toUploadVo(oss, originalName);
+    }
+
+    @Override
+    public SysOssMultipartInitVo multipartInit(SysOssMultipartInitBo bo) {
+        if (ObjUtil.isNull(bo) || StringUtils.isBlank(bo.getFileName())) {
+            throw new ServiceException("文件名不能为空");
+        }
+        OssClient storage = getOssClient(bo.getService());
+        String suffix = getSuffix(bo.getFileName());
+        String objectKey = buildObjectKey(storage, bo.getBizType(), suffix);
+        String uploadId = storage.createMultipartUpload(objectKey);
+        int partCount = resolvePartCount(bo);
+        Duration expire = Duration.ofMinutes(10);
+        List<SysOssMultipartPartVo> parts = new ArrayList<>();
+        for (int i = 1; i <= partCount; i++) {
+            SysOssMultipartPartVo partVo = new SysOssMultipartPartVo();
+            partVo.setPartNumber(i);
+            partVo.setUploadUrl(storage.getPresignedUploadPartUrl(objectKey, uploadId, i, expire));
+            partVo.setExpireAt(System.currentTimeMillis() + expire.toMillis());
+            parts.add(partVo);
+        }
+        SysOssMultipartInitVo vo = new SysOssMultipartInitVo();
+        vo.setUploadId(uploadId);
+        vo.setObjectKey(objectKey);
+        vo.setParts(parts);
+        vo.setExpireAt(System.currentTimeMillis() + expire.toMillis());
+        return vo;
+    }
+
+    @Override
+    public SysOssUploadVo multipartComplete(SysOssMultipartCompleteBo bo) {
+        if (ObjUtil.isNull(bo) || StringUtils.isBlank(bo.getUploadId()) || StringUtils.isBlank(bo.getObjectKey())) {
+            throw new ServiceException("uploadId或objectKey不能为空");
+        }
+        if (CollUtil.isEmpty(bo.getParts())) {
+            throw new ServiceException("分片列表不能为空");
+        }
+        OssClient storage = getOssClient(bo.getService());
+        String objectKey = normalizeObjectKey(storage, bo.getObjectKey());
+        List<CompletedPart> parts = bo.getParts().stream()
+            .sorted(Comparator.comparing(SysOssMultipartPartBo::getPartNumber))
+            .map(part -> CompletedPart.builder()
+                .partNumber(part.getPartNumber())
+                .eTag(normalizeEtag(part.getETag()))
+                .build())
+            .collect(Collectors.toList());
+        storage.completeMultipartUpload(objectKey, bo.getUploadId(), parts);
+        String originalName = StringUtils.isNotBlank(bo.getOriginalName()) ? bo.getOriginalName() : objectKey;
+        String suffix = getSuffix(originalName);
+        UploadResult uploadResult = UploadResult.builder()
+            .filename(objectKey)
+            .url(storage.getUrl() + StringUtils.SLASH + objectKey)
+            .build();
+        SysOssExt ext1 = new SysOssExt();
+        ext1.setFileSize(bo.getFileSize());
+        ext1.setContentType(bo.getContentType());
+        SysOssVo oss = buildResultEntity(originalName, suffix, storage.getConfigKey(), uploadResult, ext1);
+        return toUploadVo(oss, originalName);
+    }
+
+    @Override
+    public Boolean multipartAbort(SysOssMultipartAbortBo bo) {
+        if (ObjUtil.isNull(bo) || StringUtils.isBlank(bo.getUploadId()) || StringUtils.isBlank(bo.getObjectKey())) {
+            throw new ServiceException("uploadId或objectKey不能为空");
+        }
+        OssClient storage = getOssClient(bo.getService());
+        String objectKey = normalizeObjectKey(storage, bo.getObjectKey());
+        storage.abortMultipartUpload(objectKey, bo.getUploadId());
+        return true;
     }
 
     private SysOssVo buildResultEntity(String originalfileName, String suffix, String configKey, UploadResult uploadResult, SysOssExt ext1) {
@@ -234,6 +360,14 @@ public class SysOssServiceImpl implements ISysOssService {
         baseMapper.insert(oss);
         SysOssVo sysOssVo = MapstructUtils.convert(oss, SysOssVo.class);
         return this.matchingUrl(sysOssVo);
+    }
+
+    private SysOssUploadVo toUploadVo(SysOssVo oss, String originalName) {
+        SysOssUploadVo uploadVo = new SysOssUploadVo();
+        uploadVo.setUrl(oss.getUrl());
+        uploadVo.setFileName(originalName);
+        uploadVo.setOssId(String.valueOf(oss.getOssId()));
+        return uploadVo;
     }
 
     /**
@@ -266,7 +400,7 @@ public class SysOssServiceImpl implements ISysOssService {
         }
         List<SysOss> list = baseMapper.selectListByIds(ids);
         for (SysOss sysOss : list) {
-            OssClient storage = OssFactory.instance(sysOss.getService());
+            OssClient storage = getOssClient(sysOss.getService());
             storage.delete(sysOss.getUrl());
         }
         return baseMapper.deleteBatchByIds(ids) > 0;
@@ -279,12 +413,64 @@ public class SysOssServiceImpl implements ISysOssService {
      * @return oss 匹配Url的OSS对象
      */
     private SysOssVo matchingUrl(SysOssVo oss) {
-        OssClient storage = OssFactory.instance(oss.getService());
+        OssClient storage = getOssClient(oss.getService());
         // 仅修改桶类型为 private 的URL，临时URL时长为120s
         if (AccessPolicyType.PRIVATE == storage.getAccessPolicy()) {
             oss.setUrl(storage.getPrivateUrl(oss.getFileName(), Duration.ofSeconds(120)));
         }
         return oss;
+    }
+
+    private OssClient getOssClient(String service) {
+        try {
+            return StringUtils.isNotBlank(service) ? OssFactory.instance(service) : OssFactory.instance();
+        } catch (OssException e) {
+            ossConfigService.init();
+            return StringUtils.isNotBlank(service) ? OssFactory.instance(service) : OssFactory.instance();
+        }
+    }
+
+    private String buildObjectKey(OssClient storage, String bizType, String suffix) {
+        String prefix = storage.getPrefix();
+        if (StringUtils.isNotBlank(bizType)) {
+            prefix = StringUtils.isNotBlank(prefix) ? prefix + StringUtils.SLASH + bizType : bizType;
+        }
+        return storage.getPath(prefix, suffix);
+    }
+
+    private String getSuffix(String fileName) {
+        if (StringUtils.isBlank(fileName)) {
+            return "";
+        }
+        int idx = fileName.lastIndexOf('.');
+        return idx >= 0 ? fileName.substring(idx) : "";
+    }
+
+    private int resolvePartCount(SysOssMultipartInitBo bo) {
+        if (bo.getPartCount() != null && bo.getPartCount() > 0) {
+            return bo.getPartCount();
+        }
+        if (bo.getFileSize() != null && bo.getPartSize() != null && bo.getPartSize() > 0) {
+            return (int) Math.ceil((double) bo.getFileSize() / (double) bo.getPartSize());
+        }
+        throw new ServiceException("分片数量或分片大小不能为空");
+    }
+
+    private String normalizeObjectKey(OssClient storage, String objectKey) {
+        if (StringUtils.isBlank(objectKey)) {
+            return objectKey;
+        }
+        if (objectKey.startsWith("http://") || objectKey.startsWith("https://")) {
+            return storage.removeBaseUrl(objectKey);
+        }
+        return objectKey;
+    }
+
+    private String normalizeEtag(String eTag) {
+        if (StringUtils.isBlank(eTag)) {
+            return eTag;
+        }
+        return eTag.replace("\"", "");
     }
 
 }

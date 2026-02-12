@@ -4,7 +4,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.dromara.common.mybatisflex.core.page.PageQuery;
 import org.dromara.common.mybatisflex.core.page.TableDataInfo;
 import org.dromara.resource.domain.bo.SysOssBo;
+import org.dromara.resource.domain.bo.SysOssCompleteBo;
+import org.dromara.resource.domain.bo.SysOssMultipartAbortBo;
+import org.dromara.resource.domain.bo.SysOssMultipartCompleteBo;
+import org.dromara.resource.domain.bo.SysOssMultipartInitBo;
+import org.dromara.resource.domain.bo.SysOssPresignBo;
 import org.dromara.resource.domain.vo.SysOssVo;
+import org.dromara.resource.domain.vo.SysOssMultipartInitVo;
+import org.dromara.resource.domain.vo.SysOssPresignVo;
+import org.dromara.resource.domain.vo.SysOssUploadVo;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -67,6 +75,46 @@ public interface ISysOssService {
      * @return 上传成功后的 SysOssVo 对象，包含文件信息
      */
     SysOssVo upload(File file);
+
+    /**
+     * 获取直传预签名URL
+     *
+     * @param bo 预签名请求
+     * @return 预签名信息
+     */
+    SysOssPresignVo presign(SysOssPresignBo bo);
+
+    /**
+     * 上传完成确认
+     *
+     * @param bo 上传完成请求
+     * @return 上传结果
+     */
+    SysOssUploadVo complete(SysOssCompleteBo bo);
+
+    /**
+     * 初始化分片上传
+     *
+     * @param bo 分片初始化请求
+     * @return 分片上传信息
+     */
+    SysOssMultipartInitVo multipartInit(SysOssMultipartInitBo bo);
+
+    /**
+     * 完成分片上传
+     *
+     * @param bo 分片完成请求
+     * @return 上传结果
+     */
+    SysOssUploadVo multipartComplete(SysOssMultipartCompleteBo bo);
+
+    /**
+     * 取消分片上传
+     *
+     * @param bo 取消请求
+     * @return 是否成功
+     */
+    Boolean multipartAbort(SysOssMultipartAbortBo bo);
 
     /**
      * 新增OSS对象存储

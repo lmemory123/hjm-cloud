@@ -3,6 +3,7 @@ package org.dromara.system.controller.system;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.annotation.SaMode;
+import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.v7.core.tree.MapTree;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.SystemConstants;
@@ -137,6 +138,8 @@ public class SysMenuController extends BaseController {
             return R.fail("新增菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
         } else if (SystemConstants.YES_FRAME.equals(menu.getIsFrame()) && !StringUtils.ishttp(menu.getPath())) {
             return R.fail("新增菜单'" + menu.getMenuName() + "'失败，地址必须以http(s)://开头");
+        } else if (!menuService.checkRouteConfigUnique(menu)) {
+            return R.fail("新增菜单'" + menu.getMenuName() + "'失败，路由名称或地址已存在");
         }
         return toAjax(menuService.insertMenu(menu));
     }
@@ -156,6 +159,8 @@ public class SysMenuController extends BaseController {
             return R.fail("修改菜单'" + menu.getMenuName() + "'失败，地址必须以http(s)://开头");
         } else if (menu.getMenuId().equals(menu.getParentId())) {
             return R.fail("修改菜单'" + menu.getMenuName() + "'失败，上级菜单不能选择自己");
+        } else if (!menuService.checkRouteConfigUnique(menu)) {
+            return R.fail("修改菜单'" + menu.getMenuName() + "'失败，路由名称或地址已存在");
         }
         return toAjax(menuService.updateMenu(menu));
     }
