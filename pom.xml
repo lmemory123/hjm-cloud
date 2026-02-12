@@ -17,12 +17,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
-        <spring-boot.version>4.0.1</spring-boot.version>
+        <spring-boot.version>4.0.2</spring-boot.version>
         <spring-cloud.version>2025.1.0</spring-cloud.version>
         <spring-boot-admin.version>3.5.6</spring-boot-admin.version>
         <mybatis.version>3.5.19</mybatis.version>
         <mybatis-plus.version>3.5.15</mybatis-plus.version>
-        <mybatis-flex.version>1.11.5</mybatis-flex.version>
+        <mybatis-flex.version>1.11.6</mybatis-flex.version>
         <jsqlparser.version>5.2</jsqlparser.version>
         <p6spy.version>3.9.1</p6spy.version>
         <dynamic-ds.version>4.5.0</dynamic-ds.version>

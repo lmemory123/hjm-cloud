@@ -1,3 +1,5 @@
+# 将项目路径：config/下对应文件中内容复制到此处
+
 # 安全配置
 security:
   # 不校验白名单
@@ -11,6 +13,7 @@ security:
       - /auth/tenant/list
       - /resource/sms/code
       - /resource/sse/close
+      - /music/open/**
       - /*/v3/api-docs
       - /*/error
       - /csrf
@@ -20,6 +23,9 @@ spring:
   cloud:
     # 网关配置
     gateway:
+      httpclient:
+        connect-timeout: 10000
+        response-timeout: 120s
       # 打印请求日志(自定义)
       requestLog: true
       server:
@@ -55,6 +61,13 @@ spring:
               uri: lb://ruoyi-resource
               predicates:
                 - Path=/resource/**
+              filters:
+                - StripPrefix=1
+            # 音乐前台服务
+            - id: hjm-music-web
+              uri: lb://hjm-music-web
+              predicates:
+                - Path=/music/**
               filters:
                 - StripPrefix=1
             # workflow服务

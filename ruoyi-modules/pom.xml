@@ -13,7 +13,8 @@
         <subproject>ruoyi-job</subproject>
         <subproject>ruoyi-resource</subproject>
         <subproject>ruoyi-workflow</subproject>
-        <subproject>hjm-music</subproject>
+        <subproject>hjm-core-parent</subproject>
+        <subproject>hjm-music-web</subproject>
     </subprojects>
 
     <artifactId>ruoyi-modules</artifactId>

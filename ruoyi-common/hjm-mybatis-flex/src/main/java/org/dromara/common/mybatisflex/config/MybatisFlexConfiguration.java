@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @AutoConfiguration
 @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 @EnableTransactionManagement(proxyTargetClass = true)
-@MapperScan("${mybatis-flex.mapper-package:${mybatis-plus.mapperPackage:org.dromara.**.mapper}}")
+@MapperScan("${mybatis-flex.mapper-package}")
 @PropertySource(value = "classpath:common-mybatis-flex.yml", factory = YmlPropertySourceFactory.class)
 public class MybatisFlexConfiguration {
 

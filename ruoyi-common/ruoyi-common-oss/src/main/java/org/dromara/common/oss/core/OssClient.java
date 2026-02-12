@@ -23,8 +23,18 @@ import software.amazon.awssdk.http.nio.netty.NettyNioAsyncHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.S3Configuration;
+import software.amazon.awssdk.services.s3.model.CompletedMultipartUpload;
+import software.amazon.awssdk.services.s3.model.CompletedPart;
+import software.amazon.awssdk.services.s3.model.CreateMultipartUploadResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.UploadPartRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedUploadPartRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.UploadPartPresignRequest;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
 import software.amazon.awssdk.transfer.s3.model.*;
 import software.amazon.awssdk.transfer.s3.progress.LoggingTransferListener;
@@ -37,6 +47,7 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -348,6 +359,116 @@ public class OssClient {
     }
 
     /**
+     * 获取上传用的预签名 URL
+     *
+     * @param objectKey   对象KEY
+     * @param expiredTime 链接授权到期时间
+     * @param contentType 文件类型
+     * @return 预签名 URL
+     */
+    public String getPresignedPutUrl(String objectKey, Duration expiredTime, String contentType) {
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+            .bucket(properties.getBucketName())
+            .key(objectKey)
+            .contentType(contentType)
+            .build();
+        PresignedPutObjectRequest presignedPutObjectRequest = presigner.presignPutObject(
+            PutObjectPresignRequest.builder()
+                .signatureDuration(expiredTime)
+                .putObjectRequest(putObjectRequest)
+                .build()
+        );
+        return presignedPutObjectRequest.url().toString();
+    }
+
+    /**
+     * 初始化分片上传
+     *
+     * @param objectKey 对象KEY
+     * @return uploadId
+     */
+    public String createMultipartUpload(String objectKey) {
+        CreateMultipartUploadResponse response = client.createMultipartUpload(
+            x -> x.bucket(properties.getBucketName())
+                .key(objectKey)
+                .build()).join();
+        return response.uploadId();
+    }
+
+    /**
+     * 获取分片上传预签名URL
+     *
+     * @param objectKey   对象KEY
+     * @param uploadId    上传ID
+     * @param partNumber  分片序号（从1开始）
+     * @param expiredTime 预签名到期时间
+     * @return 预签名 URL
+     */
+    public String getPresignedUploadPartUrl(String objectKey, String uploadId, int partNumber, Duration expiredTime) {
+        UploadPartRequest uploadPartRequest = UploadPartRequest.builder()
+            .bucket(properties.getBucketName())
+            .key(objectKey)
+            .uploadId(uploadId)
+            .partNumber(partNumber)
+            .build();
+        PresignedUploadPartRequest presignedUploadPartRequest = presigner.presignUploadPart(
+            UploadPartPresignRequest.builder()
+                .signatureDuration(expiredTime)
+                .uploadPartRequest(uploadPartRequest)
+                .build()
+        );
+        return presignedUploadPartRequest.url().toString();
+    }
+
+    /**
+     * 完成分片上传
+     *
+     * @param objectKey 对象KEY
+     * @param uploadId  上传ID
+     * @param parts     完成的分片列表
+     */
+    public void completeMultipartUpload(String objectKey, String uploadId, List<CompletedPart> parts) {
+        client.completeMultipartUpload(
+            x -> x.bucket(properties.getBucketName())
+                .key(objectKey)
+                .uploadId(uploadId)
+                .multipartUpload(CompletedMultipartUpload.builder().parts(parts).build())
+                .build()).join();
+    }
+
+    /**
+     * 取消分片上传
+     *
+     * @param objectKey 对象KEY
+     * @param uploadId  上传ID
+     */
+    public void abortMultipartUpload(String objectKey, String uploadId) {
+        client.abortMultipartUpload(
+            x -> x.bucket(properties.getBucketName())
+                .key(objectKey)
+                .uploadId(uploadId)
+                .build()).join();
+    }
+
+    /**
+     * 判断对象是否存在
+     *
+     * @param objectKey 对象KEY
+     * @return 是否存在
+     */
+    public boolean exists(String objectKey) {
+        try {
+            HeadObjectResponse response = client.headObject(
+                x -> x.bucket(properties.getBucketName())
+                    .key(objectKey)
+                    .build()).join();
+            return response != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
      * 上传 byte[] 数据到 Amazon S3，使用指定的后缀构造对象键。
      *
      * @param data   要上传的 byte[] 数据
@@ -407,10 +528,7 @@ public class OssClient {
      * @return 终端点 URL
      */
     public String getEndpoint() {
-        // 根据配置文件中的是否使用 HTTPS，设置协议头部
-        String header = getIsHttps();
-        // 拼接协议头部和终端点，得到完整的终端点 URL
-        return header + properties.getEndpoint();
+        return withScheme(properties.getEndpoint());
     }
 
     /**
@@ -422,20 +540,19 @@ public class OssClient {
         // 从配置中获取域名、终端点、是否使用 HTTPS 等信息
         String domain = properties.getDomain();
         String endpoint = properties.getEndpoint();
-        String header = getIsHttps();
 
         // 如果是云服务商，直接返回域名或终端点
         if (Strings.CS.containsAny(endpoint, OssConstant.CLOUD_SERVICE)) {
-            return StringUtils.isNotEmpty(domain) ? header + domain : header + endpoint;
+            return StringUtils.isNotEmpty(domain) ? withScheme(domain) : withScheme(endpoint);
         }
 
         // 如果是 MinIO，处理域名并返回
         if (StringUtils.isNotEmpty(domain)) {
-            return domain.startsWith(Constants.HTTPS) || domain.startsWith(Constants.HTTP) ? domain : header + domain;
+            return withScheme(domain);
         }
 
         // 返回终端点
-        return header + endpoint;
+        return withScheme(endpoint);
     }
 
     /**
@@ -460,18 +577,16 @@ public class OssClient {
     public String getUrl() {
         String domain = properties.getDomain();
         String endpoint = properties.getEndpoint();
-        String header = getIsHttps();
         // 云服务商直接返回
         if (Strings.CS.containsAny(endpoint, OssConstant.CLOUD_SERVICE)) {
-            return header + (StringUtils.isNotEmpty(domain) ? domain : properties.getBucketName() + "." + endpoint);
+            return withScheme(StringUtils.isNotEmpty(domain) ? domain : properties.getBucketName() + "." + endpoint);
         }
         // MinIO 单独处理
         if (StringUtils.isNotEmpty(domain)) {
             // 如果 domain 以 "https://" 或 "http://" 开头
-            return (domain.startsWith(Constants.HTTPS) || domain.startsWith(Constants.HTTP)) ?
-                domain + StringUtils.SLASH + properties.getBucketName() : header + domain + StringUtils.SLASH + properties.getBucketName();
+            return withScheme(domain) + StringUtils.SLASH + properties.getBucketName();
         }
-        return header + endpoint + StringUtils.SLASH + properties.getBucketName();
+        return withScheme(endpoint) + StringUtils.SLASH + properties.getBucketName();
     }
 
     /**
@@ -509,6 +624,27 @@ public class OssClient {
      */
     public String getIsHttps() {
         return OssConstant.IS_HTTPS.equals(properties.getIsHttps()) ? Constants.HTTPS : Constants.HTTP;
+    }
+
+    /**
+     * 获取桶名称
+     */
+    public String getBucketName() {
+        return properties.getBucketName();
+    }
+
+    /**
+     * 获取前缀
+     */
+    public String getPrefix() {
+        return properties.getPrefix();
+    }
+
+    private String withScheme(String value) {
+        if (StringUtils.isEmpty(value)) {
+            return value;
+        }
+        return value.startsWith(Constants.HTTPS) || value.startsWith(Constants.HTTP) ? value : getIsHttps() + value;
     }
 
     /**
