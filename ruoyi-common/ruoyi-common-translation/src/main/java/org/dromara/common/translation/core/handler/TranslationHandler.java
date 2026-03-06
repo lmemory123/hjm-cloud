@@ -30,6 +30,13 @@ public class TranslationHandler extends ValueSerializer<Object> {
 
     private final Translation translation;
 
+    /**
+     * 提供给 jackson 创建上下文序列化器时使用 不然会报错
+     */
+    public TranslationHandler() {
+        this.translation = null;
+    }
+
     public TranslationHandler(Translation translation) {
         this.translation = translation;
     }

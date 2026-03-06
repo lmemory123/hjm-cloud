@@ -26,6 +26,15 @@ public class SensitiveHandler extends ValueSerializer<String> {
     private final String[] roleKey;
     private final String[] perms;
 
+    /**
+     * 提供给 jackson 创建上下文序列化器时使用 不然会报错
+     */
+    public SensitiveHandler() {
+        this.strategy = null;
+        this.roleKey = null;
+        this.perms = null;
+    }
+
     public SensitiveHandler(SensitiveStrategy strategy, String[] roleKey, String[] perms) {
         this.strategy = strategy;
         this.roleKey = roleKey;
