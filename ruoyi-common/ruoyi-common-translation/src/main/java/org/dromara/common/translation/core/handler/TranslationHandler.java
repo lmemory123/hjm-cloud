@@ -28,7 +28,11 @@ public class TranslationHandler extends ValueSerializer<Object> {
      */
     public static final Map<String, TranslationInterface<?>> TRANSLATION_MAPPER = new ConcurrentHashMap<>();
 
-    private Translation translation;
+    private final Translation translation;
+
+    public TranslationHandler(Translation translation) {
+        this.translation = translation;
+    }
 
     @Override
     public void serialize(Object value, JsonGenerator gen, SerializationContext serializers) {
@@ -60,8 +64,7 @@ public class TranslationHandler extends ValueSerializer<Object> {
     public ValueSerializer<?> createContextual(SerializationContext prov, BeanProperty property) {
         Translation translation = property.getAnnotation(Translation.class);
         if (Objects.nonNull(translation)) {
-            this.translation = translation;
-            return this;
+            return new TranslationHandler(translation);
         }
         return prov.findValueSerializer(property.getType());
     }

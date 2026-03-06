@@ -22,9 +22,15 @@ import java.util.Objects;
 @Slf4j
 public class SensitiveHandler extends ValueSerializer<String> {
 
-    private SensitiveStrategy strategy;
-    private String[] roleKey;
-    private String[] perms;
+    private final SensitiveStrategy strategy;
+    private final String[] roleKey;
+    private final String[] perms;
+
+    public SensitiveHandler(SensitiveStrategy strategy, String[] roleKey, String[] perms) {
+        this.strategy = strategy;
+        this.roleKey = roleKey;
+        this.perms = perms;
+    }
 
     @Override
     public void serialize(String value, JsonGenerator gen, SerializationContext serializers) {
@@ -45,10 +51,7 @@ public class SensitiveHandler extends ValueSerializer<String> {
     public ValueSerializer<?> createContextual(SerializationContext prov, BeanProperty property) {
         Sensitive annotation = property.getAnnotation(Sensitive.class);
         if (Objects.nonNull(annotation) && Objects.equals(String.class, property.getType().getRawClass())) {
-            this.strategy = annotation.strategy();
-            this.roleKey = annotation.roleKey();
-            this.perms = annotation.perms();
-            return this;
+            return new SensitiveHandler(annotation.strategy(), annotation.roleKey(), annotation.perms());
         }
         return prov.findKeySerializer(property.getType(), property);
     }
