@@ -343,9 +343,9 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         task.setNodeName("【抄送】" + task.getNodeName());
         Date updateTime = new Date(flowHisTask.getUpdateTime().getTime() - 1000);
         FlowParams flowParams = FlowParams.build()
-                .skipType(SkipType.NONE.getKey())
-                .hisStatus(TaskStatusEnum.COPY.getStatus())
-                .message("【抄送给】" + StreamUtils.join(flowCopyList, FlowCopyBo::getUserName));
+            .skipType(SkipType.NONE.getKey())
+            .hisStatus(TaskStatusEnum.COPY.getStatus())
+            .message("【抄送给】" + StreamUtils.join(flowCopyList, FlowCopyBo::getNickName));
         HisTask hisTask = hisTaskService.setSkipHisTask(task, flowNode, flowParams);
         hisTask.setCreateTime(updateTime);
         hisTask.setUpdateTime(updateTime);
