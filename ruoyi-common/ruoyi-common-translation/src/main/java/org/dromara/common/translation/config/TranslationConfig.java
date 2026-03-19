@@ -8,8 +8,9 @@ import org.dromara.common.translation.core.handler.TranslationBeanSerializerModi
 import org.dromara.common.translation.core.handler.TranslationHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.module.SimpleModule;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
+import org.springframework.context.annotation.Bean;
+import tools.jackson.databind.ser.SerializerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,9 +28,6 @@ public class TranslationConfig {
     @Autowired
     private List<TranslationInterface<?>> list;
 
-    @Autowired
-    private JsonMapper JsonMapper;
-
     @PostConstruct
     public void init() {
         Map<String, TranslationInterface<?>> map = new HashMap<>(list.size());
@@ -42,10 +40,15 @@ public class TranslationConfig {
             }
         }
         TranslationHandler.TRANSLATION_MAPPER.putAll(map);
-        // 设置 Bean 序列化修改器
-        SimpleModule module = new SimpleModule();
-        module.setSerializerModifier(new TranslationBeanSerializerModifier());
-        JsonMapper.rebuild().addModule(module);
+    }
+
+    @Bean
+    public JsonMapperBuilderCustomizer translationInitCustomizer() {
+        return builder -> {
+            SerializerFactory serializerFactory = builder.serializerFactory();
+            serializerFactory = serializerFactory.withSerializerModifier(new TranslationBeanSerializerModifier());
+            builder.serializerFactory(serializerFactory);
+        };
     }
 
 }
