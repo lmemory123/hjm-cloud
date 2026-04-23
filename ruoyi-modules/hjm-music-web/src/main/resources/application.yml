@@ -1,6 +1,6 @@
 # Tomcat
 server:
-  port: 9210
+  port: 9212
 
 # Spring
 spring:
@@ -12,6 +12,22 @@ spring:
     active: @profiles.active@
   main:
     allow-bean-definition-overriding: true
+
+valkey:
+  query:
+    enabled: true
+    mode: standalone
+    read-preference: primary
+    use-tls: false
+    connection-timeout: 5000
+    request-timeout: 5000
+    password: memory1314
+    index-management:
+      mode: none
+    standalone:
+      nodes:
+        - host: 127.0.0.1
+          port: 6379
 --- # nacos 配置
 spring:
   cloud:

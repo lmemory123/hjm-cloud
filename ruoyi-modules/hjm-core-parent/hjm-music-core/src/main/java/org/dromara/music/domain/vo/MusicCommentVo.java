@@ -8,6 +8,7 @@ import org.dromara.music.domain.MusicComment;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Date;
 
 
 /**
@@ -59,6 +60,12 @@ public class MusicCommentVo implements Serializable {
      */
     @ExcelProperty(value = "父评论ID")
     private Long parentId;
+
+    /**
+     * 创建时间
+     */
+    @ExcelProperty(value = "创建时间")
+    private Date createTime;
 
 
 }

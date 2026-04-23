@@ -144,6 +144,9 @@ public class DataPermissionHelper {
             } else if (empty) {
                 ignoreStrategy.setDataPermission(false);
             }
+            if (empty) {
+                REENTRANT_IGNORE.remove();
+            }
 
         }
     }

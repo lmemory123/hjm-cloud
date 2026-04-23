@@ -84,6 +84,9 @@ public class TenantHelper {
             } else if (empty) {
                 ignoreStrategy.setTenantLine(false);
             }
+            if (empty) {
+                REENTRANT_IGNORE.remove();
+            }
         }
     }
 

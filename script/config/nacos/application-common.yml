@@ -26,8 +26,8 @@ dubbo:
     port: -1
     # 指定dubbo协议注册ip
     # host: 192.168.0.100
-    # 开启虚拟线程
-    # threadpool: virtual
+    # 开启虚拟线程线程池
+    threadpool: virtual
   # 消费者相关配置
   consumer:
     # 超时时间
@@ -50,7 +50,7 @@ spring:
   threads:
     # 开启虚拟线程 仅jdk21可用
     virtual:
-      enabled: false
+      enabled: true
   task:
     execution:
       # 从 springboot 3.5 开始 spring自带线程池

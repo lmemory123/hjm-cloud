@@ -3,10 +3,10 @@ package org.dromara.common.satoken.core.service;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.hutool.v7.core.collection.CollUtil;
 import cn.hutool.v7.core.util.ObjUtil;
+import cn.hutool.v7.extra.spring.SpringUtil;
 import org.dromara.common.core.enums.UserType;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.service.PermissionService;
-import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.system.api.model.LoginUser;
@@ -77,7 +77,7 @@ public class SaPermissionImpl implements StpInterface {
 
     private PermissionService getPermissionService() {
         try {
-            return SpringUtils.getBean(PermissionService.class);
+            return SpringUtil.getBean(PermissionService.class);
         } catch (Exception e) {
             return null;
         }

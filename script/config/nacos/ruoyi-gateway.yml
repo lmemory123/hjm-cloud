@@ -8,8 +8,10 @@ security:
       - /auth/code
       - /auth/logout
       - /auth/login
+      - /auth/front/login
       - /auth/binding/*
       - /auth/register
+      - /auth/front/register
       - /auth/tenant/list
       - /resource/sms/code
       - /resource/sse/close

@@ -1,50 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.1.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 http://maven.apache.org/xsd/maven-4.1.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.dromara</groupId>
         <artifactId>ruoyi-cloud-plus</artifactId>
+        <version>${revision}</version>
     </parent>
-    <modelVersion>4.1.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-    <subprojects>
-        <subproject>ruoyi-common-bom</subproject>
-        <subproject>ruoyi-common-alibaba-bom</subproject>
-        <subproject>ruoyi-common-log</subproject>
-        <subproject>ruoyi-common-service-impl</subproject>
-        <subproject>ruoyi-common-excel</subproject>
-        <subproject>ruoyi-common-core</subproject>
-        <subproject>ruoyi-common-redis</subproject>
-        <subproject>ruoyi-common-doc</subproject>
-        <subproject>ruoyi-common-security</subproject>
-        <subproject>ruoyi-common-satoken</subproject>
-        <subproject>ruoyi-common-web</subproject>
-        <subproject>ruoyi-common-mybatis</subproject>
-        <subproject>hjm-mybatis-flex</subproject>
-        <subproject>ruoyi-common-job</subproject>
-        <subproject>ruoyi-common-dubbo</subproject>
-        <subproject>ruoyi-common-seata</subproject>
-        <subproject>ruoyi-common-loadbalancer</subproject>
-        <subproject>ruoyi-common-oss</subproject>
-        <subproject>ruoyi-common-ratelimiter</subproject>
-        <subproject>ruoyi-common-idempotent</subproject>
-        <subproject>ruoyi-common-mail</subproject>
-        <subproject>ruoyi-common-sms</subproject>
-        <subproject>ruoyi-common-logstash</subproject>
-        <subproject>ruoyi-common-elasticsearch</subproject>
-        <subproject>ruoyi-common-skylog</subproject>
-        <subproject>ruoyi-common-prometheus</subproject>
-        <subproject>ruoyi-common-translation</subproject>
-        <subproject>ruoyi-common-sensitive</subproject>
-        <subproject>ruoyi-common-json</subproject>
-        <subproject>ruoyi-common-encrypt</subproject>
-        <subproject>ruoyi-common-tenant</subproject>
-        <subproject>ruoyi-common-websocket</subproject>
-        <subproject>ruoyi-common-social</subproject>
-        <subproject>ruoyi-common-nacos</subproject>
-        <subproject>ruoyi-common-bus</subproject>
-        <subproject>ruoyi-common-sse</subproject>
-    </subprojects>
+    <modules>
+        <module>ruoyi-common-bom</module>
+        <module>ruoyi-common-alibaba-bom</module>
+        <module>ruoyi-common-log</module>
+        <module>ruoyi-common-service-impl</module>
+        <module>ruoyi-common-excel</module>
+        <module>ruoyi-common-core</module>
+        <module>ruoyi-common-redis</module>
+        <module>ruoyi-common-doc</module>
+        <module>ruoyi-common-security</module>
+        <module>ruoyi-common-satoken</module>
+        <module>ruoyi-common-web</module>
+        <module>ruoyi-common-mybatis</module>
+        <module>hjm-mybatis-flex</module>
+        <module>ruoyi-common-job</module>
+        <module>ruoyi-common-dubbo</module>
+        <module>ruoyi-common-seata</module>
+        <module>ruoyi-common-loadbalancer</module>
+        <module>ruoyi-common-oss</module>
+        <module>ruoyi-common-ratelimiter</module>
+        <module>ruoyi-common-idempotent</module>
+        <module>ruoyi-common-mail</module>
+        <module>ruoyi-common-sms</module>
+        <module>ruoyi-common-logstash</module>
+        <module>ruoyi-common-elasticsearch</module>
+        <module>ruoyi-common-skylog</module>
+        <module>ruoyi-common-prometheus</module>
+        <module>ruoyi-common-translation</module>
+        <module>ruoyi-common-sensitive</module>
+        <module>ruoyi-common-json</module>
+        <module>ruoyi-common-encrypt</module>
+        <module>ruoyi-common-tenant</module>
+        <module>momao-valkey-search</module>
+        <module>ruoyi-common-websocket</module>
+        <module>ruoyi-common-social</module>
+        <module>ruoyi-common-nacos</module>
+        <module>ruoyi-common-bus</module>
+        <module>ruoyi-common-sse</module>
+    </modules>
 
     <artifactId>ruoyi-common</artifactId>
     <packaging>pom</packaging>

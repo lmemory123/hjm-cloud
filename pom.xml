@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.1.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 http://maven.apache.org/xsd/maven-4.1.0.xsd" root="true">
-    <modelVersion>4.1.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.dromara</groupId>
     <artifactId>ruoyi-cloud-plus</artifactId>
@@ -17,7 +17,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
-        <spring-boot.version>4.0.2</spring-boot.version>
+        <spring-boot.version>4.0.5</spring-boot.version>
         <spring-cloud.version>2025.1.0</spring-cloud.version>
         <spring-boot-admin.version>3.5.6</spring-boot-admin.version>
         <mybatis.version>3.5.19</mybatis.version>
@@ -34,10 +34,9 @@
         <hutool.version>5.8.40</hutool.version>
         <hutool-v7.version>7.0.0-M4</hutool-v7.version>
         <redisson.version>4.0.0</redisson.version>
-        <redis.om.version>2.0.1</redis.om.version>
         <lock4j.version>2.2.7</lock4j.version>
         <snailjob.version>1.9.0</snailjob.version>
-        <satoken.version>1.44.0</satoken.version>
+        <satoken.version>1.45.0</satoken.version>
         <lombok.version>1.18.42</lombok.version>
         <logstash.version>9.0</logstash.version>
         <easy-es.version>3.0.1</easy-es.version>
@@ -61,6 +60,7 @@
         <warm-flow.version>1.8.4</warm-flow.version>
         <!-- mq配置 -->
         <rocketmq.version>2.3.4</rocketmq.version>
+        <valkey-querydsl.version>1.1.0-RC5</valkey-querydsl.version>
 
         <!-- 插件版本 -->
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
@@ -280,12 +280,6 @@
                 <version>${lock4j.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.redis.om</groupId>
-                <artifactId>redis-om-spring</artifactId>
-                <version>${redis.om.version}</version>
-            </dependency>
-
             <!--  SnailJob Client -->
             <dependency>
                 <groupId>com.aizuda</groupId>
@@ -422,15 +416,15 @@
         </dependencies>
     </dependencyManagement>
 
-    <subprojects>
-        <subproject>ruoyi-auth</subproject>
-        <subproject>ruoyi-gateway</subproject>
-        <subproject>ruoyi-visual</subproject>
-        <subproject>ruoyi-modules</subproject>
-        <subproject>ruoyi-api</subproject>
-        <subproject>ruoyi-common</subproject>
-        <subproject>ruoyi-example</subproject>
-    </subprojects>
+    <modules>
+        <module>ruoyi-auth</module>
+        <module>ruoyi-gateway</module>
+        <module>ruoyi-visual</module>
+        <module>ruoyi-modules</module>
+        <module>ruoyi-api</module>
+        <module>ruoyi-common</module>
+        <module>ruoyi-example</module>
+    </modules>
     <packaging>pom</packaging>
 
     <dependencies>
@@ -577,31 +571,5 @@
             </plugins>
         </pluginManagement>
     </build>
-
-    <repositories>
-        <repository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/alibaba/spring-cloud-alibaba</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-
-<!--    <distributionManagement>-->
-<!--        <repository>-->
-<!--            <id>gitlab-maven</id>-->
-<!--            <url>https://gitlab.xuxiaowei.com.cn/api/v4/projects/430/packages/maven</url>-->
-<!--        </repository>-->
-
-<!--        <snapshotRepository>-->
-<!--            <id>gitlab-maven</id>-->
-<!--            <url>https://gitlab.xuxiaowei.com.cn/api/v4/projects/430/packages/maven</url>-->
-<!--        </snapshotRepository>-->
-<!--    </distributionManagement>-->
 
 </project>

@@ -10,11 +10,11 @@ import cn.dev33.satoken.util.SaResult;
 import cn.dev33.satoken.util.SaTokenConsts;
 import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.constant.HttpStatus;
-import org.dromara.common.core.utils.SpringUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
 import org.dromara.gateway.config.properties.IgnoreWhiteProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 
@@ -40,6 +40,8 @@ public class AuthFilter {
                 // 登录校验 -- 拦截所有路由
                 SaRouter.match("/**")
                     .notMatch(ignoreWhite.getWhites())
+                    // 前台认证入口作为公开接口，避免依赖 nacos 白名单刷新时序
+                    .notMatch("/auth/front/**")
                     .check(r -> {
                         ServerHttpRequest request = SaReactorSyncHolder.getExchange().getRequest();
                         // 检查是否登录 是否有token
@@ -76,9 +78,9 @@ public class AuthFilter {
      * 对 actuator 健康检查接口 做账号密码鉴权
      */
     @Bean
-    public SaReactorFilter actuatorFilter() {
-        String username = SpringUtils.getProperty("spring.cloud.nacos.discovery.metadata.username");
-        String password = SpringUtils.getProperty("spring.cloud.nacos.discovery.metadata.userpassword");
+    public SaReactorFilter actuatorFilter(Environment environment) {
+        String username = environment.getProperty("spring.cloud.nacos.discovery.metadata.username");
+        String password = environment.getProperty("spring.cloud.nacos.discovery.metadata.userpassword");
         return new SaReactorFilter()
             .addInclude("/actuator", "/actuator/**")
             .setAuth(obj -> {

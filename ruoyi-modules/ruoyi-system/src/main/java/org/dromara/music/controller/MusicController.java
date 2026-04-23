@@ -19,6 +19,7 @@ import org.dromara.common.web.core.BaseController;
 import org.dromara.music.domain.bo.MusicAuditBo;
 import org.dromara.music.domain.bo.MusicBo;
 import org.dromara.music.domain.vo.MusicDetailVo;
+import org.dromara.music.domain.vo.MusicFullDetailVo;
 import org.dromara.music.domain.vo.MusicVo;
 import org.dromara.music.service.IMusicService;
 import org.springframework.validation.annotation.Validated;
@@ -83,6 +84,16 @@ public class MusicController extends BaseController {
     public R<MusicDetailVo> getDetail(@NotNull(message = "主键不能为空")
                                       @PathVariable("id") Long id) {
         return R.ok(musicService.queryDetailById(id));
+    }
+
+    /**
+     * 获取音乐完整聚合详情(含统计、通知、评论)
+     */
+    @SaCheckPermission("music:music:query")
+    @GetMapping("/fullDetail/{id}")
+    public R<MusicFullDetailVo> getFullDetail(@NotNull(message = "主键不能为空")
+                                              @PathVariable("id") Long id) {
+        return R.ok(musicService.queryFullDetailById(id));
     }
 
     /**

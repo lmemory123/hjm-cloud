@@ -32,3 +32,9 @@ spring:
     import:
       - optional:nacos:application-common.yml
       - optional:nacos:${spring.application.name}.yml
+
+security:
+  front-auth:
+    client-id: ${FRONT_AUTH_CLIENT_ID:}
+    grant-type: password
+    register-enabled: true

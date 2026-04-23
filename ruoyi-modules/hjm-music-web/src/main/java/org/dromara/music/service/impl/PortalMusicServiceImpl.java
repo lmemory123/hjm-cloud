@@ -11,6 +11,7 @@ import org.dromara.common.mybatisflex.core.page.PageQuery;
 import org.dromara.common.mybatisflex.core.page.TableDataInfo;
 import org.dromara.music.domain.bo.MusicSubmitBo;
 import org.dromara.music.domain.bo.PortalMusicUpdateBo;
+import org.dromara.music.service.MusicInteractionService;
 import org.dromara.music.service.IPortalMusicService;
 import org.dromara.music.domain.*;
 import org.dromara.music.domain.bo.MusicBo;
@@ -45,6 +46,7 @@ public class PortalMusicServiceImpl implements IPortalMusicService {
     private final TagMapper tagMapper;
     private final MusicAuditLogMapper auditLogMapper;
     private final TagProposalMapper tagProposalMapper;
+    private final MusicInteractionService musicInteractionService;
 
     private static final String AUDIT_PENDING = "0";
     private static final String AUDIT_REJECT = "2";
@@ -55,6 +57,7 @@ public class PortalMusicServiceImpl implements IPortalMusicService {
         query.setCreatorId(userId);
         QueryWrapper wrapper = buildQueryWrapper(query);
         Page<MusicVo> result = musicMapper.selectVoPage(pageQuery.build(), wrapper);
+        musicInteractionService.fillDynamicStats(result.getRecords());
         return TableDataInfo.build(result);
     }
 
@@ -86,6 +89,7 @@ public class PortalMusicServiceImpl implements IPortalMusicService {
         detail.setResources(resources);
         detail.setTags(tags);
         detail.setAuditLogs(auditLogs);
+        musicInteractionService.fillDynamicStats(detail);
         return detail;
     }
 

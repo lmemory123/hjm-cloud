@@ -205,6 +205,26 @@ public class RemoteUserServiceImpl implements RemoteUserService {
     }
 
     /**
+     * 注册前台用户信息
+     *
+     * @param remoteUserBo 用户信息
+     * @return 结果
+     */
+    @Override
+    public Boolean registerFrontUserInfo(RemoteUserBo remoteUserBo) throws UserException, ServiceException {
+        SysUserBo sysUserBo = MapstructUtils.convert(remoteUserBo, SysUserBo.class);
+        String username = sysUserBo.getUserName();
+        boolean exist = TenantHelper.dynamic(remoteUserBo.getTenantId(), () ->
+            userMapper.selectCountByQuery(QueryWrapper.create()
+                .eq(SysUser::getUserName, sysUserBo.getUserName())) > 0
+        );
+        if (exist) {
+            throw new UserException("user.register.save.error", username);
+        }
+        return userService.registerUser(sysUserBo, remoteUserBo.getTenantId());
+    }
+
+    /**
      * 通过用户ID查询用户账户
      *
      * @param userId 用户ID

@@ -5,6 +5,7 @@ import org.dromara.common.mybatisflex.core.page.TableDataInfo;
 import org.dromara.music.domain.bo.MusicAuditBo;
 import org.dromara.music.domain.bo.MusicBo;
 import org.dromara.music.domain.vo.MusicDetailVo;
+import org.dromara.music.domain.vo.MusicFullDetailVo;
 import org.dromara.music.domain.vo.MusicVo;
 
 import java.util.Collection;
@@ -33,6 +34,14 @@ public interface IMusicService {
      * @return 音乐详情
      */
     MusicDetailVo queryDetailById(Long id);
+
+    /**
+     * 查询音乐完整聚合详情
+     *
+     * @param id 主键
+     * @return 音乐完整详情
+     */
+    MusicFullDetailVo queryFullDetailById(Long id);
 
     /**
      * 分页查询音乐曲库主列表

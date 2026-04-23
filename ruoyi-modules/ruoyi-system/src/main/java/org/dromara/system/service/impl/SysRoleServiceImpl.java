@@ -543,15 +543,15 @@ public class SysRoleServiceImpl implements ISysRoleService {
             return;
         }
         // 角色关联的在线用户量过大会导致redis阻塞卡顿 谨慎操作
-        keys.parallelStream().forEach(key -> {
+        for (String key : keys) {
             String token = StringUtils.substringAfterLast(key, ":");
             // 如果已经过期则跳过
             if (StpUtil.stpLogic.getTokenActiveTimeoutByToken(token) < -1) {
-                return;
+                continue;
             }
             LoginUser loginUser = LoginHelper.getLoginUser(token);
             if (ObjUtil.isNull(loginUser) || CollUtil.isEmpty(loginUser.getRoles())) {
-                return;
+                continue;
             }
             if (loginUser.getRoles().stream().anyMatch(r -> r.getRoleId().equals(roleId))) {
                 try {
@@ -559,7 +559,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
                 } catch (NotLoginException ignored) {
                 }
             }
-        });
+        }
     }
 
     /**
@@ -579,15 +579,15 @@ public class SysRoleServiceImpl implements ISysRoleService {
             return;
         }
         // 角色关联的在线用户量过大会导致redis阻塞卡顿 谨慎操作
-        keys.parallelStream().forEach(key -> {
+        for (String key : keys) {
             String token = StringUtils.substringAfterLast(key, ":");
             // 如果已经过期则跳过
             if (StpUtil.stpLogic.getTokenActiveTimeoutByToken(token) < -1) {
-                return;
+                continue;
             }
             LoginUser loginUser = LoginHelper.getLoginUser(token);
             if (ObjUtil.isNull(loginUser)) {
-                return;
+                continue;
             }
             if (userIds.contains(loginUser.getUserId())) {
                 try {
@@ -595,7 +595,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
                 } catch (NotLoginException ignored) {
                 }
             }
-        });
+        }
     }
 
 }

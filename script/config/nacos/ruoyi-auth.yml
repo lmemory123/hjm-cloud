@@ -10,6 +10,11 @@ security:
     numberLength: 1
     # 字符验证码长度
     charLength: 4
+  front-auth:
+    # 前台专用客户端ID，需在 sys_client 中先创建对应记录
+    client-id: ""
+    grant-type: password
+    register-enabled: true
 
 # 用户配置
 user:

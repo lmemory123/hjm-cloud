@@ -4,9 +4,11 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.music.api.RemoteMusicSearchService;
 import org.dromara.common.mybatisflex.core.page.PageQuery;
 import org.dromara.common.mybatisflex.core.page.TableDataInfo;
 import org.dromara.music.domain.Music;
@@ -15,15 +17,22 @@ import org.dromara.music.domain.bo.MusicAuditBo;
 import org.dromara.music.domain.bo.MusicBo;
 import org.dromara.music.domain.vo.MusicAuditLogVo;
 import org.dromara.music.domain.vo.MusicDetailVo;
+import org.dromara.music.domain.vo.MusicCommentVo;
+import org.dromara.music.domain.vo.MusicFullDetailVo;
+import org.dromara.music.domain.vo.MusicNotifyLogVo;
 import org.dromara.music.domain.vo.MusicOriginalVo;
 import org.dromara.music.domain.vo.MusicResourceVo;
+import org.dromara.music.domain.vo.MusicStatVo;
 import org.dromara.music.domain.vo.MusicTagRelVo;
 import org.dromara.music.domain.vo.MusicVo;
 import org.dromara.music.domain.vo.TagVo;
+import org.dromara.music.mapper.MusicCommentMapper;
 import org.dromara.music.mapper.MusicAuditLogMapper;
 import org.dromara.music.mapper.MusicMapper;
+import org.dromara.music.mapper.MusicNotifyLogMapper;
 import org.dromara.music.mapper.MusicOriginalMapper;
 import org.dromara.music.mapper.MusicResourceMapper;
+import org.dromara.music.mapper.MusicStatMapper;
 import org.dromara.music.mapper.MusicTagRelMapper;
 import org.dromara.music.mapper.TagMapper;
 import org.dromara.music.service.IMusicService;
@@ -42,6 +51,8 @@ import static org.dromara.music.domain.table.MusicOriginalTableDef.MUSIC_ORIGINA
 import static org.dromara.music.domain.table.MusicResourceTableDef.MUSIC_RESOURCE;
 import static org.dromara.music.domain.table.MusicTagRelTableDef.MUSIC_TAG_REL;
 import static org.dromara.music.domain.table.MusicAuditLogTableDef.MUSIC_AUDIT_LOG;
+import static org.dromara.music.domain.table.MusicCommentTableDef.MUSIC_COMMENT;
+import static org.dromara.music.domain.table.MusicNotifyLogTableDef.MUSIC_NOTIFY_LOG;
 import static org.dromara.music.domain.table.TagTableDef.TAG;
 
 /**
@@ -61,6 +72,12 @@ public class MusicServiceImpl implements IMusicService {
     private final MusicTagRelMapper tagRelMapper;
     private final TagMapper tagMapper;
     private final MusicAuditLogMapper auditLogMapper;
+    private final MusicStatMapper musicStatMapper;
+    private final MusicNotifyLogMapper musicNotifyLogMapper;
+    private final MusicCommentMapper musicCommentMapper;
+
+    @DubboReference
+    private final RemoteMusicSearchService remoteMusicSearchService;
 
     private static final String AUDIT_PENDING = "0";
     private static final String AUDIT_PASS = "1";
@@ -103,6 +120,27 @@ public class MusicServiceImpl implements IMusicService {
         detail.setTags(tags);
         detail.setAuditLogs(auditLogs);
         return detail;
+    }
+
+    @Override
+    public MusicFullDetailVo queryFullDetailById(Long id) {
+        MusicDetailVo detail = queryDetailById(id);
+        if (detail == null) {
+            return null;
+        }
+        MusicFullDetailVo fullDetail = new MusicFullDetailVo();
+        BeanUtils.copyProperties(detail, fullDetail);
+        MusicStatVo stat = musicStatMapper.selectVoById(id);
+        List<MusicNotifyLogVo> notifyLogs = musicNotifyLogMapper.selectVoList(
+            QueryWrapper.create().where(MUSIC_NOTIFY_LOG.MUSIC_ID.eq(id)).orderBy(MUSIC_NOTIFY_LOG.CREATE_TIME.desc())
+        );
+        List<MusicCommentVo> comments = musicCommentMapper.selectVoList(
+            QueryWrapper.create().where(MUSIC_COMMENT.MUSIC_ID.eq(id)).orderBy(MUSIC_COMMENT.CREATE_TIME.desc())
+        );
+        fullDetail.setStat(stat);
+        fullDetail.setNotifyLogs(notifyLogs);
+        fullDetail.setComments(comments);
+        return fullDetail;
     }
 
     /**
@@ -178,6 +216,7 @@ public class MusicServiceImpl implements IMusicService {
         boolean flag = baseMapper.insert(add) > 0;
         if (flag) {
             bo.setId(add.getId());
+            syncMusicSearchQuietly(add.getId());
         }
         return flag;
     }
@@ -192,7 +231,11 @@ public class MusicServiceImpl implements IMusicService {
     public Boolean updateByBo(MusicBo bo) {
         Music update = MapstructUtils.convert(bo, Music.class);
         validEntityBeforeSave(update);
-        return baseMapper.update(update) > 0;
+        boolean updated = baseMapper.update(update) > 0;
+        if (updated) {
+            syncMusicSearchQuietly(update.getId());
+        }
+        return updated;
     }
 
     /**
@@ -214,7 +257,11 @@ public class MusicServiceImpl implements IMusicService {
         if(isValid){
             //TODO 做一些业务上的校验,判断是否需要校验
         }
-        return baseMapper.deleteBatchByIds(ids) > 0;
+        boolean deleted = baseMapper.deleteBatchByIds(ids) > 0;
+        if (deleted) {
+            ids.forEach(this::removeMusicSearchQuietly);
+        }
+        return deleted;
     }
 
     @Override
@@ -250,6 +297,7 @@ public class MusicServiceImpl implements IMusicService {
         log.setOperatorId(operatorId);
         log.setCreateTime(new Date());
         auditLogMapper.insert(log);
+        syncMusicSearchQuietly(music.getId());
         return true;
     }
 
@@ -309,6 +357,22 @@ public class MusicServiceImpl implements IMusicService {
             return Long.parseLong(status);
         } catch (NumberFormatException e) {
             return null;
+        }
+    }
+
+    private void syncMusicSearchQuietly(Long musicId) {
+        try {
+            remoteMusicSearchService.syncMusicIndex(musicId);
+        } catch (Exception ex) {
+            log.warn("同步音乐搜索索引失败, musicId={}", musicId, ex);
+        }
+    }
+
+    private void removeMusicSearchQuietly(Long musicId) {
+        try {
+            remoteMusicSearchService.removeMusicIndex(musicId);
+        } catch (Exception ex) {
+            log.warn("删除音乐搜索索引失败, musicId={}", musicId, ex);
         }
     }
 }

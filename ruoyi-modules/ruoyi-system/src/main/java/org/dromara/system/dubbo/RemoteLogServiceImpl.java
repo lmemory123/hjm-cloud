@@ -3,6 +3,7 @@ package org.dromara.system.dubbo;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.core.config.VirtualThreadExecutionConfig;
 import org.dromara.system.api.RemoteLogService;
 import org.dromara.system.api.domain.bo.RemoteLogininforBo;
 import org.dromara.system.api.domain.bo.RemoteOperLogBo;
@@ -31,7 +32,7 @@ public class RemoteLogServiceImpl implements RemoteLogService {
      *
      * @param remoteOperLogBo 日志实体
      */
-    @Async
+    @Async(VirtualThreadExecutionConfig.ASYNC_TASK_EXECUTOR_BEAN)
     @Override
     public void saveLog(RemoteOperLogBo remoteOperLogBo) {
         SysOperLogBo sysOperLogBo = MapstructUtils.convert(remoteOperLogBo, SysOperLogBo.class);
@@ -43,7 +44,7 @@ public class RemoteLogServiceImpl implements RemoteLogService {
      *
      * @param remoteLogininforBo 访问实体
      */
-    @Async
+    @Async(VirtualThreadExecutionConfig.ASYNC_TASK_EXECUTOR_BEAN)
     @Override
     public void saveLogininfor(RemoteLogininforBo remoteLogininforBo) {
         SysLogininforBo sysLogininforBo = MapstructUtils.convert(remoteLogininforBo, SysLogininforBo.class);

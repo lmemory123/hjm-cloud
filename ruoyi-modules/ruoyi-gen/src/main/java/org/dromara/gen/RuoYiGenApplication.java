@@ -17,7 +17,7 @@ public class RuoYiGenApplication {
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(RuoYiGenApplication.class);
         application.setApplicationStartup(new BufferingApplicationStartup(2048));
-        ConfigurableApplicationContext context = application.run(args);
+        application.run(args);
         System.out.println("(♥◠‿◠)ﾉﾞ  代码生成模块启动成功   ლ(´ڡ`ლ)ﾞ  ");
     }
 }

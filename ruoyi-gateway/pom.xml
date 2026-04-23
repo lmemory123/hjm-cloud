@@ -1,11 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.1.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 http://maven.apache.org/xsd/maven-4.1.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.dromara</groupId>
         <artifactId>ruoyi-cloud-plus</artifactId>
+        <version>${revision}</version>
     </parent>
-    <modelVersion>4.1.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
     <artifactId>ruoyi-gateway</artifactId>
 
@@ -52,16 +53,38 @@
             <artifactId>hutool-http</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>cn.hutool.v7</groupId>
+            <artifactId>hutool-extra</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+
         <!-- Sa-Token 权限认证（Reactor响应式集成）, 在线文档：http://sa-token.dev33.cn/ -->
         <dependency>
             <groupId>cn.dev33</groupId>
             <artifactId>sa-token-reactor-spring-boot3-starter</artifactId>
             <version>${satoken.version}</version>
+            <exclusions>
+                <!-- Spring Boot 4 使用 Jackson 3，排除 Jackson 2 适配插件 -->
+                <exclusion>
+                    <groupId>cn.dev33</groupId>
+                    <artifactId>sa-token-jackson</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.dromara</groupId>
             <artifactId>ruoyi-common-satoken</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>ruoyi-common-core</artifactId>
         </dependency>
 
         <!-- RuoYi Common Redis-->

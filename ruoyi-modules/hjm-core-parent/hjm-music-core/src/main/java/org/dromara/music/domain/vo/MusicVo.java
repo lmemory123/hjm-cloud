@@ -187,5 +187,35 @@ public class MusicVo implements Serializable {
     @ExcelProperty(value = "备注")
     private String remark;
 
+    /**
+     * 搜索高亮标题
+     */
+    private String highlightTitle;
+
+    /**
+     * 搜索高亮副标题
+     */
+    private String highlightSubtitle;
+
+    /**
+     * 搜索高亮原曲名
+     */
+    private String highlightOriginalTitle;
+
+    /**
+     * 搜索高亮创作者
+     */
+    private String highlightCreatorName;
+
+    /**
+     * 搜索高亮标签
+     */
+    private String highlightTags;
+
+    /**
+     * 搜索综合分数
+     */
+    private Double searchScore;
+
 
 }

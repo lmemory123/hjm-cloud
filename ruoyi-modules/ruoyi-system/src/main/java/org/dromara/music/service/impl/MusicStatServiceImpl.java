@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.mybatisflex.core.page.PageQuery;
 import org.dromara.common.mybatisflex.core.page.TableDataInfo;
+import org.dromara.common.redis.utils.RedisUtils;
+import org.dromara.music.constant.MusicInteractionCacheConstants;
 import org.dromara.music.domain.MusicStat;
 import org.dromara.music.domain.bo.MusicStatBo;
 import org.dromara.music.domain.vo.MusicStatVo;
@@ -41,7 +43,20 @@ public class MusicStatServiceImpl implements IMusicStatService {
      */
     @Override
     public MusicStatVo queryById(Long musicId){
-        return baseMapper.selectVoById(musicId);
+        MusicStatVo vo = baseMapper.selectVoById(musicId);
+        if (vo == null) {
+            vo = new MusicStatVo();
+            vo.setMusicId(musicId);
+            vo.setPlayCount(0L);
+            vo.setLikeCount(0L);
+            vo.setCollectCount(0L);
+            vo.setCommentCount(0L);
+            vo.setShareCount(0L);
+            vo.setDownloadCount(0L);
+            vo.setScore(0L);
+        }
+        mergePendingDelta(vo);
+        return vo;
     }
 
     /**
@@ -55,6 +70,7 @@ public class MusicStatServiceImpl implements IMusicStatService {
     public TableDataInfo<MusicStatVo> queryPageList(MusicStatBo bo, PageQuery pageQuery) {
         QueryWrapper wrapper = buildQueryWrapper(bo);
         Page<MusicStatVo> result = baseMapper.selectVoPage(pageQuery.build(), wrapper);
+        result.getRecords().forEach(this::mergePendingDelta);
         return TableDataInfo.build(result);
     }
 
@@ -67,7 +83,9 @@ public class MusicStatServiceImpl implements IMusicStatService {
     @Override
     public List<MusicStatVo> queryList(MusicStatBo bo) {
         QueryWrapper wrapper = buildQueryWrapper(bo);
-        return baseMapper.selectVoList(wrapper);
+        List<MusicStatVo> list = baseMapper.selectVoList(wrapper);
+        list.forEach(this::mergePendingDelta);
+        return list;
     }
 
     private QueryWrapper buildQueryWrapper(MusicStatBo bo) {
@@ -136,5 +154,27 @@ public class MusicStatServiceImpl implements IMusicStatService {
             //TODO 做一些业务上的校验,判断是否需要校验
         }
         return baseMapper.deleteBatchByIds(ids) > 0;
+    }
+
+    private void mergePendingDelta(MusicStatVo vo) {
+        if (vo == null || vo.getMusicId() == null) {
+            return;
+        }
+        long playDelta = RedisUtils.getAtomicValue(MusicInteractionCacheConstants.playDeltaKey(vo.getMusicId()));
+        long likeDelta = RedisUtils.getAtomicValue(MusicInteractionCacheConstants.likeDeltaKey(vo.getMusicId()));
+        long collectDelta = RedisUtils.getAtomicValue(MusicInteractionCacheConstants.collectDeltaKey(vo.getMusicId()));
+        long commentDelta = RedisUtils.getAtomicValue(MusicInteractionCacheConstants.commentDeltaKey(vo.getMusicId()));
+        long shareDelta = RedisUtils.getAtomicValue(MusicInteractionCacheConstants.shareDeltaKey(vo.getMusicId()));
+        long downloadDelta = RedisUtils.getAtomicValue(MusicInteractionCacheConstants.downloadDeltaKey(vo.getMusicId()));
+        vo.setPlayCount(safeValue(vo.getPlayCount()) + playDelta);
+        vo.setLikeCount(Math.max(0L, safeValue(vo.getLikeCount()) + likeDelta));
+        vo.setCollectCount(Math.max(0L, safeValue(vo.getCollectCount()) + collectDelta));
+        vo.setCommentCount(Math.max(0L, safeValue(vo.getCommentCount()) + commentDelta));
+        vo.setShareCount(Math.max(0L, safeValue(vo.getShareCount()) + shareDelta));
+        vo.setDownloadCount(Math.max(0L, safeValue(vo.getDownloadCount()) + downloadDelta));
+    }
+
+    private long safeValue(Long value) {
+        return value == null ? 0L : value;
     }
 }

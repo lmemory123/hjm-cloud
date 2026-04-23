@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.1.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 http://maven.apache.org/xsd/maven-4.1.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>org.dromara</groupId>
         <artifactId>ruoyi-cloud-plus</artifactId>
+        <version>${revision}</version>
     </parent>
-    <modelVersion>4.1.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-    <subprojects>
-        <subproject>ruoyi-demo</subproject>
-        <subproject>ruoyi-test-mq</subproject>
-    </subprojects>
+    <modules>
+        <module>ruoyi-demo</module>
+        <module>ruoyi-test-mq</module>
+    </modules>
 
     <artifactId>ruoyi-example</artifactId>
     <packaging>pom</packaging>

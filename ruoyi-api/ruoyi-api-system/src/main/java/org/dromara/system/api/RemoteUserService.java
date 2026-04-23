@@ -70,6 +70,14 @@ public interface RemoteUserService {
     Boolean registerUserInfo(RemoteUserBo remoteUserBo) throws UserException, ServiceException;
 
     /**
+     * 注册前台用户信息（不受后台注册开关限制）
+     *
+     * @param remoteUserBo 用户信息
+     * @return 结果
+     */
+    Boolean registerFrontUserInfo(RemoteUserBo remoteUserBo) throws UserException, ServiceException;
+
+    /**
      * 通过userId查询用户账户
      *
      * @param userId 用户id
