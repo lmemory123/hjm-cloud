@@ -1,19 +1,9 @@
 package org.dromara.system.service.impl;
 
-<<<<<<< HEAD
 import cn.hutool.v7.core.collection.CollUtil;
 import cn.hutool.v7.crypto.SecureUtil;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
-=======
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.crypto.SecureUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
->>>>>>> 7e54246af (update 客户端管理新增客户端key唯一校验逻辑)
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.constant.CacheNames;
@@ -32,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import static org.dromara.system.domain.table.SysClientTableDef.SYS_CLIENT;
 
@@ -102,6 +93,9 @@ public class SysClientServiceImpl implements ISysClientService {
      */
     @Override
     public Boolean insertByBo(SysClientBo bo) {
+        if (!checkClickKeyUnique(bo)) {
+            return false;
+        }
         SysClient add = MapstructUtils.convert(bo, SysClient.class);
         add.setGrantType(CollUtil.join(bo.getGrantTypeList(), StringUtils.SEPARATOR));
         // 生成clientId
@@ -121,6 +115,9 @@ public class SysClientServiceImpl implements ISysClientService {
     @CacheEvict(cacheNames = CacheNames.SYS_CLIENT, key = "#bo.clientId")
     @Override
     public Boolean updateByBo(SysClientBo bo) {
+        if (!checkClickKeyUnique(bo)) {
+            return false;
+        }
         SysClient update = MapstructUtils.convert(bo, SysClient.class);
         update.setGrantType(StringUtils.joinComma(bo.getGrantTypeList()));
         return baseMapper.update(update) > 0;
@@ -154,10 +151,12 @@ public class SysClientServiceImpl implements ISysClientService {
      */
     @Override
     public boolean checkClickKeyUnique(SysClientBo client) {
-        boolean exist = baseMapper.exists(new LambdaQueryWrapper<SysClient>()
-            .eq(SysClient::getClientKey, client.getClientKey())
-            .ne(ObjectUtil.isNotNull(client.getId()), SysClient::getId, client.getId()));
-        return !exist;
+        QueryWrapper queryWrapper = QueryWrapper.create()
+            .eq(SysClient::getClientKey, client.getClientKey());
+        if (Objects.nonNull(client.getId())) {
+            queryWrapper.ne(SysClient::getId, client.getId());
+        }
+        return baseMapper.selectCountByQuery(queryWrapper) == 0;
     }
 
 }

@@ -1,0 +1,32 @@
+### Login (gateway)
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "tenantId": "000000",
+  "username": "admin",
+  "password": "admin123",
+  "clientId": "e5cd7e4891bf95d1d19206ce24a7b32e",
+  "grantType": "password"
+}
+
+### Open tag list (no login token)
+GET http://localhost:8080/music/open/tag/list
+
+### Portal music my (needs login token)
+GET http://localhost:8080/music/portal/music/my
+ClientId: e5cd7e4891bf95d1d19206ce24a7b32e
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJsb2dpblR5cGUiOiJsb2dpbiIsImxvZ2luSWQiOiJzeXNfdXNlcjoxIiwicm5TdHIiOiJJTE90ZkxjenhOU2dzU1BmblV6Q2ZqMENBR3A3dTBYVCIsImNsaWVudGlkIjoiZTVjZDdlNDg5MWJmOTVkMWQxOTIwNmNlMjRhN2IzMmUiLCJ0ZW5hbnRJZCI6IjAwMDAwMCIsInVzZXJJZCI6MSwidXNlck5hbWUiOiJhZG1pbiIsImRlcHRJZCI6MTAzLCJkZXB0TmFtZSI6IueglOWPkemDqOmXqCIsImRlcHRDYXRlZ29yeSI6IiJ9.H2tbfnbDnPpg5nzSkMFHgqC9MlcXXnEo-x-2PY7ZOr8
+
+### OSS presign
+POST http://localhost:8080/resource/oss/portal/presign
+Content-Type: application/json
+Authorization: Bearer {{access_token}}
+
+{
+  "fileName": "oss_test.txt",
+  "fileSize": 16,
+  "contentType": "text/plain",
+  "bizType": "music",
+  "service": "rustfs"
+}

@@ -1,7 +1,7 @@
 package org.dromara.common.core.utils;
 
-import cn.hutool.core.date.DateUnit;
-import cn.hutool.core.date.DateUtil;
+import cn.hutool.v7.core.date.DateUnit;
+import cn.hutool.v7.core.date.DateUtil;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.dromara.common.core.enums.FormatsType;
 import org.dromara.common.core.exception.ServiceException;
@@ -341,7 +341,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
         if (date == null) {
             return "";
         }
-        Date now = DateUtil.date();
+        Date now = new Date();
 
         // 未来时间或非今年
         if (date.after(now) || DateUtil.year(date) != DateUtil.year(now)) {

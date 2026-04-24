@@ -197,31 +197,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HandlerMethodValidationException.class)
     public R<Void> handlerMethodValidationException(HandlerMethodValidationException e) {
-        log.error(e.getMessage(),e);
+        log.error(e.getMessage(), e);
         String message = StreamUtils.join(e.getAllErrors(), MessageSourceResolvable::getDefaultMessage, ", ");
         return R.fail(message);
-    }
-
-
-    /**
-     * 方法参数校验异常 用于处理 @Validated 注解
-     */
-    @ExceptionHandler(HandlerMethodValidationException.class)
-    public R<Void> handlerMethodValidationException(HandlerMethodValidationException e) {
-        log.error(e.getMessage());
-        String message = StreamUtils.join(e.getAllErrors(), MessageSourceResolvable::getDefaultMessage, ", ");
-        return R.fail(message);
-    }
-
-    /**
-     * JSON 解析异常（Jackson 在处理 JSON 格式出错时抛出）
-     * 可能是请求体格式非法，也可能是服务端反序列化失败
-     */
-    @ExceptionHandler(StreamReadException.class)
-    public R<Void> handleJsonParseException(StreamReadException e, HttpServletRequest request) {
-        String requestURI = request.getRequestURI();
-        log.error("请求地址'{}' 发生 JSON 解析异常: {}", requestURI, e.getMessage());
-        return R.fail(HttpStatus.HTTP_BAD_REQUEST, "请求数据格式错误（JSON 解析失败）：" + e.getMessage());
     }
 
     /**
@@ -229,8 +207,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public R<Void> handleHttpMessageNotReadableException(HttpMessageNotReadableException e, HttpServletRequest request) {
-        log.error("请求地址'{}', 参数解析失败: {}", request.getRequestURI(), e.getMessage());
-        return R.fail(HttpStatus.HTTP_BAD_REQUEST, "请求参数格式错误：" + e.getMostSpecificCause().getMessage());
+        String requestURI = request.getRequestURI();
+        log.error("请求地址'{}' 发生 JSON 解析异常: {}", requestURI, e.getMessage());
+        return R.fail(HttpStatus.HTTP_BAD_REQUEST, "请求数据格式错误（JSON 解析失败）：" + e.getMessage());
     }
 
     /**

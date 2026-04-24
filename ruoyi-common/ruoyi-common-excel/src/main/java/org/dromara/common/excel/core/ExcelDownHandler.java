@@ -116,8 +116,17 @@ public class ExcelDownHandler implements SheetWriteHandler {
             } else if (field.isAnnotationPresent(ExcelEnumFormat.class)) {
                 // 否则如果指定了@ExcelEnumFormat，则使用枚举的逻辑
                 ExcelEnumFormat format = field.getDeclaredAnnotation(ExcelEnumFormat.class);
-                List<Object> values = EnumUtil.getFieldValues(format.enumClass(), format.textField());
-                options = StreamUtils.toList(values, Convert::toStr);
+                List<Object> values = new ArrayList<>();
+                try {
+                    java.lang.reflect.Field field1 = format.enumClass().getDeclaredField(format.textField());
+                    field1.setAccessible(true);
+                    for (Object enumVal : format.enumClass().getEnumConstants()) {
+                        values.add(field1.get(enumVal));
+                    }
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    log.warn("Failed to get enum values for field {}: {}", format.textField(), e.getMessage());
+                }
+                options = StreamUtils.toList(values, v -> ConvertUtil.toStr(v));
             } else if (field.isAnnotationPresent(ExcelDynamicOptions.class)) {
                 // 处理动态下拉选项
                 ExcelDynamicOptions dynamicOptions = field.getDeclaredAnnotation(ExcelDynamicOptions.class);
