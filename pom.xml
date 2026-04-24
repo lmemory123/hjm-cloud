@@ -62,6 +62,8 @@
         <valkey-querydsl.version>1.1.0-RC5</valkey-querydsl.version>
         <!-- mqtt配置 -->
         <mica-mqtt.version>2.4.3</mica-mqtt.version>
+        <!-- elasticsearch配置 -->
+        <elasticsearch-client.version>8.14.0</elasticsearch-client.version>
 
         <!-- 插件版本 -->
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>

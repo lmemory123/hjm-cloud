@@ -650,7 +650,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         } else {
             flowTaskVo.setVarList(new HashMap<>());
         }
-        flowTaskVo.setNodeRatio(flowNode.getNodeRatio());
+        flowTaskVo.setNodeRatio(flowNode.getNodeRatio() != null ? flowNode.getNodeRatio().toString() : null);
         flowTaskVo.setApplyNode(flowNode.getNodeCode().equals(flwCommonService.applyNodeCode(task.getDefinitionId())));
         return flowTaskVo;
     }
