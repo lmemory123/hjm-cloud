@@ -1,7 +1,6 @@
 package org.dromara.common.doc.core.resolver;
 
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ClassLoaderUtil;
+import cn.hutool.v7.core.convert.ConvertUtil;
 import io.swagger.v3.oas.models.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.doc.core.model.SaTokenSecurityMetadata;
@@ -41,10 +40,10 @@ public class SaTokenAnnotationMetadataJavadocResolver extends AbstractMetadataJa
 
     static {
         // 通过类加载器去加载注解类Class实例
-        SA_CHECK_ROLE_CLASS = (Class<? extends Annotation>) ClassLoaderUtil.loadClass(SA_CHECK_ROLE_CLASS_NAME, false);
-        SA_CHECK_PERMISSION_CLASS = (Class<? extends Annotation>) ClassLoaderUtil.loadClass(SA_CHECK_PERMISSION_CLASS_NAME, false);
-        SA_IGNORE_CLASS = (Class<? extends Annotation>) ClassLoaderUtil.loadClass(SA_IGNORE_CLASS_NAME, false);
-        SA_CHECK_LOGIN_CLASS = (Class<? extends Annotation>) ClassLoaderUtil.loadClass(SA_CHECK_LOGIN_NAME, false);
+        SA_CHECK_ROLE_CLASS = loadAnnotationClass(SA_CHECK_ROLE_CLASS_NAME);
+        SA_CHECK_PERMISSION_CLASS = loadAnnotationClass(SA_CHECK_PERMISSION_CLASS_NAME);
+        SA_IGNORE_CLASS = loadAnnotationClass(SA_IGNORE_CLASS_NAME);
+        SA_CHECK_LOGIN_CLASS = loadAnnotationClass(SA_CHECK_LOGIN_NAME);
         if (log.isDebugEnabled()) {
             log.debug("SaTokenAnnotationJavadocResolver init success, load annotation class: {}", List.of(SA_CHECK_ROLE_CLASS, SA_CHECK_PERMISSION_CLASS, SA_IGNORE_CLASS, SA_CHECK_LOGIN_CLASS));
         }
@@ -114,10 +113,10 @@ public class SaTokenAnnotationMetadataJavadocResolver extends AbstractMetadataJa
             Object type = annotationValueMap.get( "type");
             Object orRole = annotationValueMap.get( "orRole");
 
-            String[] values = Convert.toStrArray(value);
+            String[] values = ConvertUtil.toStrArray(value);
             String modeStr = mode != null ? mode.toString() : "AND";
             String typeStr = type != null ? type.toString() : "";
-            String[] orRoles = Convert.toStrArray(orRole);
+            String[] orRoles = ConvertUtil.toStrArray(orRole);
 
             metadata.addPermission(values, modeStr, typeStr, orRoles);
         } catch (Exception ignore) {
@@ -151,13 +150,23 @@ public class SaTokenAnnotationMetadataJavadocResolver extends AbstractMetadataJa
             Object mode = annotationValueMap.get("mode");
             Object type = annotationValueMap.get("type");
 
-            String[] values = Convert.toStrArray(value);
+            String[] values = ConvertUtil.toStrArray(value);
             String modeStr = mode != null ? mode.toString() : "AND";
             String typeStr = type != null ? type.toString() : "";
 
             metadata.addRole(values, modeStr, typeStr);
         } catch (Exception ignore) {
             // 忽略解析错误
+        }
+    }
+
+    private static Class<? extends Annotation> loadAnnotationClass(String annotationClassName) {
+        try {
+            @SuppressWarnings("unchecked")
+            Class<? extends Annotation> clazz = (Class<? extends Annotation>) Class.forName(annotationClassName);
+            return clazz;
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("Sa-Token annotation class not found: " + annotationClassName, e);
         }
     }
 

@@ -228,7 +228,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             throw new ServiceException("流程任务不存在或任务已审批！");
         }
         Instance ins = insService.getById(flowTask.getInstanceId());
-        if (ObjectUtil.isNull(ins)) {
+        if (ObjUtil.isNull(ins)) {
             throw new ServiceException("流程实例不存在");
         }
         // 检查流程状态是否为草稿、已撤销或已退回状态，若是则执行流程提交监听
@@ -495,7 +495,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
             throw new ServiceException("任务不存在！");
         }
         Instance inst = insService.getById(task.getInstanceId());
-        if (ObjectUtil.isNull(inst)) {
+        if (ObjUtil.isNull(inst)) {
             throw new ServiceException("流程实例不存在");
         }
         BusinessStatusEnum.checkBackStatus(inst.getFlowStatus());
@@ -529,7 +529,7 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
     @Override
     public List<Node> getBackTaskNode(Long taskId, String nowNodeCode) {
         FlowTask task = flowTaskMapper.selectById(taskId);
-        if (ObjectUtil.isNull(task)) {
+        if (ObjUtil.isNull(task)) {
             throw new ServiceException("任务不存在！");
         }
         List<Node> nodeCodes = nodeService.getByNodeCodes(Collections.singletonList(nowNodeCode), task.getDefinitionId());
@@ -616,11 +616,11 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         }
         FlowTaskVo flowTaskVo = BeanUtil.toBean(task, FlowTaskVo.class);
         Instance instance = insService.getById(task.getInstanceId());
-        if (ObjectUtil.isNull(instance)) {
+        if (ObjUtil.isNull(instance)) {
             throw new ServiceException("流程实例不存在");
         }
         Definition definition = defService.getById(task.getDefinitionId());
-        if (ObjectUtil.isNull(definition)) {
+        if (ObjUtil.isNull(definition)) {
             throw new ServiceException("流程定义不存在");
         }
         flowTaskVo.setFlowStatus(instance.getFlowStatus());
@@ -665,15 +665,15 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         Long taskId = bo.getTaskId();
         Map<String, Object> variables = bo.getVariables();
         Task task = taskService.getById(taskId);
-        if (ObjectUtil.isNull(task)) {
+        if (ObjUtil.isNull(task)) {
             throw new ServiceException("任务不存在！");
         }
         Instance instance = insService.getById(task.getInstanceId());
-        if (ObjectUtil.isNull(instance)) {
+        if (ObjUtil.isNull(instance)) {
             throw new ServiceException("流程实例不存在");
         }
         Definition definition = defService.getById(task.getDefinitionId());
-        if (ObjectUtil.isNull(definition)) {
+        if (ObjUtil.isNull(definition)) {
             throw new ServiceException("流程定义不存在");
         }
         Map<String, Object> mergeVariable = MapUtil.mergeAll(instance.getVariableMap(), variables);
@@ -785,11 +785,11 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
 
         Long taskId = bo.getTaskId();
         Task task = taskService.getById(taskId);
-        if (ObjectUtil.isNull(task)) {
+        if (ObjUtil.isNull(task)) {
             throw new ServiceException("任务不存在！");
         }
         FlowNode flowNode = getByNodeCode(task.getNodeCode(), task.getDefinitionId());
-        if (ObjectUtil.isNull(flowNode)) {
+        if (ObjUtil.isNull(flowNode)) {
             throw new ServiceException("流程节点不存在");
         }
         if (op == TaskOperationEnum.ADD_SIGNATURE || op == TaskOperationEnum.REDUCTION_SIGNATURE) {
@@ -823,10 +823,10 @@ public class FlwTaskServiceImpl implements IFlwTaskService {
         if (result && CollUtil.isNotEmpty(bo.getMessageType())) {
             List<Long> userIdList = new ArrayList<>();
             if (StrUtil.isNotBlank(bo.getUserId())) {
-                userIdList.add(Convert.toLong(bo.getUserId()));
+                userIdList.add(ConvertUtil.toLong(bo.getUserId()));
             }
             if (CollUtil.isNotEmpty(bo.getUserIds())) {
-                userIdList.addAll(StreamUtils.toList(bo.getUserIds(), Convert::toLong));
+                userIdList.addAll(StreamUtils.toList(bo.getUserIds(), ConvertUtil::toLong));
             }
             if (CollUtil.isNotEmpty(userIdList)) {
                 flwCommonService.sendMessage(

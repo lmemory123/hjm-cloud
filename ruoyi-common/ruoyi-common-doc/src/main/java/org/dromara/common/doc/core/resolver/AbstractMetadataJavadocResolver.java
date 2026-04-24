@@ -1,7 +1,6 @@
 package org.dromara.common.doc.core.resolver;
 
-import cn.hutool.core.annotation.AnnotationUtil;
-import cn.hutool.core.util.ClassLoaderUtil;
+import cn.hutool.v7.core.annotation.AnnotationUtil;
 import io.swagger.v3.oas.models.Operation;
 import org.springframework.web.method.HandlerMethod;
 
@@ -131,7 +130,7 @@ public abstract class AbstractMetadataJavadocResolver<M> implements JavadocResol
      */
     @SuppressWarnings("unchecked")
     public Map<String, Object> getClassAnnotationValueMap(HandlerMethod handlerMethod, String annotationClassName) {
-        Class<? extends Annotation> annotationClass = (Class<? extends Annotation>) ClassLoaderUtil.loadClass(annotationClassName, false);
+        Class<? extends Annotation> annotationClass = loadAnnotationClass(annotationClassName);
         return AnnotationUtil.getAnnotationValueMap(handlerMethod.getBeanType(), annotationClass);
     }
 
@@ -153,11 +152,20 @@ public abstract class AbstractMetadataJavadocResolver<M> implements JavadocResol
      */
     @SuppressWarnings("unchecked")
     public Map<String, Object> getMethodAnnotationValueMap(HandlerMethod handlerMethod, String annotationClassName) {
-        Class<? extends Annotation> annotationClass = (Class<? extends Annotation>) ClassLoaderUtil.loadClass(annotationClassName, false);
+        Class<? extends Annotation> annotationClass = loadAnnotationClass(annotationClassName);
         return AnnotationUtil.getAnnotationValueMap(handlerMethod.getMethod(), annotationClass);
     }
 
     private Map<String, Object> getAnnotationValueMap(AnnotatedElement annotatedElement, Class<? extends Annotation> annotationClass) {
         return AnnotationUtil.getAnnotationValueMap(annotatedElement, annotationClass);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Class<? extends Annotation> loadAnnotationClass(String annotationClassName) {
+        try {
+            return (Class<? extends Annotation>) Class.forName(annotationClassName);
+        } catch (ClassNotFoundException e) {
+            throw new IllegalArgumentException("Annotation class not found: " + annotationClassName, e);
+        }
     }
 }

@@ -4,6 +4,11 @@ import cn.hutool.v7.core.text.StrUtil;
 import cn.hutool.v7.core.util.ObjUtil;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.core.utils.SpringUtils;
@@ -13,7 +18,7 @@ import org.dromara.common.redis.handler.RedisExceptionHandler;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.StringCodec;
 import org.redisson.codec.CompositeCodec;
-import org.redisson.codec.TypedJsonJackson3Codec;
+import org.redisson.codec.TypedJsonJacksonCodec;
 import org.redisson.spring.data.connection.RedissonConnectionFactory;
 import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +32,6 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import redis.clients.jedis.JedisPoolConfig;
-import tools.jackson.databind.DefaultTyping;
-import tools.jackson.databind.ext.javatime.deser.LocalDateTimeDeserializer;
-import tools.jackson.databind.ext.javatime.ser.LocalDateTimeSerializer;
-import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
-import tools.jackson.databind.module.SimpleModule;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -55,17 +54,16 @@ public class RedisConfiguration {
     @Bean
     public RedissonAutoConfigurationCustomizer redissonCustomizer() {
         return config -> {
-            SimpleModule simpleModule = new SimpleModule();
+            JavaTimeModule javaTimeModule = new JavaTimeModule();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            simpleModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(formatter));
-            simpleModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(formatter));
-            JsonMapper jsonMapper = JsonMapper.builder()
-                .addModules(simpleModule)
-                .defaultTimeZone(TimeZone.getDefault())
-                .changeDefaultVisibility(visibilityChecker -> visibilityChecker.withVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY))
-                .activateDefaultTyping(BasicPolymorphicTypeValidator.builder().allowIfSubType((ctxt, clazz) -> true).build(), DefaultTyping.NON_FINAL)
-                .build();
-            TypedJsonJackson3Codec jsonCodec = new TypedJsonJackson3Codec(Object.class, jsonMapper);
+            javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(formatter));
+            javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(formatter));
+            ObjectMapper om = new ObjectMapper();
+            om.registerModule(javaTimeModule);
+            om.setTimeZone(TimeZone.getDefault());
+            om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+            om.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
+            TypedJsonJacksonCodec jsonCodec = new TypedJsonJacksonCodec(Object.class, om);
             CompositeCodec codec = new CompositeCodec(StringCodec.INSTANCE, jsonCodec, jsonCodec);
             KeyPrefixHandler nameMapper = new KeyPrefixHandler(redissonProperties.getKeyPrefix());
             config.setThreads(redissonProperties.getThreads())
