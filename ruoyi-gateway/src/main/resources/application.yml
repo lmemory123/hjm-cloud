@@ -13,6 +13,12 @@ spring:
     # 环境配置
     active: @profiles.active@
 
+# Dubbo
+dubbo:
+  consumer:
+    # 超时时间 - 增加到 10 秒以支持权限加载
+    timeout: 10000
+
 --- # nacos 配置
 spring:
   main:

@@ -2,6 +2,12 @@
 server:
   port: 9211
 
+# Dubbo
+dubbo:
+  consumer:
+    # 超时时间 - 增加到 10 秒以支持权限加载
+    timeout: 10000
+
 # Spring
 spring:
   application:

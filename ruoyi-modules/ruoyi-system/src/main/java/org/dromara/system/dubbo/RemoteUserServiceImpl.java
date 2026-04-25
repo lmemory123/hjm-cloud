@@ -298,13 +298,17 @@ public class RemoteUserServiceImpl implements RemoteUserService {
             loginUser.setDeptName(deptOpt.map(SysDeptVo::getDeptName).orElse(StringUtils.EMPTY));
             loginUser.setDeptCategory(deptOpt.map(SysDeptVo::getDeptCategory).orElse(StringUtils.EMPTY));
         }
-        // 同步加载权限、角色、岗位等信息，避免虚拟线程导致的序列化问题
-        loginUser.setMenuPermission(permissionService.getMenuPermission(userId));
-        loginUser.setRolePermission(permissionService.getRolePermission(userId));
-        List<SysRoleVo> roles = roleService.selectRolesByUserId(userId);
-        loginUser.setRoles(BeanUtil.copyToList(roles, RoleDTO.class));
-        List<SysPostVo> posts = postService.selectPostsByUserId(userId);
-        loginUser.setPosts(BeanUtil.copyToList(posts, PostDTO.class));
+        ThreadUtils.virtualSubmit(() -> {
+            loginUser.setMenuPermission(permissionService.getMenuPermission(userId));
+        }, () -> {
+            loginUser.setRolePermission(permissionService.getRolePermission(userId));
+        }, () -> {
+            List<SysRoleVo> roles = roleService.selectRolesByUserId(userId);
+            loginUser.setRoles(BeanUtil.copyToList(roles, RoleDTO.class));
+        }, () -> {
+            List<SysPostVo> posts = postService.selectPostsByUserId(userId);
+            loginUser.setPosts(BeanUtil.copyToList(posts, PostDTO.class));
+        });
         return loginUser;
     }
 
