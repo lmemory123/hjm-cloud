@@ -19,21 +19,21 @@ public class CaptchaProperties {
     /**
      * 验证码类型
      */
-    private String type;
+    private String type = "random";
 
     /**
      * 数字验证码位数
      */
-    private Integer numberLength;
+    private Integer numberLength = 6;
 
     /**
      * 字符验证码长度
      */
-    private Integer charLength;
+    private Integer charLength = 6;
 
     /**
      * 验证码开关
      */
-    private Boolean enabled;
+    private Boolean enabled = true;
 
 }

@@ -7,7 +7,7 @@ spring:
         # 主库数据源
         master:
           type: ${spring.datasource.type}
-          driver-class-name: com.mysql.cj.jdbc.Driver
+          driver-class-name: org.postgresql.Driver
           url: ${datasource.workflow.url}
           username: ${datasource.workflow.username}
           password: ${datasource.workflow.password}

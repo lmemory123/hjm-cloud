@@ -1,7 +1,7 @@
 spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: org.postgresql.Driver
     url: ${datasource.job.url}
     username: ${datasource.job.username}
     password: ${datasource.job.password}
