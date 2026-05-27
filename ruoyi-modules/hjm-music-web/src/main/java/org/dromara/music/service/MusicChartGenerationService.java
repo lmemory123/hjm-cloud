@@ -76,8 +76,7 @@ public class MusicChartGenerationService {
             musicChartItemMapper.deleteByQuery(QueryWrapper.create().where(MUSIC_CHART_ITEM.SNAPSHOT_ID.eq(snapshot.getId())));
         }
 
-        List<MusicVo> candidates = musicMapper.selectVoList(QueryWrapper.create()
-            .where(MUSIC.AUDIT_STATUS.eq(AUDIT_APPROVED).and(MUSIC.IS_PUBLIC.eq(PUBLIC_VISIBLE))));
+        List<MusicVo> candidates = musicMapper.selectVoList(buildCandidateWrapper(chartType));
         musicInteractionService.fillDynamicStats(candidates);
 
         List<RankedSong> rankedSongs = candidates.stream()
@@ -125,6 +124,17 @@ public class MusicChartGenerationService {
             + safeValue(song.getCommentCount()) * 4
             + safeValue(song.getShareCount()) * 2
             + safeValue(song.getDownloadCount()) * 3;
+    }
+
+    private QueryWrapper buildCandidateWrapper(String chartType) {
+        QueryWrapper wrapper = QueryWrapper.create()
+            .where(MUSIC.AUDIT_STATUS.eq(AUDIT_APPROVED).and(MUSIC.IS_PUBLIC.eq(PUBLIC_VISIBLE)));
+        if (CHART_TYPE_MONTH.equals(chartType)) {
+            wrapper.and(MUSIC.IS_ORIGINAL.eq("1"));
+            wrapper.and("(lower(coalesce(tags_snapshot::text, '')) not like ? and lower(coalesce(extend_data::text, '')) not like ? and lower(coalesce(extend_data::text, '')) not like ?)",
+                "%ai%", "%\"isai\":true%", "%\"is_ai\":true%");
+        }
+        return wrapper;
     }
 
     private void syncSongScore(Long musicId, long score, Date now) {

@@ -24,5 +24,7 @@ public class OpenCommentVo {
 
     private Date createTime;
 
+    private Long likeCount;
+
     private List<OpenCommentVo> replies;
 }

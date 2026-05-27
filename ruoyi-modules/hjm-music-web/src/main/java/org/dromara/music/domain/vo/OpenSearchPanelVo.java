@@ -31,5 +31,9 @@ public class OpenSearchPanelVo {
 
     private List<OpenSearchFacetItemVo> tags;
 
+    private List<OpenSearchFacetItemVo> styleTags;
+
+    private List<OpenSearchFacetItemVo> activeFilters;
+
     private List<String> hotKeywords;
 }

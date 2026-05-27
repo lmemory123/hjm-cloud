@@ -82,6 +82,7 @@ public class MusicCommentFacadeService {
         }
         roots.forEach(this::sortRepliesRecursively);
         roots.sort(Comparator.comparing(OpenCommentVo::getCreateTime).thenComparing(OpenCommentVo::getId));
+        musicInteractionService.fillCommentLikeStats(roots);
         return roots;
     }
 
@@ -196,6 +197,7 @@ public class MusicCommentFacadeService {
         vo.setRootId(comment.getRootId());
         vo.setParentId(comment.getParentId());
         vo.setCreateTime(comment.getCreateTime());
+        vo.setLikeCount(0L);
         vo.setReplies(new ArrayList<>());
         return vo;
     }

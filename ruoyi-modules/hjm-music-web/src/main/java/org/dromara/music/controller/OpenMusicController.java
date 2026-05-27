@@ -9,6 +9,7 @@ import org.dromara.common.mybatisflex.core.page.TableDataInfo;
 import org.dromara.music.domain.vo.MusicDetailVo;
 import org.dromara.music.domain.vo.MusicVo;
 import org.dromara.music.domain.vo.OpenCommentVo;
+import org.dromara.music.domain.vo.OpenChartArchiveVo;
 import org.dromara.music.domain.vo.OpenChartVo;
 import org.dromara.music.domain.vo.OpenSearchPanelVo;
 import org.dromara.music.domain.vo.OpenSearchSuggestVo;
@@ -39,9 +40,19 @@ public class OpenMusicController {
     @GetMapping("/list")
     public TableDataInfo<MusicVo> list(@RequestParam(value = "keyword", required = false) String keyword,
                                        @RequestParam(value = "tag", required = false) String tag,
+                                       @RequestParam(value = "tags", required = false) String tags,
+                                       @RequestParam(value = "style", required = false) String style,
                                        @RequestParam(value = "sort", required = false) String sort,
+                                       @RequestParam(value = "isOriginal", required = false) String isOriginal,
+                                       @RequestParam(value = "isAi", required = false) String isAi,
+                                       @RequestParam(value = "resourceStatus", required = false) String resourceStatus,
+                                       @RequestParam(value = "startDate", required = false) String startDate,
+                                       @RequestParam(value = "endDate", required = false) String endDate,
+                                       @RequestParam(value = "playCountMin", required = false) Long playCountMin,
+                                       @RequestParam(value = "playCountMax", required = false) Long playCountMax,
                                        PageQuery pageQuery) {
-        return openMusicService.searchPublic(keyword, tag, sort, pageQuery);
+        return openMusicService.searchPublic(keyword, tag, tags, style, sort, isOriginal, isAi, resourceStatus,
+            startDate, endDate, playCountMin, playCountMax, pageQuery);
     }
 
     @SaIgnore
@@ -74,9 +85,19 @@ public class OpenMusicController {
     @GetMapping("/panel")
     public R<OpenSearchPanelVo> panel(@RequestParam(value = "keyword", required = false) String keyword,
                                       @RequestParam(value = "tag", required = false) String tag,
+                                      @RequestParam(value = "tags", required = false) String tags,
+                                      @RequestParam(value = "style", required = false) String style,
                                       @RequestParam(value = "sort", required = false) String sort,
+                                      @RequestParam(value = "isOriginal", required = false) String isOriginal,
+                                      @RequestParam(value = "isAi", required = false) String isAi,
+                                      @RequestParam(value = "resourceStatus", required = false) String resourceStatus,
+                                      @RequestParam(value = "startDate", required = false) String startDate,
+                                      @RequestParam(value = "endDate", required = false) String endDate,
+                                      @RequestParam(value = "playCountMin", required = false) Long playCountMin,
+                                      @RequestParam(value = "playCountMax", required = false) Long playCountMax,
                                       @RequestParam(value = "limit", required = false) Integer limit) {
-        return R.ok(openMusicService.querySearchPanel(keyword, tag, sort, limit));
+        return R.ok(openMusicService.querySearchPanel(keyword, tag, tags, style, sort, isOriginal, isAi, resourceStatus,
+            startDate, endDate, playCountMin, playCountMax, limit));
     }
 
     @SaIgnore
@@ -85,6 +106,13 @@ public class OpenMusicController {
                                 @RequestParam(value = "period", required = false) String period,
                                 @RequestParam(value = "limit", required = false) Integer limit) {
         return R.ok(openMusicService.queryPublicChart(type, period, limit));
+    }
+
+    @SaIgnore
+    @GetMapping("/chart/{type}/archives")
+    public R<List<OpenChartArchiveVo>> chartArchives(@PathVariable("type") String type,
+                                                     @RequestParam(value = "limit", required = false) Integer limit) {
+        return R.ok(openMusicService.queryChartArchives(type, limit));
     }
 
     @SaIgnore

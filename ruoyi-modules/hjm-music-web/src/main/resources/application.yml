@@ -26,8 +26,8 @@ valkey:
       mode: none
     standalone:
       nodes:
-        - host: 127.0.0.1
-          port: 6379
+        - host: 64.83.46.95
+          port: 32768
 --- # nacos 配置
 spring:
   cloud:

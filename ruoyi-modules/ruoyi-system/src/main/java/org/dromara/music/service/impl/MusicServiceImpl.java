@@ -83,6 +83,9 @@ public class MusicServiceImpl implements IMusicService {
     private static final String AUDIT_PASS = "1";
     private static final String AUDIT_REJECT = "2";
     private static final String AUDIT_OFFLINE = "3";
+    private static final String PUBLIC_VISIBLE = "1";
+    private static final String PUBLIC_HIDDEN = "0";
+    private static final String RESOURCE_STATUS_NORMAL = "0";
 
     /**
      * 查询音乐曲库主
@@ -284,6 +287,10 @@ public class MusicServiceImpl implements IMusicService {
         update.setUpdateTime(new Date());
         if (AUDIT_PASS.equals(newStatus)) {
             update.setPublishTime(new Date());
+            update.setIsPublic(PUBLIC_VISIBLE);
+            update.setResourceStatus(StringUtils.isBlank(music.getResourceStatus()) ? RESOURCE_STATUS_NORMAL : music.getResourceStatus());
+        } else if (AUDIT_REJECT.equals(newStatus) || AUDIT_OFFLINE.equals(newStatus)) {
+            update.setIsPublic(PUBLIC_HIDDEN);
         }
         baseMapper.update(update);
 

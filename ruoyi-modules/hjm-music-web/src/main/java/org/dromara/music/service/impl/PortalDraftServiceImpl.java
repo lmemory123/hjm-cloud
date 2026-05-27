@@ -2,6 +2,7 @@ package org.dromara.music.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import com.alibaba.fastjson2.JSON;
+import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.dromara.common.satoken.utils.LoginHelper;
@@ -9,11 +10,18 @@ import org.dromara.music.domain.bo.MusicSubmitBo;
 import org.dromara.music.service.IPortalDraftService;
 import org.dromara.music.domain.*;
 import org.dromara.music.domain.vo.MusicDraftVo;
+import org.dromara.music.domain.vo.TagVo;
 import org.dromara.music.mapper.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.dromara.music.domain.table.TagTableDef.TAG;
 
 /**
  * 前台草稿服务实现
@@ -30,11 +38,16 @@ public class PortalDraftServiceImpl implements IPortalDraftService {
      * 审核状态常量
      */
     private static final String AUDIT_STATUS_PENDING = "0";
+    private static final String PUBLIC_HIDDEN = "0";
+    private static final String RESOURCE_STATUS_NORMAL = "0";
+    private static final String PROCESS_STATUS_UPLOADED = "uploaded";
     private final MusicDraftMapper draftMapper;
     private final MusicMapper musicMapper;
     private final MusicOriginalMapper originalMapper;
     private final MusicTagRelMapper tagRelMapper;
     private final MusicResourceMapper resourceMapper;
+    private final MusicAuditLogMapper auditLogMapper;
+    private final TagMapper tagMapper;
     private final TagProposalMapper tagProposalMapper;
 
     @Override
@@ -111,6 +124,14 @@ public class PortalDraftServiceImpl implements IPortalDraftService {
         music.setCopyrightInfo(bo.getCopyrightInfo());
         music.setRemark(bo.getRemark());
         music.setAuditStatus(AUDIT_STATUS_PENDING);
+        music.setIsPublic(PUBLIC_HIDDEN);
+        music.setResourceStatus(RESOURCE_STATUS_NORMAL);
+        music.setPlayCount(0L);
+        music.setLikeCount(0L);
+        music.setCollectCount(0L);
+        music.setCommentCount(0L);
+        music.setShareCount(0L);
+        music.setDownloadCount(0L);
         music.setCreateBy(bo.getUserId());
         music.setCreateTime(new Date());
 
@@ -121,6 +142,7 @@ public class PortalDraftServiceImpl implements IPortalDraftService {
 
         musicMapper.insert(music);
         Long musicId = music.getId();
+        List<Map<String, Object>> resourceSnapshot = new ArrayList<>();
 
         // 2. 保存原曲关联
         if (CollUtil.isNotEmpty(bo.getOriginalInfoList())) {
@@ -142,6 +164,33 @@ public class PortalDraftServiceImpl implements IPortalDraftService {
         }
 
         // 3. 关联资源
+        if (CollUtil.isNotEmpty(bo.getUploadedResources())) {
+            int sortOrder = 0;
+            for (MusicSubmitBo.ResourceInfoBo info : bo.getUploadedResources()) {
+                MusicResource resource = new MusicResource();
+                resource.setMusicId(musicId);
+                resource.setResType(resolveResourceType(info));
+                resource.setQualityTier("original");
+                resource.setSourceType("upload");
+                resource.setSourceId(info.getId());
+                resource.setUrl(info.getUrl());
+                resource.setCdnUrl(info.getUrl());
+                resource.setFileName(info.getName());
+                resource.setFileFormat(resolveFileFormat(info));
+                resource.setFileSize(info.getSize());
+                resource.setAccessCount(0L);
+                resource.setIsPrimary(isPrimaryResource(info, bo.getCoverResourceId()) ? "1" : "0");
+                resource.setStatus(RESOURCE_STATUS_NORMAL);
+                resource.setProcessStatus(PROCESS_STATUS_UPLOADED);
+                resource.setRetryCount(0L);
+                resource.setFailCount(0L);
+                resource.setSortOrder((long) sortOrder++);
+                resource.setCreateBy(bo.getUserId());
+                resource.setCreateTime(new Date());
+                resourceMapper.insert(resource);
+                resourceSnapshot.add(toResourceSnapshot(resource, info));
+            }
+        }
         if (CollUtil.isNotEmpty(bo.getResourceIds())) {
             for (Long resourceId : bo.getResourceIds()) {
                 MusicResource resource = resourceMapper.selectOneById(resourceId);
@@ -150,11 +199,13 @@ public class PortalDraftServiceImpl implements IPortalDraftService {
                     update.setId(resourceId);
                     update.setMusicId(musicId);
                     resourceMapper.update(update, false);
+                    resourceSnapshot.add(toResourceSnapshot(resource, null));
                 }
             }
         }
 
         // 4. 关联标签
+        List<Map<String, Object>> tagSnapshot = buildTagSnapshot(bo.getTagIds());
         if (CollUtil.isNotEmpty(bo.getTagIds())) {
             int weight = bo.getTagIds().size();
             for (Long tagId : bo.getTagIds()) {
@@ -185,6 +236,117 @@ public class PortalDraftServiceImpl implements IPortalDraftService {
             }
         }
 
+        Music update = new Music();
+        update.setId(musicId);
+        update.setOriginalTitle(resolveOriginalTitle(bo));
+        if (!resourceSnapshot.isEmpty()) {
+            update.setResourceData(JSON.toJSONString(resourceSnapshot));
+        }
+        if (!tagSnapshot.isEmpty()) {
+            update.setTagsSnapshot(JSON.toJSONString(tagSnapshot));
+        }
+        update.setUpdateBy(bo.getUserId());
+        update.setUpdateTime(new Date());
+        musicMapper.update(update, false);
+
+        MusicAuditLog log = new MusicAuditLog();
+        log.setMusicId(musicId);
+        log.setTargetType("music");
+        log.setAction(0L);
+        log.setOldStatus(null);
+        log.setNewStatus(0L);
+        log.setReason("用户提交审核");
+        log.setSnapshot(JSON.toJSONString(bo));
+        log.setOperatorId(bo.getUserId());
+        log.setCreateTime(new Date());
+        auditLogMapper.insert(log);
+
         return musicId;
+    }
+
+    private String resolveOriginalTitle(MusicSubmitBo bo) {
+        if (CollUtil.isEmpty(bo.getOriginalInfoList())) {
+            return null;
+        }
+        for (MusicSubmitBo.OriginalInfoBo info : bo.getOriginalInfoList()) {
+            if (info.getOriginalTitle() != null && !info.getOriginalTitle().isBlank()) {
+                return info.getOriginalTitle();
+            }
+        }
+        return null;
+    }
+
+    private String resolveResourceType(MusicSubmitBo.ResourceInfoBo info) {
+        if (info == null) {
+            return "file";
+        }
+        if ("image".equalsIgnoreCase(info.getKind()) || startsWith(info.getContentType(), "image/")) {
+            return "cover";
+        }
+        if ("audio".equalsIgnoreCase(info.getKind()) || startsWith(info.getContentType(), "audio/")) {
+            return "audio";
+        }
+        return "file";
+    }
+
+    private boolean isPrimaryResource(MusicSubmitBo.ResourceInfoBo info, Long coverResourceId) {
+        if (info == null) {
+            return false;
+        }
+        if (coverResourceId != null && String.valueOf(coverResourceId).equals(info.getId())) {
+            return true;
+        }
+        return "audio".equals(resolveResourceType(info));
+    }
+
+    private boolean startsWith(String value, String prefix) {
+        return value != null && value.startsWith(prefix);
+    }
+
+    private String resolveFileFormat(MusicSubmitBo.ResourceInfoBo info) {
+        if (info == null || info.getName() == null || !info.getName().contains(".")) {
+            return null;
+        }
+        return info.getName().substring(info.getName().lastIndexOf('.') + 1).toLowerCase();
+    }
+
+    private Map<String, Object> toResourceSnapshot(MusicResource resource, MusicSubmitBo.ResourceInfoBo info) {
+        Map<String, Object> snapshot = new LinkedHashMap<>();
+        snapshot.put("id", resource.getId());
+        snapshot.put("sourceId", resource.getSourceId());
+        snapshot.put("name", firstNonBlank(resource.getFileName(), info == null ? null : info.getName()));
+        snapshot.put("fileName", firstNonBlank(resource.getFileName(), info == null ? null : info.getName()));
+        snapshot.put("url", firstNonBlank(resource.getUrl(), info == null ? null : info.getUrl()));
+        snapshot.put("type", resource.getResType());
+        snapshot.put("contentType", info == null ? null : info.getContentType());
+        snapshot.put("fileSize", resource.getFileSize());
+        snapshot.put("isPrimary", resource.getIsPrimary());
+        return snapshot;
+    }
+
+    private List<Map<String, Object>> buildTagSnapshot(List<Long> tagIds) {
+        if (CollUtil.isEmpty(tagIds)) {
+            return new ArrayList<>();
+        }
+        List<TagVo> tags = tagMapper.selectVoList(QueryWrapper.create().where(TAG.ID.in(tagIds)));
+        List<Map<String, Object>> result = new ArrayList<>(tags.size());
+        for (TagVo tag : tags) {
+            Map<String, Object> snapshot = new LinkedHashMap<>();
+            snapshot.put("id", tag.getId());
+            snapshot.put("name", tag.getName());
+            snapshot.put("type", tag.getType());
+            snapshot.put("color", tag.getColor());
+            result.add(snapshot);
+        }
+        return result;
+    }
+
+    private String firstNonBlank(String... values) {
+        for (String value : values) {
+            if (value != null && !value.isBlank()) {
+                return value;
+            }
+        }
+        return null;
     }
 }

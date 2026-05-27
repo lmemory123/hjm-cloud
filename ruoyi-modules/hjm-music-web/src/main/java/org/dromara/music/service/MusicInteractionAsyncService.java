@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-import static org.dromara.music.constant.MusicInteractionCacheConstants.ACTION_LIKE;
 import static org.dromara.music.constant.MusicInteractionCacheConstants.TARGET_TYPE_SONG;
 import static org.dromara.music.domain.table.MusicActionTableDef.MUSIC_ACTION;
 
@@ -25,24 +24,30 @@ public class MusicInteractionAsyncService {
 
     @Async(VirtualThreadExecutionConfig.ASYNC_TASK_EXECUTOR_BEAN)
     public void syncLikeAction(Long musicId, Long userId, boolean liked) {
+        syncAction(musicId, userId, TARGET_TYPE_SONG, org.dromara.music.constant.MusicInteractionCacheConstants.ACTION_LIKE, liked);
+    }
+
+    @Async(VirtualThreadExecutionConfig.ASYNC_TASK_EXECUTOR_BEAN)
+    public void syncAction(Long targetId, Long userId, String targetType, String actionName, boolean enabled) {
         try {
             MusicAction action = musicActionMapper.selectOneByQuery(QueryWrapper.create()
                 .where(MUSIC_ACTION.USER_ID.eq(userId)
-                    .and(MUSIC_ACTION.TARGET_ID.eq(musicId))
-                    .and(MUSIC_ACTION.TARGET_TYPE.eq(TARGET_TYPE_SONG))));
+                    .and(MUSIC_ACTION.TARGET_ID.eq(targetId))
+                    .and(MUSIC_ACTION.TARGET_TYPE.eq(targetType))));
 
-            if (liked) {
+            if (enabled) {
                 if (action == null) {
                     MusicAction add = new MusicAction();
                     add.setId(DataBaseHelper.nextId());
                     add.setUserId(userId);
-                    add.setTargetId(musicId);
-                    add.setTargetType(TARGET_TYPE_SONG);
-                    add.setAction(ACTION_LIKE);
+                    add.setTargetId(targetId);
+                    add.setTargetType(targetType);
+                    add.setAction(actionName);
                     add.setCreateTime(new Date());
                     musicActionMapper.insert(add);
-                } else if (!ACTION_LIKE.equals(action.getAction())) {
-                    action.setAction(ACTION_LIKE);
+                } else if (!actionName.equals(action.getAction())) {
+                    action.setAction(actionName);
+                    action.setCreateTime(new Date());
                     musicActionMapper.update(action, false);
                 }
                 return;
@@ -52,7 +57,8 @@ public class MusicInteractionAsyncService {
                 musicActionMapper.deleteById(action.getId());
             }
         } catch (Exception ex) {
-            log.warn("异步同步点赞动作失败, musicId={}, userId={}, liked={}", musicId, userId, liked, ex);
+            log.warn("异步同步互动动作失败, targetId={}, userId={}, targetType={}, action={}, enabled={}",
+                targetId, userId, targetType, actionName, enabled, ex);
         }
     }
 }

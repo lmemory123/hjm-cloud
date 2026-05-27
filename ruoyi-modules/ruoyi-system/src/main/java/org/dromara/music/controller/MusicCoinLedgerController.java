@@ -15,6 +15,7 @@ import org.dromara.common.log.enums.BusinessType;
 import org.dromara.common.mybatisflex.core.page.PageQuery;
 import org.dromara.common.mybatisflex.core.page.TableDataInfo;
 import org.dromara.common.web.core.BaseController;
+import org.dromara.music.domain.bo.MusicCoinGrantBo;
 import org.dromara.music.domain.bo.MusicCoinLedgerBo;
 import org.dromara.music.domain.vo.MusicCoinLedgerVo;
 import org.dromara.music.service.IMusicCoinLedgerService;
@@ -90,6 +91,28 @@ public class MusicCoinLedgerController extends BaseController {
     @PutMapping()
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody MusicCoinLedgerBo bo) {
         return toAjax(musicCoinLedgerService.updateByBo(bo));
+    }
+
+    /**
+     * 批量发放哈气金
+     */
+    @SaCheckPermission("music:coinLedger:add")
+    @Log(title = "哈气金批量发放", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
+    @PostMapping("/grant")
+    public R<Integer> grant(@Validated @RequestBody MusicCoinGrantBo bo) {
+        return R.ok(musicCoinLedgerService.batchGrant(bo));
+    }
+
+    /**
+     * 批量撤回哈气金
+     */
+    @SaCheckPermission("music:coinLedger:edit")
+    @Log(title = "哈气金撤回", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
+    @PostMapping("/revoke")
+    public R<Integer> revoke(@NotEmpty(message = "主键不能为空") @RequestBody List<Long> ids) {
+        return R.ok(musicCoinLedgerService.batchRevoke(ids));
     }
 
     /**

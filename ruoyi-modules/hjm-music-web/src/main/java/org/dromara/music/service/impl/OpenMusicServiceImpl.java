@@ -18,12 +18,14 @@ import org.dromara.music.domain.MusicChartSnapshot;
 import org.dromara.music.domain.Tag;
 import org.dromara.music.domain.vo.MusicChartItemVo;
 import org.dromara.music.domain.vo.MusicDetailVo;
+import org.dromara.music.domain.vo.OpenChartArchiveVo;
 import org.dromara.music.domain.vo.OpenChartItemVo;
 import org.dromara.music.domain.vo.OpenChartVo;
 import org.dromara.music.domain.vo.OpenSearchFacetItemVo;
 import org.dromara.music.domain.vo.OpenSearchPanelVo;
 import org.dromara.music.domain.vo.OpenSearchSuggestVo;
 import org.dromara.music.domain.vo.OpenSearchSortOptionVo;
+import org.dromara.music.domain.vo.OpenUserProfileVo;
 import org.dromara.music.domain.vo.MusicOriginalVo;
 import org.dromara.music.domain.vo.MusicResourceVo;
 import org.dromara.music.domain.vo.MusicTagRelVo;
@@ -134,14 +136,29 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
     private String customSynonymsConfig;
 
     @Override
-    public TableDataInfo<MusicVo> searchPublic(String keyword, String tag, String sort, PageQuery pageQuery) {
+    public TableDataInfo<MusicVo> searchPublic(String keyword,
+                                               String tag,
+                                               String tags,
+                                               String style,
+                                               String sort,
+                                               String isOriginal,
+                                               String isAi,
+                                               String resourceStatus,
+                                               String startDate,
+                                               String endDate,
+                                               Long playCountMin,
+                                               Long playCountMax,
+                                               PageQuery pageQuery) {
         recordSearchKeyword(keyword);
-        TableDataInfo<MusicVo> valkeyResult = searchFromValkey(keyword, tag, sort, pageQuery);
+        TableDataInfo<MusicVo> valkeyResult = hasAdvancedFilters(tags, style, isOriginal, isAi, resourceStatus, startDate, endDate, playCountMin, playCountMax)
+            ? null
+            : searchFromValkey(keyword, tag, sort, pageQuery);
         if (valkeyResult != null && valkeyResult.getTotal() > 0) {
             return valkeyResult;
         }
 
-        TableDataInfo<MusicVo> databaseResult = searchFromDatabase(keyword, tag, sort, pageQuery);
+        TableDataInfo<MusicVo> databaseResult = searchFromDatabase(keyword, tag, tags, style, sort, isOriginal, isAi,
+            resourceStatus, startDate, endDate, playCountMin, playCountMax, pageQuery);
         warmUpIndex(databaseResult.getRows());
         return databaseResult;
     }
@@ -171,6 +188,42 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
         detail.setAuditLogs(Collections.emptyList());
         musicInteractionService.fillDynamicStats(detail);
         return detail;
+    }
+
+    @Override
+    public OpenUserProfileVo queryPublicUserProfile(String uid) {
+        if (StringUtils.isBlank(uid)) {
+            return null;
+        }
+
+        QueryWrapper wrapper = QueryWrapper.create()
+            .where(MUSIC.AUDIT_STATUS.eq(AUDIT_APPROVED).and(MUSIC.IS_PUBLIC.eq(PUBLIC_VISIBLE)));
+        Long creatorId = parseCreatorId(uid);
+        if (creatorId != null) {
+            wrapper.and(MUSIC.CREATOR_ID.eq(creatorId));
+        } else {
+            wrapper.and(MUSIC.CREATOR_NAME.eq(uid));
+        }
+        wrapper.orderBy(MUSIC.PUBLISH_TIME.desc(), MUSIC.ID.desc());
+
+        List<MusicVo> rows = musicMapper.selectVoList(wrapper);
+        if (rows == null || rows.isEmpty()) {
+            return createEmptyUserProfile(uid, creatorId);
+        }
+        musicInteractionService.fillDynamicStats(rows);
+
+        MusicVo first = rows.get(0);
+        OpenUserProfileVo profile = new OpenUserProfileVo();
+        profile.setUid(creatorId == null ? uid : String.valueOf(creatorId));
+        profile.setDisplayName(firstNonBlank(first.getCreatorName(), uid));
+        profile.setCreatorLink(first.getCreatorLink());
+        profile.setSongCount((long) rows.size());
+        profile.setTotalPlayCount(rows.stream().map(MusicVo::getPlayCount).mapToLong(this::safeLong).sum());
+        profile.setTotalLikeCount(rows.stream().map(MusicVo::getLikeCount).mapToLong(this::safeLong).sum());
+        profile.setTotalCollectCount(rows.stream().map(MusicVo::getCollectCount).mapToLong(this::safeLong).sum());
+        profile.setTotalCommentCount(rows.stream().map(MusicVo::getCommentCount).mapToLong(this::safeLong).sum());
+        profile.setSongs(rows.size() > 24 ? new ArrayList<>(rows.subList(0, 24)) : rows);
+        return profile;
     }
 
     @Override
@@ -252,11 +305,24 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
     }
 
     @Override
-    public OpenSearchPanelVo querySearchPanel(String keyword, String tag, String sort, Integer limit) {
+    public OpenSearchPanelVo querySearchPanel(String keyword,
+                                              String tag,
+                                              String tags,
+                                              String style,
+                                              String sort,
+                                              String isOriginal,
+                                              String isAi,
+                                              String resourceStatus,
+                                              String startDate,
+                                              String endDate,
+                                              Long playCountMin,
+                                              Long playCountMax,
+                                              Integer limit) {
         int facetLimit = normalizeLimit(limit, DEFAULT_PANEL_LIMIT, MAX_PANEL_LIMIT);
-        QueryWrapper wrapper = buildPublicSearchWrapper(keyword, tag);
+        QueryWrapper wrapper = buildPublicSearchWrapper(keyword, tag, tags, style, isOriginal, isAi, resourceStatus,
+            startDate, endDate, playCountMin, playCountMax);
         List<MusicVo> rows = musicMapper.selectVoList(wrapper);
-        List<String> selectedTags = parseTagFilters(tag);
+        List<String> selectedTags = parseTagFilters(tag, tags, style);
         List<String> synonymKeywords = resolveSynonymKeywords(keyword);
         String correctedKeyword = resolveCorrectedKeyword(keyword, synonymKeywords);
         String currentSort = normalizePanelSort(sort, keyword);
@@ -275,6 +341,8 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
         panel.setMatchedFields(buildMatchFieldFacets(rows, keyword, facetLimit));
         panel.setCreators(buildFacetItems(rows, facetLimit, MusicVo::getCreatorName, "creator", Collections.emptyList()));
         panel.setTags(buildTagFacetItems(rows, facetLimit, selectedTags));
+        panel.setStyleTags(buildStyleTagFacetItems(rows, facetLimit, style));
+        panel.setActiveFilters(buildActiveFilterFacets(selectedTags, isOriginal, isAi, resourceStatus, startDate, endDate, playCountMin, playCountMax));
         panel.setHotKeywords(queryHotKeywords(Math.min(facetLimit, DEFAULT_HOT_KEYWORD_LIMIT), DEFAULT_HOT_KEYWORD_DAYS));
         return panel;
     }
@@ -283,7 +351,7 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
     public OpenChartVo queryPublicChart(String chartType, String periodKey, Integer limit) {
         MusicChartSnapshot snapshot = loadLatestSnapshot(chartType, periodKey);
         if (snapshot == null) {
-            return null;
+            return createEmptyChart(chartType, periodKey);
         }
 
         int size = normalizeLimit(limit, DEFAULT_CHART_LIMIT, DEFAULT_CHART_LIMIT);
@@ -307,6 +375,34 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
         chart.setStatus(snapshot.getStatus());
         chart.setItems(items.stream().map(item -> toOpenChartItem(item, songMap.get(item.getMusicId()))).toList());
         return chart;
+    }
+
+    @Override
+    public List<OpenChartArchiveVo> queryChartArchives(String chartType, Integer limit) {
+        int size = normalizeLimit(limit, 12, 36);
+        QueryWrapper wrapper = QueryWrapper.create()
+            .where(MUSIC_CHART_SNAPSHOT.STATUS.eq(CHART_ACTIVE));
+        if (StringUtils.isNotBlank(chartType)) {
+            wrapper.and(MUSIC_CHART_SNAPSHOT.CHART_TYPE.eq(chartType));
+        }
+        wrapper.orderBy(MUSIC_CHART_SNAPSHOT.ID.desc());
+        List<MusicChartSnapshot> snapshots = musicChartSnapshotMapper.selectListByQueryAs(wrapper, MusicChartSnapshot.class);
+        if (snapshots.size() > size) {
+            snapshots = new ArrayList<>(snapshots.subList(0, size));
+        }
+        if (snapshots.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return snapshots.stream().map(snapshot -> {
+            OpenChartArchiveVo vo = new OpenChartArchiveVo();
+            vo.setSnapshotId(snapshot.getId());
+            vo.setChartType(snapshot.getChartType());
+            vo.setPeriodKey(snapshot.getPeriodKey());
+            vo.setStatus(snapshot.getStatus());
+            vo.setItemCount(musicChartItemMapper.selectCountByQuery(
+                QueryWrapper.create().where(MUSIC_CHART_ITEM.SNAPSHOT_ID.eq(snapshot.getId()))));
+            return vo;
+        }).toList();
     }
 
     private TableDataInfo<MusicVo> searchFromValkey(String keyword, String tag, String sort, PageQuery pageQuery) {
@@ -349,11 +445,25 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
         }
     }
 
-    private TableDataInfo<MusicVo> searchFromDatabase(String keyword, String tag, String sort, PageQuery pageQuery) {
+    private TableDataInfo<MusicVo> searchFromDatabase(String keyword,
+                                                      String tag,
+                                                      String tags,
+                                                      String style,
+                                                      String sort,
+                                                      String isOriginal,
+                                                      String isAi,
+                                                      String resourceStatus,
+                                                      String startDate,
+                                                      String endDate,
+                                                      Long playCountMin,
+                                                      Long playCountMax,
+                                                      PageQuery pageQuery) {
         if (isRelevanceSort(sort, keyword)) {
-            return searchByRelevance(keyword, tag, pageQuery);
+            return searchByRelevance(keyword, tag, tags, style, isOriginal, isAi, resourceStatus, startDate, endDate,
+                playCountMin, playCountMax, pageQuery);
         }
-        QueryWrapper wrapper = buildPublicSearchWrapper(keyword, tag);
+        QueryWrapper wrapper = buildPublicSearchWrapper(keyword, tag, tags, style, isOriginal, isAi, resourceStatus,
+            startDate, endDate, playCountMin, playCountMax);
 
         applySort(wrapper, sort);
         Page<MusicVo> result = musicMapper.selectVoPage(pageQuery.build(), wrapper);
@@ -362,8 +472,20 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
         return TableDataInfo.build(result);
     }
 
-    private TableDataInfo<MusicVo> searchByRelevance(String keyword, String tag, PageQuery pageQuery) {
-        QueryWrapper wrapper = buildPublicSearchWrapper(keyword, tag);
+    private TableDataInfo<MusicVo> searchByRelevance(String keyword,
+                                                     String tag,
+                                                     String tags,
+                                                     String style,
+                                                     String isOriginal,
+                                                     String isAi,
+                                                     String resourceStatus,
+                                                     String startDate,
+                                                     String endDate,
+                                                     Long playCountMin,
+                                                     Long playCountMax,
+                                                     PageQuery pageQuery) {
+        QueryWrapper wrapper = buildPublicSearchWrapper(keyword, tag, tags, style, isOriginal, isAi, resourceStatus,
+            startDate, endDate, playCountMin, playCountMax);
         wrapper.orderBy(MUSIC.PLAY_COUNT.desc(), MUSIC.PUBLISH_TIME.desc());
 
         Page<MusicVo> requestedPage = pageQuery.build();
@@ -376,7 +498,7 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
 
         musicInteractionService.fillDynamicStats(candidates);
         applySearchHighlights(candidates, keyword);
-        applyRelevanceRanking(candidates, keyword, tag);
+        applyRelevanceRanking(candidates, keyword, tag, tags, style);
 
         int fromIndex = (int) Math.max(0, (requestedPage.getPageNumber() - 1) * requestedPage.getPageSize());
         if (fromIndex >= candidates.size()) {
@@ -386,17 +508,63 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
         return new TableDataInfo<>(new ArrayList<>(candidates.subList(fromIndex, toIndex)), candidatePage.getTotalRow());
     }
 
-    private QueryWrapper buildPublicSearchWrapper(String keyword, String tag) {
+    private QueryWrapper buildPublicSearchWrapper(String keyword,
+                                                  String tag,
+                                                  String tags,
+                                                  String style,
+                                                  String isOriginal,
+                                                  String isAi,
+                                                  String resourceStatus,
+                                                  String startDate,
+                                                  String endDate,
+                                                  Long playCountMin,
+                                                  Long playCountMax) {
         QueryWrapper wrapper = QueryWrapper.create()
             .where(MUSIC.AUDIT_STATUS.eq(AUDIT_APPROVED).and(MUSIC.IS_PUBLIC.eq(PUBLIC_VISIBLE)));
         QueryCondition keywordCondition = buildKeywordCondition(buildExpandedSearchTerms(keyword));
         if (keywordCondition != null) {
             wrapper.and(keywordCondition);
         }
-        for (String tagValue : parseTagFilters(tag)) {
+        for (String tagValue : parseTagFilters(tag, tags, style)) {
             wrapper.and(MUSIC.TAGS_SNAPSHOT.like(tagValue));
         }
+        String normalizedOriginal = normalizeOriginalFilter(isOriginal);
+        if (StringUtils.isNotBlank(normalizedOriginal)) {
+            wrapper.and(MUSIC.IS_ORIGINAL.eq(normalizedOriginal));
+        }
+        applyAiFilter(wrapper, isAi);
+        if (StringUtils.isNotBlank(resourceStatus)) {
+            wrapper.and(MUSIC.RESOURCE_STATUS.eq(resourceStatus.trim()));
+        }
+        if (playCountMin != null && playCountMin >= 0) {
+            wrapper.and(MUSIC.PLAY_COUNT.ge(playCountMin));
+        }
+        if (playCountMax != null && playCountMax >= 0) {
+            wrapper.and(MUSIC.PLAY_COUNT.le(playCountMax));
+        }
+        java.util.Date parsedStartDate = parseDateStart(startDate);
+        if (parsedStartDate != null) {
+            wrapper.and(MUSIC.PUBLISH_TIME.ge(parsedStartDate));
+        }
+        java.util.Date parsedEndDate = parseDateEnd(endDate);
+        if (parsedEndDate != null) {
+            wrapper.and(MUSIC.PUBLISH_TIME.le(parsedEndDate));
+        }
         return wrapper;
+    }
+
+    private void applyAiFilter(QueryWrapper wrapper, String isAi) {
+        String normalized = normalizeBooleanLikeFilter(isAi);
+        if (StringUtils.isBlank(normalized)) {
+            return;
+        }
+        if ("1".equals(normalized)) {
+            wrapper.and("(lower(coalesce(tags_snapshot::text, '')) like ? or lower(coalesce(extend_data::text, '')) like ? or lower(coalesce(extend_data::text, '')) like ?)",
+                "%ai%", "%\"isai\":true%", "%\"is_ai\":true%");
+            return;
+        }
+        wrapper.and("(lower(coalesce(tags_snapshot::text, '')) not like ? and lower(coalesce(extend_data::text, '')) not like ? and lower(coalesce(extend_data::text, '')) not like ?)",
+            "%ai%", "%\"isai\":true%", "%\"is_ai\":true%");
     }
 
     private QueryCondition buildKeywordCondition(List<String> terms) {
@@ -451,6 +619,28 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
         vo.setLikeCount(item.getLikeCount());
         vo.setSong(song);
         return vo;
+    }
+
+    private OpenChartVo createEmptyChart(String chartType, String periodKey) {
+        OpenChartVo chart = new OpenChartVo();
+        chart.setChartType(StringUtils.defaultIfBlank(chartType, "week"));
+        chart.setPeriodKey(periodKey);
+        chart.setStatus("empty");
+        chart.setItems(Collections.emptyList());
+        return chart;
+    }
+
+    private OpenUserProfileVo createEmptyUserProfile(String uid, Long creatorId) {
+        OpenUserProfileVo profile = new OpenUserProfileVo();
+        profile.setUid(creatorId == null ? uid : String.valueOf(creatorId));
+        profile.setDisplayName(uid);
+        profile.setSongCount(0L);
+        profile.setTotalPlayCount(0L);
+        profile.setTotalLikeCount(0L);
+        profile.setTotalCollectCount(0L);
+        profile.setTotalCommentCount(0L);
+        profile.setSongs(Collections.emptyList());
+        return profile;
     }
 
     private OpenSearchSuggestVo toSongSuggestVo(MusicVo musicVo, String keyword) {
@@ -562,13 +752,13 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
             && value.toLowerCase().contains(keyword.toLowerCase());
     }
 
-    private void applyRelevanceRanking(List<MusicVo> rows, String keyword, String tag) {
+    private void applyRelevanceRanking(List<MusicVo> rows, String keyword, String tag, String tags, String style) {
         if (rows == null || rows.isEmpty()) {
             return;
         }
         List<String> baseTerms = parseSearchTerms(keyword);
         List<String> expandedTerms = buildExpandedSearchTerms(keyword);
-        List<String> selectedTags = parseTagFilters(tag);
+        List<String> selectedTags = parseTagFilters(tag, tags, style);
         for (MusicVo row : rows) {
             row.setSearchScore(computeSearchScore(row, baseTerms, expandedTerms, selectedTags));
         }
@@ -667,6 +857,94 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
         return value == null ? 0L : Math.max(0L, value);
     }
 
+    private boolean hasAdvancedFilters(String tags,
+                                       String style,
+                                       String isOriginal,
+                                       String isAi,
+                                       String resourceStatus,
+                                       String startDate,
+                                       String endDate,
+                                       Long playCountMin,
+                                       Long playCountMax) {
+        return StringUtils.isNotBlank(tags)
+            || StringUtils.isNotBlank(style)
+            || StringUtils.isNotBlank(normalizeOriginalFilter(isOriginal))
+            || StringUtils.isNotBlank(normalizeBooleanLikeFilter(isAi))
+            || StringUtils.isNotBlank(resourceStatus)
+            || StringUtils.isNotBlank(startDate)
+            || StringUtils.isNotBlank(endDate)
+            || playCountMin != null
+            || playCountMax != null;
+    }
+
+    private String normalizeOriginalFilter(String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+        String normalized = value.trim().toLowerCase(Locale.ROOT);
+        if ("1".equals(normalized) || "true".equals(normalized) || "yes".equals(normalized) || "original".equals(normalized)) {
+            return "1";
+        }
+        if ("0".equals(normalized) || "false".equals(normalized) || "no".equals(normalized) || "cover".equals(normalized)) {
+            return "0";
+        }
+        return null;
+    }
+
+    private String normalizeBooleanLikeFilter(String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+        String normalized = value.trim().toLowerCase(Locale.ROOT);
+        if ("1".equals(normalized) || "true".equals(normalized) || "yes".equals(normalized) || "ai".equals(normalized)) {
+            return "1";
+        }
+        if ("0".equals(normalized) || "false".equals(normalized) || "no".equals(normalized) || "non_ai".equals(normalized) || "no_ai".equals(normalized)) {
+            return "0";
+        }
+        return null;
+    }
+
+    private java.util.Date parseDateStart(String value) {
+        LocalDate date = parseDateFilter(value, false);
+        if (date == null) {
+            return null;
+        }
+        return java.util.Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    private java.util.Date parseDateEnd(String value) {
+        LocalDate date = parseDateFilter(value, true);
+        if (date == null) {
+            return null;
+        }
+        return java.util.Date.from(date.plusDays(1).atStartOfDay(ZoneId.systemDefault()).minusNanos(1).toInstant());
+    }
+
+    private LocalDate parseDateFilter(String value, boolean useMonthEnd) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+        String normalized = value.trim();
+        try {
+            if (normalized.matches("\\d{4}-\\d{2}")) {
+                LocalDate monthStart = LocalDate.parse(normalized + "-01");
+                return useMonthEnd ? monthStart.withDayOfMonth(monthStart.lengthOfMonth()) : monthStart;
+            }
+            return LocalDate.parse(normalized);
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    private Long parseCreatorId(String uid) {
+        try {
+            return Long.valueOf(uid);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
+    }
+
     private String normalizeComparableText(String value) {
         return normalizeKeyword(value) == null ? "" : normalizeKeyword(value).toLowerCase(Locale.ROOT);
     }
@@ -727,6 +1005,117 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
             .limit(limit)
             .map(entry -> toFacetItem("tag", entry.getKey(), entry.getValue(), selectedTags.contains(entry.getKey())))
             .toList();
+    }
+
+    private List<OpenSearchFacetItemVo> buildStyleTagFacetItems(List<MusicVo> rows, int limit, String selectedStyle) {
+        List<String> selectedStyles = parseTagFilters(null, null, selectedStyle);
+        List<TagVo> configuredStyles = tagMapper.selectVoList(QueryWrapper.create()
+            .where(TAG.STATUS.eq("0")
+                .and(TAG.TYPE.eq("style")
+                    .or(TAG.TYPE.eq("genre"))
+                    .or(TAG.TYPE.eq("风格"))))
+            .orderBy(TAG.IS_RECOMMEND.desc(), TAG.IS_HOT.desc(), TAG.USE_COUNT.desc(), TAG.SORT_ORDER.asc(), TAG.ID.asc()));
+        Map<String, Long> styleCounts = rows.stream()
+            .map(MusicVo::getTagsSnapshot)
+            .filter(StringUtils::isNotBlank)
+            .flatMap(value -> extractTagNames(value).stream())
+            .filter(StringUtils::isNotBlank)
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        LinkedHashMap<String, Long> merged = new LinkedHashMap<>();
+        for (TagVo tag : configuredStyles) {
+            if (StringUtils.isNotBlank(tag.getName())) {
+                merged.put(tag.getName(), styleCounts.getOrDefault(tag.getName(), 0L));
+            }
+        }
+        styleCounts.entrySet().stream()
+            .sorted(Map.Entry.<String, Long>comparingByValue().reversed().thenComparing(Map.Entry::getKey))
+            .forEach(entry -> merged.putIfAbsent(entry.getKey(), entry.getValue()));
+
+        return merged.entrySet().stream()
+            .filter(entry -> entry.getValue() > 0 || selectedStyles.contains(entry.getKey()))
+            .limit(limit)
+            .map(entry -> toFacetItem("style", entry.getKey(), entry.getValue(), selectedStyles.contains(entry.getKey())))
+            .toList();
+    }
+
+    private List<OpenSearchFacetItemVo> buildActiveFilterFacets(List<String> selectedTags,
+                                                                String isOriginal,
+                                                                String isAi,
+                                                                String resourceStatus,
+                                                                String startDate,
+                                                                String endDate,
+                                                                Long playCountMin,
+                                                                Long playCountMax) {
+        List<OpenSearchFacetItemVo> filters = new ArrayList<>();
+        if (selectedTags != null) {
+            selectedTags.stream()
+                .filter(StringUtils::isNotBlank)
+                .forEach(tag -> filters.add(toActiveFilter("tag", tag, tag)));
+        }
+        String normalizedOriginal = normalizeOriginalFilter(isOriginal);
+        if ("1".equals(normalizedOriginal)) {
+            filters.add(toActiveFilter("isOriginal", "原创作品", normalizedOriginal));
+        } else if ("0".equals(normalizedOriginal)) {
+            filters.add(toActiveFilter("isOriginal", "翻唱/二创", normalizedOriginal));
+        }
+        String normalizedAi = normalizeBooleanLikeFilter(isAi);
+        if ("1".equals(normalizedAi)) {
+            filters.add(toActiveFilter("isAi", "AI 作品", normalizedAi));
+        } else if ("0".equals(normalizedAi)) {
+            filters.add(toActiveFilter("isAi", "排除 AI", normalizedAi));
+        }
+        if (StringUtils.isNotBlank(resourceStatus)) {
+            filters.add(toActiveFilter("resourceStatus", resolveResourceStatusLabel(resourceStatus), resourceStatus.trim()));
+        }
+        if (StringUtils.isNotBlank(startDate) || StringUtils.isNotBlank(endDate)) {
+            filters.add(toActiveFilter("dateRange", buildRangeLabel(startDate, endDate, "发布时间"), firstNonBlank(startDate, "") + "~" + firstNonBlank(endDate, "")));
+        }
+        if (playCountMin != null || playCountMax != null) {
+            filters.add(toActiveFilter("playRange", buildRangeLabel(playCountMin, playCountMax, "播放量"), String.valueOf(playCountMin) + "~" + playCountMax));
+        }
+        return filters;
+    }
+
+    private OpenSearchFacetItemVo toActiveFilter(String type, String label, String value) {
+        OpenSearchFacetItemVo item = new OpenSearchFacetItemVo();
+        item.setType(type);
+        item.setLabel(label);
+        item.setValue(value);
+        item.setDescription("active");
+        item.setCount(null);
+        item.setSelected(Boolean.TRUE);
+        return item;
+    }
+
+    private String resolveResourceStatusLabel(String resourceStatus) {
+        String normalized = resourceStatus == null ? "" : resourceStatus.trim();
+        return switch (normalized) {
+            case "0" -> "资源正常";
+            case "1" -> "部分失效";
+            case "2" -> "需补档";
+            default -> "资源状态 " + normalized;
+        };
+    }
+
+    private String buildRangeLabel(String start, String end, String prefix) {
+        if (StringUtils.isNotBlank(start) && StringUtils.isNotBlank(end)) {
+            return prefix + " " + start + " 至 " + end;
+        }
+        if (StringUtils.isNotBlank(start)) {
+            return prefix + " 自 " + start;
+        }
+        return prefix + " 至 " + end;
+    }
+
+    private String buildRangeLabel(Long min, Long max, String prefix) {
+        if (min != null && max != null) {
+            return prefix + " " + min + " 至 " + max;
+        }
+        if (min != null) {
+            return prefix + " ≥ " + min;
+        }
+        return prefix + " ≤ " + max;
     }
 
     private OpenSearchFacetItemVo toFacetItem(String type, String value, Long count, boolean selected) {
@@ -1306,7 +1695,7 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
                 .append('}')
                 .append(')');
         }
-        for (String tagValue : parseTagFilters(tag)) {
+        for (String tagValue : parseTagFilters(tag, null, null)) {
             builder.append(' ')
                 .append("@tags:{")
                 .append(escapeTagValue(tagValue))
@@ -1328,11 +1717,15 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
             .collect(Collectors.collectingAndThen(Collectors.toCollection(LinkedHashSet::new), ArrayList::new));
     }
 
-    private List<String> parseTagFilters(String tag) {
-        if (StringUtils.isBlank(tag)) {
+    private List<String> parseTagFilters(String tag, String tags, String style) {
+        String rawTags = String.join(",",
+            Arrays.stream(new String[] {tag, tags, style})
+                .filter(StringUtils::isNotBlank)
+                .toList());
+        if (StringUtils.isBlank(rawTags)) {
             return Collections.emptyList();
         }
-        return Arrays.stream(tag.split(","))
+        return Arrays.stream(rawTags.split("[,，|/]+"))
             .map(String::trim)
             .filter(StringUtils::isNotBlank)
             .distinct()

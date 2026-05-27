@@ -2,6 +2,7 @@ package org.dromara.music.service;
 
 import org.dromara.common.mybatisflex.core.page.PageQuery;
 import org.dromara.common.mybatisflex.core.page.TableDataInfo;
+import org.dromara.music.domain.bo.MusicCoinGrantBo;
 import org.dromara.music.domain.bo.MusicCoinLedgerBo;
 import org.dromara.music.domain.vo.MusicCoinLedgerVo;
 
@@ -56,6 +57,22 @@ public interface IMusicCoinLedgerService {
      * @return 是否修改成功
      */
     Boolean updateByBo(MusicCoinLedgerBo bo);
+
+    /**
+     * 批量发放哈气金
+     *
+     * @param bo 发放参数
+     * @return 写入流水条数
+     */
+    Integer batchGrant(MusicCoinGrantBo bo);
+
+    /**
+     * 撤回哈气金发放
+     *
+     * @param ids 流水ID
+     * @return 写入撤回流水条数
+     */
+    Integer batchRevoke(Collection<Long> ids);
 
     /**
      * 校验并批量删除哈气金流水信息

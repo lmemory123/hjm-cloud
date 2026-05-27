@@ -4,9 +4,13 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
+import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.mybatisflex.helper.DataBaseHelper;
 import org.dromara.common.mybatisflex.core.page.PageQuery;
 import org.dromara.common.mybatisflex.core.page.TableDataInfo;
+import org.dromara.music.domain.bo.MusicCoinGrantBo;
 import org.dromara.music.domain.MusicCoinLedger;
 import org.dromara.music.domain.bo.MusicCoinLedgerBo;
 import org.dromara.music.domain.vo.MusicCoinLedgerVo;
@@ -15,8 +19,10 @@ import org.dromara.music.service.IMusicCoinLedgerService;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.dromara.music.domain.table.MusicCoinLedgerTableDef.MUSIC_COIN_LEDGER;
 
@@ -30,6 +36,9 @@ import static org.dromara.music.domain.table.MusicCoinLedgerTableDef.MUSIC_COIN_
 @RequiredArgsConstructor
 @Service
 public class MusicCoinLedgerServiceImpl implements IMusicCoinLedgerService {
+
+    private static final String REASON_SYSTEM_GRANT = "system_grant";
+    private static final String REASON_REVOKE = "system_revoke";
 
     private final MusicCoinLedgerMapper baseMapper;
 
@@ -113,11 +122,66 @@ public class MusicCoinLedgerServiceImpl implements IMusicCoinLedgerService {
         return baseMapper.update(update) > 0;
     }
 
+    @Override
+    public Integer batchGrant(MusicCoinGrantBo bo) {
+        if (bo.getAmount() == null || bo.getAmount() <= 0) {
+            throw new ServiceException("发放金额必须大于 0");
+        }
+        String reasonCode = StringUtils.isBlank(bo.getReasonCode()) ? REASON_SYSTEM_GRANT : bo.getReasonCode().trim();
+        Date now = new Date();
+        int count = 0;
+        for (Long userId : bo.getUserIds()) {
+            if (userId == null) {
+                continue;
+            }
+            MusicCoinLedger ledger = newLedger(userId, bo.getAmount(), reasonCode, currentBalance(userId) + bo.getAmount(), now);
+            count += baseMapper.insert(ledger) > 0 ? 1 : 0;
+        }
+        return count;
+    }
+
+    @Override
+    public Integer batchRevoke(Collection<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return 0;
+        }
+        List<MusicCoinLedger> ledgers = baseMapper.selectListByIds(ids).stream()
+            .filter(Objects::nonNull)
+            .filter(item -> item.getAmount() != null && item.getAmount() > 0)
+            .toList();
+        Date now = new Date();
+        int count = 0;
+        for (MusicCoinLedger source : ledgers) {
+            Long userId = source.getUserId();
+            Long amount = -source.getAmount();
+            MusicCoinLedger revoke = newLedger(userId, amount, REASON_REVOKE, currentBalance(userId) + amount, now);
+            count += baseMapper.insert(revoke) > 0 ? 1 : 0;
+        }
+        return count;
+    }
+
     /**
      * 保存前的数据校验
      */
     private void validEntityBeforeSave(MusicCoinLedger entity){
         //TODO 做一些数据校验,如唯一约束
+    }
+
+    private MusicCoinLedger newLedger(Long userId, Long amount, String reasonCode, Long balanceAfter, Date now) {
+        MusicCoinLedger ledger = new MusicCoinLedger();
+        ledger.setId(DataBaseHelper.nextId());
+        ledger.setUserId(userId);
+        ledger.setAmount(amount);
+        ledger.setReasonCode(reasonCode);
+        ledger.setBalanceAfter(Math.max(0L, balanceAfter));
+        ledger.setCreateTime(now);
+        return ledger;
+    }
+
+    private long currentBalance(Long userId) {
+        List<MusicCoinLedger> rows = baseMapper.selectListByQuery(QueryWrapper.create()
+            .where(MUSIC_COIN_LEDGER.USER_ID.eq(userId)));
+        return rows.stream().map(MusicCoinLedger::getAmount).filter(Objects::nonNull).mapToLong(Long::longValue).sum();
     }
 
     /**
