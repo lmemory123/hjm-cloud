@@ -295,6 +295,27 @@ S6.2 完成记录：
 - 验证通过：后端 `mvn -pl ruoyi-modules/hjm-music-web -am -DskipTests compile`。
 - 剩余风险：当前 API key 仍由系统参数手工维护，没有专门后台管理页、密钥哈希存储、按应用限频和调用日志；Webhook 是同步 HTTP 推送，没有失败重试队列、签名摘要和机器人平台适配器。
 
+S6.3 专项草稿记录：
+
+- 完成日期：2026-05-27。
+- OpenAPI 专项：在 `DeveloperApiV1Controller.java` 中增加 Swagger `@Operation` tags 标签，对 `/music/open/api/v1/*` 进行分组。
+- Webhook 专项：将 Webhook 升级为异步任务。新增 `IDeveloperWebhookService` 及异步实现，采用虚拟线程执行并支持指数退避重试（3 次）。
+- 日志专项：新增 `music_webhook_log` 数据库表及对应的 Mapper/Domain，记录每次 Webhook 调用的详细 Payload、状态码、成功标志和重试次数。
+- 机器人适配：在 `doc/30-open-api/hajihami-open-api-v1.md` 中补充了接口分组说明、全局错误码表、HTTP 请求示例，以及 QQ 机器人、Discord、Telegram 的集成建议。
+- 后台配置专项：在 `hjm-admin` 中新增了“开放平台”模块，提供 API Key 和 Webhook 的可视化管理页面，并集成了 JSON 配置的读取与更新逻辑。
+- Dashboard 增强：在音乐运营 Dashboard 中补充了开放平台管理和 Webhook 任务推送的快捷入口。
+- 类型治理专项：治理了 `hjm-admin` 中 100 多个 TypeScript 类型错误，重点修复了 Naive UI `NInput` 与 `IdType` 的兼容性问题，并修正了 `records` vs `rows` 的数据结构不一致。
+- 当前验证：后端和前台构建链路可通过，后台 `pnpm build` 可通过。
+- 剩余风险：后台 `pnpm typecheck` 仍失败，且失败不只来自 `gen/soy` 生成页，还包含新开放平台日志页和全局业务类型定义问题。S6.3 不能标记为完整完成。
+
+S6.3 复核补充：
+
+- 复核日期：2026-05-27。
+- 复核结论：S6.3 当前仍应视为“协同草稿待收口”，不能直接视为完整完成。
+- 已复核通过：后端 `mvn -pl ruoyi-modules/hjm-music-web -am -DskipTests clean compile`、后端 `mvn -pl ruoyi-modules/ruoyi-system -am -DskipTests compile`、前台 `pnpm exec vue-tsc --noEmit --skipLibCheck`、前台 `pnpm build`、后台 `pnpm build`。
+- 未通过：后台 `pnpm typecheck` 仍失败。失败包含 `gen/soy` 生成页、`src/views/developer/webhook-log/index.vue` 的表格 hook 返回值使用错误、`src/constants/business.ts` 的状态枚举覆盖不完整，以及部分系统页历史类型问题。
+- 下一步计划见：`doc/20-stage/hajihami-next-execution-plan-20260527.md`。
+
 ## 4. 当前完成记录
 
 | 阶段 | 状态 | 完成日期 | 说明 |
@@ -305,7 +326,7 @@ S6.2 完成记录：
 | S3 投稿、上传、草稿、审核闭环 | 已完成 | 2026-04-28 | 已完成投稿资源落库、提交审核、审核发布/隐藏、我的作品状态同步、后台审核动作 |
 | S4 互动、社群、用户成长 | 已完成 | 2026-04-28 | 已完成云端收藏/历史、关注、歌曲/评论举报、评论点赞、社群配置和后台举报入口 MVP |
 | S5 运营后台与激励系统 | 已完成 | 2026-04-28 | 已完成运营配置公开接口、首页运营展示、哈气金批量发放/撤回、后台运营入口 MVP |
-| S6 开放 API、机器人、质量交付 | 进行中 | 2026-05-27 | S6.1 已完成开发者只读 API v1、60/min/IP 限频和开放 API 文档；S6.2 已完成可选 API key 和 Webhook 分发最小闭环；Swagger/SDK/压测仍未完成 |
+| S6 开放 API、机器人、质量交付 | 进行中 | 2026-05-27 | S6.1-S6.2 已完成；S6.3 已有异步 Webhook、日志、后台开放平台和交付文档草稿，但后台 typecheck 未通过，仍需收口 |
 
 ## 5. 后续交接区
 
@@ -345,7 +366,7 @@ S6.2 完成记录：
 - 批量审核接入了现有接口，但还不是专门审核工作台，驳回理由模板也未做成配置化。
 - AI 标记当前按标签快照和扩展字段文本识别，准确率依赖数据录入规范。
 - 榜单手动微调和发布仍依赖现有榜单快照 CRUD，未做专门运营界面。
-- 开放 API v1 已完成 S6.1/S6.2，但 API key 仍依赖系统参数手工维护，Webhook 仍是同步推送；Swagger、SDK、压测、测试覆盖仍未完成。
+- 开放 API v1 已完成 S6.1/S6.2；S6.3 已有异步 Webhook 和日志草稿，但后台类型门禁未通过，Webhook 签名、真实推送回归、菜单权限 SQL、SDK/压测/测试覆盖仍需收口。
 
 ## 7. 更新规则
 

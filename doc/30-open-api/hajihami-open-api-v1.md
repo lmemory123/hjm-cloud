@@ -15,6 +15,29 @@
 - 限频：60 次/分钟/IP，已通过 `@RateLimiter(limitType = IP)` 接入
 - 写操作：只开放 Webhook 分发测试/推送接口，必须提供有效开发者 token；播放、分享、下载上报仍保留在现有前台接口中
 
+### 接口分组说明
+
+OpenAPI v1 按以下 Swagger/OpenAPI 标签分组：
+
+1. **元信息与统计** (`/meta`, `/stats/overview`)：提供基础配置下发和全站公开统计概览。
+2. **歌曲检索** (`/songs`, `/songs/{id}`, `/songs/random`, `/search`)：音乐实体资源的分页、详情和随机推荐。
+3. **搜索辅助** (`/search/panel`, `/search/suggest`, `/search/hot-keywords`)：提供聚合搜索面板、输入框建议词和近期热搜榜。
+4. **榜单与标签** (`/charts/{type}`, `/charts/{type}/archives`, `/tags`)：周月榜单、历史归档及公用多级标签树。
+5. **用户与互动** (`/users/{uid}`, `/songs/{id}/comments`)：公开用户主页资料及歌曲公开评论数据。
+6. **Webhook 推送** (`/webhooks/dispatch`)：支持开发者主动触发或模拟服务端事件分发。
+
+### 全局错误码表
+
+| HTTP 状态码 | 业务 Code | 说明 | 常见场景 |
+| --- | --- | --- | --- |
+| 200 | 200 | 成功 | 请求处理成功 |
+| 400 | 500 | 业务错误 | 请求参数缺失或校验未通过 |
+| 401 | 401 | 未授权 | 需提供有效 API key 或 token 已停用 |
+| 403 | 403 | 访问拒绝 | 权限不足或被封禁 |
+| 404 | 404 | 资源未找到 | 请求的记录（如歌曲 ID、uid）不存在 |
+| 429 | 429 | 请求过频 | 超出 60次/分钟 的限流阈值 |
+| 500 | 500 | 服务器异常 | 内部服务异常或第三方网络超时 |
+
 ## 2. 开发者 Token 配置
 
 开发者 token 当前通过系统参数维护，不新增表结构。
@@ -56,6 +79,13 @@
 ### GET `/music/open/api/v1/songs`
 
 公开歌曲搜索和分页列表。
+
+**请求示例**：
+```http
+GET /music/open/api/v1/songs?keyword=测试&sort=hot&pageNum=1&pageSize=10 HTTP/1.1
+Host: api.hajihami.com
+X-Hakimi-Api-Key: dev_xxx
+```
 
 参数：
 
@@ -118,6 +148,12 @@
 ### GET `/music/open/api/v1/charts/{type}`
 
 榜单详情。
+
+**请求示例**：
+```http
+GET /music/open/api/v1/charts/week?limit=20 HTTP/1.1
+Host: api.hajihami.com
+```
 
 参数：
 
@@ -193,11 +229,15 @@
 
 ### POST `/music/open/api/v1/webhooks/dispatch`
 
-用途：开发者 Webhook 推送测试/分发，必须提供有效开发者 token。
+用途：开发者 Webhook 推送测试/分发，必须提供有效开发者 token。该接口已升级为**异步任务**模式。
 
-请求体：
+**请求示例**：
+```http
+POST /music/open/api/v1/webhooks/dispatch HTTP/1.1
+Host: api.hajihami.com
+Content-Type: application/json
+X-Hakimi-Api-Key: dev_xxx
 
-```json
 {
   "eventType": "test",
   "title": "哈基哈米 Webhook 测试",
@@ -211,17 +251,43 @@
 
 接收端收到的 payload 会包含 `eventType`、`title`、`content`、`targetUrl`、`data`、`clientId`、`timestamp`。
 
+**重试策略**：
+- 如推送失败（非 2xx 响应或网络超时），系统将进行最多 **3 次**自动重试。
+- 重试间隔采用指数退避策略（1s, 2s, 4s）。
+
 返回字段：
 
 | 字段 | 说明 |
 | --- | --- |
 | eventType | 本次事件类型 |
 | triggeredBy | 触发的开发者应用名 |
-| attempted/succeeded/failed | 尝试、成功、失败数量 |
-| results | 每个 Webhook 目标的状态码和错误信息 |
+| dispatchedAt | 任务提交时间 |
+| message | 状态简讯（如：“Webhook 推送任务已异步提交”） |
 
-## 10. 后续计划
+> 提示：具体的推送结果、状态码和重试记录，请联系管理员在后台“Webhook 调用日志”中查看。
 
-- S6.3：补 Swagger/OpenAPI 分组或导出说明。
+## 10. 机器人平台适配建议
+
+哈基哈米 Webhook 发送标准 JSON 格式。如需集成到主流机器人平台，可参考以下建议：
+
+### 10.1 QQ 机器人 (官方 OpenAPI)
+- **方案**：建议使用中间件（如 Node.js Express 或 Python FastAPI）接收哈基哈米推送，然后调用 QQ 机器人 OpenAPI 发送消息。
+- **配置**：在 `hajihami.developer.webhooks` 中配置中间件地址。
+
+### 10.2 Discord
+- **方案**：Discord Webhook 需特定格式。可使用 [Discord Webhook Proxy](https://github.com/vaxerr/discord-webhook-proxy) 或简单的网关函数进行转换。
+- **Payload 转换示例** (Node.js):
+  ```javascript
+  const discordPayload = {
+    content: `**${body.title}**\n${body.content}\n[查看详情](${body.targetUrl})`
+  };
+  ```
+
+### 10.3 Telegram
+- **方案**：使用 `https://api.telegram.org/bot<token>/sendMessage`。
+- **适配**：由于 Telegram 接收 `chat_id` 和 `text` 参数，建议通过网关将哈基哈米的 `content` 映射到 `text`。
+
+## 11. 后续计划
+
 - S6.4：补 SDK 示例、部署手册、运维手册、数据库 ER 和上线检查清单。
 - S6.5：补核心测试、E2E 和压测前置脚本。

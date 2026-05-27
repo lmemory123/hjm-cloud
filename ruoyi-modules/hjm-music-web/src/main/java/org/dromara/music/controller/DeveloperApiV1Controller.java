@@ -13,11 +13,11 @@ import org.dromara.common.core.constant.HttpStatus;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.StringUtils;
-import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.mybatisflex.core.page.PageQuery;
 import org.dromara.common.mybatisflex.core.page.TableDataInfo;
 import org.dromara.common.ratelimiter.annotation.RateLimiter;
 import org.dromara.common.ratelimiter.enums.LimitType;
+import org.dromara.music.constant.DeveloperApiConstants;
 import org.dromara.music.domain.bo.DeveloperWebhookDispatchBo;
 import org.dromara.music.domain.vo.DeveloperApiMetaVo;
 import org.dromara.music.domain.vo.DeveloperStatsOverviewVo;
@@ -31,6 +31,7 @@ import org.dromara.music.domain.vo.OpenSearchPanelVo;
 import org.dromara.music.domain.vo.OpenSearchSuggestVo;
 import org.dromara.music.domain.vo.OpenUserProfileVo;
 import org.dromara.music.domain.vo.TagVo;
+import org.dromara.music.service.IDeveloperWebhookService;
 import org.dromara.music.service.IOpenMusicService;
 import org.dromara.music.service.IPortalTagService;
 import org.dromara.music.service.MusicCommentFacadeService;
@@ -44,17 +45,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Tag(name = "哈基哈米开放 API v1")
 @Validated
@@ -66,23 +59,18 @@ public class DeveloperApiV1Controller {
     private static final String BASE_PATH = "/music/open/api/v1";
     private static final int RATE_LIMIT_COUNT = 60;
     private static final int RATE_LIMIT_SECONDS = 60;
-    private static final String API_KEY_HEADER = "X-Hakimi-Api-Key";
-    private static final String API_KEYS_CONFIG_KEY = "hajihami.developer.api_keys";
-    private static final String WEBHOOKS_CONFIG_KEY = "hajihami.developer.webhooks";
 
     private final IOpenMusicService openMusicService;
     private final IPortalTagService portalTagService;
     private final MusicCommentFacadeService musicCommentFacadeService;
-    private final HttpClient webhookClient = HttpClient.newBuilder()
-        .connectTimeout(Duration.ofSeconds(3))
-        .build();
+    private final IDeveloperWebhookService developerWebhookService;
 
     @DubboReference
     private RemoteConfigService remoteConfigService;
 
     @SaIgnore
     @RateLimiter(time = RATE_LIMIT_SECONDS, count = RATE_LIMIT_COUNT, limitType = LimitType.IP)
-    @Operation(summary = "开放 API 元信息")
+    @Operation(summary = "开放 API 元信息", tags = {"1. 元信息与统计"})
     @GetMapping("/meta")
     public R<DeveloperApiMetaVo> meta(HttpServletRequest request) {
         authorizeDeveloperClient(request, false);
@@ -91,9 +79,9 @@ public class DeveloperApiV1Controller {
         vo.setBasePath(BASE_PATH);
         vo.setAuthMode("public-readonly + optional-api-key");
         vo.setRateLimit(RATE_LIMIT_COUNT + "/min/ip");
-        vo.setApiKeyHeader(API_KEY_HEADER);
-        vo.setApiKeyConfigKey(API_KEYS_CONFIG_KEY);
-        vo.setWebhookConfigKey(WEBHOOKS_CONFIG_KEY);
+        vo.setApiKeyHeader(DeveloperApiConstants.API_KEY_HEADER);
+        vo.setApiKeyConfigKey(DeveloperApiConstants.API_KEYS_CONFIG_KEY);
+        vo.setWebhookConfigKey(DeveloperApiConstants.WEBHOOKS_CONFIG_KEY);
         vo.setDocsPath("/doc/30-open-api/hajihami-open-api-v1.md");
         vo.setEndpoints(List.of(
             DeveloperApiMetaVo.Endpoint.of("GET", BASE_PATH + "/songs", "公开歌曲搜索和分页列表", false),
@@ -116,7 +104,7 @@ public class DeveloperApiV1Controller {
 
     @SaIgnore
     @RateLimiter(time = RATE_LIMIT_SECONDS, count = RATE_LIMIT_COUNT, limitType = LimitType.IP)
-    @Operation(summary = "公开歌曲列表")
+    @Operation(summary = "公开歌曲列表", tags = {"2. 歌曲检索"})
     @GetMapping({"/songs", "/search"})
     public TableDataInfo<MusicVo> songs(@RequestParam(value = "keyword", required = false) String keyword,
                                         @RequestParam(value = "tag", required = false) String tag,
@@ -139,7 +127,7 @@ public class DeveloperApiV1Controller {
 
     @SaIgnore
     @RateLimiter(time = RATE_LIMIT_SECONDS, count = RATE_LIMIT_COUNT, limitType = LimitType.IP)
-    @Operation(summary = "公开歌曲详情")
+    @Operation(summary = "公开歌曲详情", tags = {"2. 歌曲检索"})
     @GetMapping("/songs/{id}")
     public R<MusicDetailVo> songDetail(@NotNull(message = "主键不能为空") @PathVariable("id") Long id,
                                        HttpServletRequest request) {
@@ -149,7 +137,7 @@ public class DeveloperApiV1Controller {
 
     @SaIgnore
     @RateLimiter(time = RATE_LIMIT_SECONDS, count = RATE_LIMIT_COUNT, limitType = LimitType.IP)
-    @Operation(summary = "随机推荐歌曲")
+    @Operation(summary = "随机推荐歌曲", tags = {"2. 歌曲检索"})
     @GetMapping("/songs/random")
     public R<List<MusicVo>> randomSongs(@RequestParam(value = "limit", required = false) Integer limit,
                                         HttpServletRequest request) {
@@ -159,7 +147,7 @@ public class DeveloperApiV1Controller {
 
     @SaIgnore
     @RateLimiter(time = RATE_LIMIT_SECONDS, count = RATE_LIMIT_COUNT, limitType = LimitType.IP)
-    @Operation(summary = "公开评论树")
+    @Operation(summary = "公开评论树", tags = {"5. 用户与互动"})
     @GetMapping("/songs/{id}/comments")
     public R<List<OpenCommentVo>> comments(@NotNull(message = "主键不能为空") @PathVariable("id") Long id,
                                            HttpServletRequest request) {
@@ -169,7 +157,7 @@ public class DeveloperApiV1Controller {
 
     @SaIgnore
     @RateLimiter(time = RATE_LIMIT_SECONDS, count = RATE_LIMIT_COUNT, limitType = LimitType.IP)
-    @Operation(summary = "搜索筛选面板")
+    @Operation(summary = "搜索筛选面板", tags = {"3. 搜索辅助"})
     @GetMapping("/search/panel")
     public R<OpenSearchPanelVo> searchPanel(@RequestParam(value = "keyword", required = false) String keyword,
                                             @RequestParam(value = "tag", required = false) String tag,
@@ -192,7 +180,7 @@ public class DeveloperApiV1Controller {
 
     @SaIgnore
     @RateLimiter(time = RATE_LIMIT_SECONDS, count = RATE_LIMIT_COUNT, limitType = LimitType.IP)
-    @Operation(summary = "搜索建议词")
+    @Operation(summary = "搜索建议词", tags = {"3. 搜索辅助"})
     @GetMapping("/search/suggest")
     public R<List<OpenSearchSuggestVo>> suggest(@RequestParam(value = "keyword", required = false) String keyword,
                                                 @RequestParam(value = "limit", required = false) Integer limit,
@@ -203,7 +191,7 @@ public class DeveloperApiV1Controller {
 
     @SaIgnore
     @RateLimiter(time = RATE_LIMIT_SECONDS, count = RATE_LIMIT_COUNT, limitType = LimitType.IP)
-    @Operation(summary = "热搜词")
+    @Operation(summary = "热搜词", tags = {"3. 搜索辅助"})
     @GetMapping("/search/hot-keywords")
     public R<List<String>> hotKeywords(@RequestParam(value = "limit", required = false) Integer limit,
                                        @RequestParam(value = "days", required = false) Integer days,
@@ -214,7 +202,7 @@ public class DeveloperApiV1Controller {
 
     @SaIgnore
     @RateLimiter(time = RATE_LIMIT_SECONDS, count = RATE_LIMIT_COUNT, limitType = LimitType.IP)
-    @Operation(summary = "榜单详情")
+    @Operation(summary = "榜单详情", tags = {"4. 榜单与标签"})
     @GetMapping("/charts/{type}")
     public R<OpenChartVo> chart(@PathVariable("type") String type,
                                 @RequestParam(value = "period", required = false) String period,
@@ -226,7 +214,7 @@ public class DeveloperApiV1Controller {
 
     @SaIgnore
     @RateLimiter(time = RATE_LIMIT_SECONDS, count = RATE_LIMIT_COUNT, limitType = LimitType.IP)
-    @Operation(summary = "榜单历史归档")
+    @Operation(summary = "榜单历史归档", tags = {"4. 榜单与标签"})
     @GetMapping("/charts/{type}/archives")
     public R<List<OpenChartArchiveVo>> chartArchives(@PathVariable("type") String type,
                                                      @RequestParam(value = "limit", required = false) Integer limit,
@@ -237,7 +225,7 @@ public class DeveloperApiV1Controller {
 
     @SaIgnore
     @RateLimiter(time = RATE_LIMIT_SECONDS, count = RATE_LIMIT_COUNT, limitType = LimitType.IP)
-    @Operation(summary = "公开用户主页")
+    @Operation(summary = "公开用户主页", tags = {"5. 用户与互动"})
     @GetMapping("/users/{uid}")
     public R<OpenUserProfileVo> user(@PathVariable("uid") String uid,
                                      HttpServletRequest request) {
@@ -247,7 +235,7 @@ public class DeveloperApiV1Controller {
 
     @SaIgnore
     @RateLimiter(time = RATE_LIMIT_SECONDS, count = RATE_LIMIT_COUNT, limitType = LimitType.IP)
-    @Operation(summary = "公开标签列表")
+    @Operation(summary = "公开标签列表", tags = {"4. 榜单与标签"})
     @GetMapping("/tags")
     public R<List<TagVo>> tags(@RequestParam(value = "keyword", required = false) String keyword,
                                @RequestParam(value = "type", required = false) String type,
@@ -258,7 +246,7 @@ public class DeveloperApiV1Controller {
 
     @SaIgnore
     @RateLimiter(time = RATE_LIMIT_SECONDS, count = RATE_LIMIT_COUNT, limitType = LimitType.IP)
-    @Operation(summary = "开放数据概览")
+    @Operation(summary = "开放数据概览", tags = {"1. 元信息与统计"})
     @GetMapping("/stats/overview")
     public R<DeveloperStatsOverviewVo> statsOverview(HttpServletRequest request) {
         authorizeDeveloperClient(request, false);
@@ -280,34 +268,18 @@ public class DeveloperApiV1Controller {
 
     @SaIgnore
     @RateLimiter(time = RATE_LIMIT_SECONDS, count = RATE_LIMIT_COUNT, limitType = LimitType.IP)
-    @Operation(summary = "开发者 Webhook 推送测试/分发")
+    @Operation(summary = "开发者 Webhook 推送测试/分发", tags = {"6. Webhook 推送"})
     @PostMapping("/webhooks/dispatch")
     public R<DeveloperWebhookDispatchVo> dispatchWebhook(@Valid @RequestBody DeveloperWebhookDispatchBo bo,
                                                          HttpServletRequest request) {
         DeveloperClient client = authorizeDeveloperClient(request, true);
-        List<Dict> targets = safeArrayConfig(WEBHOOKS_CONFIG_KEY);
+        developerWebhookService.pushAsync(client.appId(), bo);
+
         DeveloperWebhookDispatchVo vo = new DeveloperWebhookDispatchVo();
         vo.setEventType(bo.getEventType());
         vo.setTriggeredBy(client.name());
         vo.setDispatchedAt(OffsetDateTime.now().toString());
-
-        List<DeveloperWebhookDispatchVo.Result> results = new ArrayList<>();
-        for (Dict target : targets) {
-            if (!isEnabled(target.get("enabled")) || !supportsEvent(target.get("eventTypes"), bo.getEventType())) {
-                continue;
-            }
-            String url = stringValue(target.get("url"));
-            if (StringUtils.isBlank(url)) {
-                continue;
-            }
-            results.add(sendWebhook(target, url, client, bo));
-        }
-
-        long successCount = results.stream().filter(DeveloperWebhookDispatchVo.Result::getSuccess).count();
-        vo.setAttempted(results.size());
-        vo.setSucceeded((int) successCount);
-        vo.setFailed(results.size() - (int) successCount);
-        vo.setResults(results);
+        vo.setMessage("Webhook 推送任务已异步提交，请稍后在调用日志中查看结果。");
         return R.ok(vo);
     }
 
@@ -319,7 +291,7 @@ public class DeveloperApiV1Controller {
             }
             return DeveloperClient.anonymous();
         }
-        for (Dict item : safeArrayConfig(API_KEYS_CONFIG_KEY)) {
+        for (Dict item : safeArrayConfig(DeveloperApiConstants.API_KEYS_CONFIG_KEY)) {
             String token = stringValue(item.get("token"));
             if (StringUtils.equals(apiKey, token) && isDeveloperKeyEnabled(item)) {
                 String appId = stringValue(item.get("appId"));
@@ -332,7 +304,7 @@ public class DeveloperApiV1Controller {
     }
 
     private String resolveApiKey(HttpServletRequest request) {
-        String apiKey = request.getHeader(API_KEY_HEADER);
+        String apiKey = request.getHeader(DeveloperApiConstants.API_KEY_HEADER);
         if (StringUtils.isNotBlank(apiKey)) {
             return apiKey.trim();
         }
@@ -350,49 +322,6 @@ public class DeveloperApiV1Controller {
         } catch (Exception ignored) {
             return List.of();
         }
-    }
-
-    private DeveloperWebhookDispatchVo.Result sendWebhook(Dict target, String url, DeveloperClient client,
-                                                          DeveloperWebhookDispatchBo bo) {
-        DeveloperWebhookDispatchVo.Result result = new DeveloperWebhookDispatchVo.Result();
-        result.setId(stringValue(target.get("id")));
-        result.setName(stringValue(target.get("name")));
-        result.setUrl(url);
-
-        Map<String, Object> payload = new LinkedHashMap<>();
-        payload.put("eventType", bo.getEventType());
-        payload.put("title", bo.getTitle());
-        payload.put("content", bo.getContent());
-        payload.put("targetUrl", bo.getTargetUrl());
-        payload.put("data", bo.getData());
-        payload.put("clientId", client.appId());
-        payload.put("timestamp", OffsetDateTime.now().toString());
-
-        try {
-            HttpRequest.Builder builder = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .timeout(Duration.ofSeconds(5))
-                .header("Content-Type", "application/json")
-                .header("X-Hakimi-Event", bo.getEventType())
-                .POST(HttpRequest.BodyPublishers.ofString(JsonUtils.toJsonString(payload)));
-            String secret = stringValue(target.get("secret"));
-            if (StringUtils.isNotBlank(secret)) {
-                builder.header("X-Hakimi-Webhook-Secret", secret);
-            }
-            HttpResponse<String> response = webhookClient.send(builder.build(), HttpResponse.BodyHandlers.ofString());
-            result.setStatusCode(response.statusCode());
-            result.setSuccess(response.statusCode() >= 200 && response.statusCode() < 300);
-            result.setMessage(result.getSuccess() ? "ok" : StringUtils.substring(response.body(), 0, 200));
-        } catch (Exception e) {
-            result.setSuccess(false);
-            result.setMessage(StringUtils.substring(e.getMessage(), 0, 200));
-        }
-        return result;
-    }
-
-    private boolean supportsEvent(Object configuredEvents, String eventType) {
-        List<String> eventTypes = toStringList(configuredEvents);
-        return eventTypes.isEmpty() || eventTypes.contains("*") || eventTypes.contains(eventType);
     }
 
     private boolean isEnabled(Object value) {
@@ -414,23 +343,6 @@ public class DeveloperApiV1Controller {
 
     private String stringValue(Object value) {
         return value == null ? null : String.valueOf(value).trim();
-    }
-
-    private List<String> toStringList(Object value) {
-        if (value instanceof Collection<?> collection) {
-            return collection.stream()
-                .map(this::stringValue)
-                .filter(StringUtils::isNotBlank)
-                .toList();
-        }
-        String text = stringValue(value);
-        if (StringUtils.isBlank(text)) {
-            return List.of();
-        }
-        return List.of(text.split(",")).stream()
-            .map(String::trim)
-            .filter(StringUtils::isNotBlank)
-            .toList();
     }
 
     private record DeveloperClient(String appId, String name) {

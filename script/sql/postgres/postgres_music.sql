@@ -98,6 +98,45 @@ COMMENT ON COLUMN music.audit_status IS '审核状态: 0待审 1通过 2拒绝 3
 COMMENT ON COLUMN music.is_public IS '是否公开: 0否 1是';
 COMMENT ON COLUMN music.is_original IS '是否原创: 0否 1是';
 COMMENT ON COLUMN music.resource_status IS '资源状态: 0正常 1部分失效 2全部失效';
+
+-- =====================================================
+-- music_webhook_log 开发者 Webhook 调用日志
+-- =====================================================
+DROP TABLE IF EXISTS music_webhook_log CASCADE;
+CREATE TABLE IF NOT EXISTS music_webhook_log
+(
+    id                int8            NOT NULL,
+    webhook_id        varchar(64),
+    webhook_name      varchar(100),
+    url               varchar(500)    NOT NULL,
+    event_type        varchar(64)     NOT NULL,
+    payload           text,
+    status_code       int4,
+    success           char(1)         DEFAULT '0',
+    message           text,
+    retry_count       int4            DEFAULT 0,
+    client_id         varchar(100),
+    create_time       timestamp       DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT pk_music_webhook_log PRIMARY KEY (id)
+);
+
+CREATE INDEX idx_music_webhook_log_event ON music_webhook_log(event_type);
+CREATE INDEX idx_music_webhook_log_create_time ON music_webhook_log(create_time);
+
+COMMENT ON TABLE music_webhook_log IS '开发者 Webhook 调用日志';
+COMMENT ON COLUMN music_webhook_log.id IS '主键ID';
+COMMENT ON COLUMN music_webhook_log.webhook_id IS 'Webhook配置ID';
+COMMENT ON COLUMN music_webhook_log.webhook_name IS 'Webhook配置名称';
+COMMENT ON COLUMN music_webhook_log.url IS '推送目标URL';
+COMMENT ON COLUMN music_webhook_log.event_type IS '事件类型';
+COMMENT ON COLUMN music_webhook_log.payload IS '推送报文';
+COMMENT ON COLUMN music_webhook_log.status_code IS '响应状态码';
+COMMENT ON COLUMN music_webhook_log.success IS '是否成功: 0否 1是';
+COMMENT ON COLUMN music_webhook_log.message IS '错误或响应信息';
+COMMENT ON COLUMN music_webhook_log.retry_count IS '已重试次数';
+COMMENT ON COLUMN music_webhook_log.client_id IS '触发应用ID';
+COMMENT ON COLUMN music_webhook_log.create_time IS '记录创建时间';
 COMMENT ON COLUMN music.copyright_info IS '版权信息';
 COMMENT ON COLUMN music.remark IS '备注';
 COMMENT ON COLUMN music.create_by IS '创建人ID';

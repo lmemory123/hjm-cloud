@@ -19,6 +19,8 @@ public class DeveloperWebhookDispatchVo {
 
     private String dispatchedAt;
 
+    private String message;
+
     private List<Result> results;
 
     @Data
