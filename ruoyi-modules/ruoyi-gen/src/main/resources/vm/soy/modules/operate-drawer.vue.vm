@@ -38,7 +38,7 @@ const treeList = ref<Api.Demo.Tree[]>([]);
 const { formRef, validate, restoreValidation } = useNaiveForm();
 const { createRequiredRule } = useFormRules();
 
-const title = computed(() => {
+const drawerTitle = computed(() => {
   const titles: Record<NaiveUI.TableOperateType, string> = {
     add: '新增${functionName}',
     edit: '编辑${functionName}'
@@ -132,7 +132,9 @@ watch(visible, () => {
   if (visible.value) {
     handleUpdateModelWhenEdit();
     restoreValidation();
+#if($tplCategory == 'tree')
     getTreeList();
+#end
   }
 });
 #if($tplCategory == 'tree')
@@ -150,8 +152,8 @@ const treeOptions = computed(() => {
 </script>
 
 <template>
-  <NDrawer v-model:show="visible" :title="title" display-directive="show" :width="800" class="max-w-90%">
-    <NDrawerContent :title="title" :native-scrollbar="false" closable>
+  <NDrawer v-model:show="visible" :title="drawerTitle" display-directive="show" :width="800" class="max-w-90%">
+    <NDrawerContent :title="drawerTitle" :native-scrollbar="false" closable>
       <NForm ref="formRef" :model="model" :rules="rules">
 #set($immediateDictList = [])
 #foreach($column in $columns)
