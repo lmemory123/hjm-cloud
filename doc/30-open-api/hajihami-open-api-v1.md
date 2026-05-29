@@ -287,7 +287,10 @@ X-Hakimi-Api-Key: dev_xxx
 - **方案**：使用 `https://api.telegram.org/bot<token>/sendMessage`。
 - **适配**：由于 Telegram 接收 `chat_id` 和 `text` 参数，建议通过网关将哈基哈米的 `content` 映射到 `text`。
 
-## 11. 后续计划
+## 12. 静态文档导出说明
 
-- S6.4：补 SDK 示例、部署手册、运维手册、数据库 ER 和上线检查清单。
-- S6.5：补核心测试、E2E 和压测前置脚本。
+如需将本 API 契约导出为静态 JSON/YAML 文件（用于导入 Postman、Apifox 或生成客户端 SDK），请参考以下步骤：
+
+1. **在线访问**：启动后端服务后，访问 `http://<gateway-ip>/music/v3/api-docs/music-open` 获取 JSON 原始定义。
+2. **Swagger UI**：访问 `http://<gateway-ip>/music/swagger-ui/index.html` 切换到“哈基哈米开放 API v1”分组进行在线调试与导出。
+3. **手动导出**：本项目已预置 Swagger 分组，导出的 JSON 文件建议命名为 `hajihami-openapi-v1.json` 并归档至本目录。
