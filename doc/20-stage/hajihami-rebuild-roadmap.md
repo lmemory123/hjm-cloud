@@ -58,10 +58,10 @@
 
 下一步工作建议：
 
-### S6.4：实机集成与压力测试
-1. **实机适配**：使用真实 QQ 机器人/Discord 接收端验证 Webhook 签名与 Payload。
-2. **性能压测**：执行 72 小时稳定性压测，观察虚拟线程在高并发 Webhook 推送时的内存表现。
-3. **E2E 自动化**：基于 `acceptance-records.md` 编写 Playwright 或 Cypress 自动化脚本。
+### S6.4：自动化测试与压测脚本 (已交付)
+1. **实机验证脚本**：已交付 `webhook-receiver-demo.js`，支持校验签名与时间戳。
+2. **压测脚本**：已交付 `stress-test.js` (k6)，覆盖核心 OpenAPI 负载测试。
+3. **E2E 自动化**：已交付 `basic-flow.spec.ts` (Playwright)，覆盖首页、搜索与详情页核心链路。
 
 ### S6.5：正式发布准备
 1. **Swagger 归档**：正式导出静态 OpenAPI 文档供第三方下载。
