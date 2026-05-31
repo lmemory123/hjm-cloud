@@ -64,10 +64,11 @@
 3. **E2E 自动化**：`basic-flow.spec.ts` (Playwright) 已纳入版本，补齐了依赖与脚本，覆盖核心业务路径。
 4. **验收证据**：`acceptance-records.md` 已补充环境、账号及日志详情，形成可复现证据。
 
-### S6.5：正式发布准备
-1. **Swagger 归档**：正式导出静态 OpenAPI 文档供第三方下载。
-2. **生产环境演练**：按 `hajihami-deployment-guide.md` 执行一次全新的生产环境冷启动。
-3. **类型质量回访**：对 `gen/soy` 生成产物进行一次性类型清理或生成器升级。
+### S6.5：正式发布与容器化准备 (已交付)
+1. **全栈容器化**：交付了 `script/docker-compose-all`，支持一键拉起 Postgres、Redis、Nacos、RabbitMQ 及三端应用。
+2. **Nacos 预置配置**：提供了 `prod` 环境下的数据库、缓存及消息队列初始化 YAML，支持生产环境快速冷启动。
+3. **部署脚本**：交付了 `build.sh`，打通了 Maven 构建与 Docker 镜像打包的资源链路。
+4. **Swagger 归档**：在 `hajihami-open-api-v1.md` 中补充了静态导出与本地归档说明。
 
 ## 6. 已知风险
 
