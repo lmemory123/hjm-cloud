@@ -1,0 +1,18 @@
+spring:
+  data:
+    redis:
+      host: hjm-redis
+      port: 6379
+      password: "" # Docker standalone redis usually has no password unless set
+      database: 0
+  rabbitmq:
+    host: hjm-rabbitmq
+    port: 5672
+    username: ruoyi
+    password: ruoyi123
+  cloud:
+    nacos:
+      discovery:
+        server-addr: hjm-nacos:8848
+      config:
+        server-addr: hjm-nacos:8848

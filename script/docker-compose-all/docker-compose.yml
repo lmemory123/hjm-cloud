@@ -1,0 +1,158 @@
+version: '3.8'
+
+networks:
+  hjm-network:
+    driver: bridge
+
+services:
+  # Middleware: Postgres
+  hjm-postgres:
+    image: postgres:15-alpine
+    container_name: hjm-postgres
+    environment:
+      POSTGRES_USER: ruoyi
+      POSTGRES_PASSWORD: ruoyi123
+      POSTGRES_DB: ry-cloud
+      TZ: Asia/Shanghai
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../sql/postgres:/docker-entrypoint-initdb.d
+      - ./middleware/postgres/data:/var/lib/postgresql/data
+    networks:
+      - hjm-network
+
+  # Middleware: Redis
+  hjm-redis:
+    image: redis:7.2.8-alpine
+    container_name: hjm-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - hjm-network
+
+  # Middleware: Nacos
+  hjm-nacos:
+    image: ruoyi/ruoyi-nacos:2.5.1
+    container_name: hjm-nacos
+    environment:
+      TZ: Asia/Shanghai
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+      MODE: standalone
+      SPRING_DATASOURCE_PLATFORM: postgresql
+      DB_ADDR: hjm-postgres:5432
+      DB_NAME: ry-cloud
+      DB_USER: ruoyi
+      DB_PASSWORD: ruoyi123
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+      - "9849:9849"
+    volumes:
+      - ./middleware/nacos/logs:/root/nacos/logs
+    depends_on:
+      - hjm-postgres
+    networks:
+      - hjm-network
+
+  # Middleware: RabbitMQ
+  hjm-rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: hjm-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ruoyi
+      RABBITMQ_DEFAULT_PASS: ruoyi123
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - hjm-network
+
+  # Backend: Gateway
+  ruoyi-gateway:
+    build:
+      context: ../../ruoyi-gateway
+      dockerfile: Dockerfile
+    container_name: ruoyi-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR: hjm-nacos:8848
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      - hjm-nacos
+    networks:
+      - hjm-network
+
+  # Backend: Auth
+  ruoyi-auth:
+    build:
+      context: ../../ruoyi-auth
+      dockerfile: Dockerfile
+    container_name: ruoyi-auth
+    environment:
+      SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR: hjm-nacos:8848
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      - hjm-nacos
+    networks:
+      - hjm-network
+
+  # Backend: System
+  ruoyi-system:
+    build:
+      context: ../../ruoyi-modules/ruoyi-system
+      dockerfile: Dockerfile
+    container_name: ruoyi-system
+    environment:
+      SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR: hjm-nacos:8848
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      - hjm-nacos
+      - hjm-postgres
+    networks:
+      - hjm-network
+
+  # Backend: Music Web (Hajihami Core)
+  hjm-music-web:
+    build:
+      context: ../../ruoyi-modules/hjm-music-web
+      dockerfile: ../../../script/docker-compose-all/backend/Dockerfile.music-web
+    container_name: hjm-music-web
+    environment:
+      SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR: hjm-nacos:8848
+      SPRING_PROFILES_ACTIVE: prod
+    depends_on:
+      - hjm-nacos
+      - hjm-postgres
+      - hjm-redis
+    networks:
+      - hjm-network
+
+  # Admin: Soybean Admin
+  hjm-admin:
+    build:
+      context: ../../../hjm-admin
+      dockerfile: Dockerfile
+    container_name: hjm-admin
+    ports:
+      - "80:80"
+    depends_on:
+      - ruoyi-gateway
+    networks:
+      - hjm-network
+
+  # Frontend: Nuxt 4
+  hjm-frontend:
+    build:
+      context: ../../../hjm-web-nuxt-frontend
+      dockerfile: Dockerfile
+    container_name: hjm-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NUXT_PUBLIC_API_BASE: http://ruoyi-gateway:8080
+    depends_on:
+      - ruoyi-gateway
+    networks:
+      - hjm-network

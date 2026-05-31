@@ -1,0 +1,6 @@
+valkey:
+  query:
+    standalone:
+      nodes:
+        - host: hjm-redis
+          port: 6379

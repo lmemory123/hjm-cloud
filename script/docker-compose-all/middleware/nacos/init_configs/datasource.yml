@@ -1,0 +1,24 @@
+datasource:
+  system-master:
+    url: jdbc:postgresql://hjm-postgres:5432/ry-cloud?currentSchema=public&reWriteBatchedInserts=true
+    username: ruoyi
+    password: ruoyi123
+  gen:
+    url: jdbc:postgresql://hjm-postgres:5432/ry-cloud?currentSchema=public&reWriteBatchedInserts=true
+    username: ruoyi
+    password: ruoyi123
+  job:
+    url: jdbc:postgresql://hjm-postgres:5432/ry-cloud?currentSchema=public&reWriteBatchedInserts=true
+    username: ruoyi
+    password: ruoyi123
+  workflow:
+    url: jdbc:postgresql://hjm-postgres:5432/ry-cloud?currentSchema=public&reWriteBatchedInserts=true
+    username: ruoyi
+    password: ruoyi123
+
+spring:
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    dynamic:
+      p6spy: true
+      strict: true
