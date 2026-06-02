@@ -1,15 +1,16 @@
 #!/bin/bash
+set -e
 
-# 哈基哈米一键构建脚本
+# Hajihami Full-Stack Build Script
 
-echo "🚀 开始构建后端项目 (hjm-cloud)..."
-# 回到项目根目录
-cd ../../
-mvn clean package -DskipTests
+echo "🚀 Starting backend build (hjm-cloud)..."
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="${SCRIPT_DIR}/../.."
 
-# 复制 hjm-music-web.jar 到 docker 目录
-echo "📦 准备后端镜像资源..."
-cp ruoyi-modules/hjm-music-web/target/hjm-music-web.jar script/docker-compose-all/backend/
+cd "${ROOT_DIR}"
+mvn clean package -Dmaven.test.skip=true -pl ruoyi-gateway,ruoyi-auth,ruoyi-modules/ruoyi-system,ruoyi-modules/hjm-music-web,ruoyi-visual/ruoyi-nacos -am
 
-echo "✅ 构建完成！"
-echo "💡 请运行: cd script/docker-compose-all && docker-compose up --build -d"
+echo "✅ Backend build completed!"
+echo "💡 To start the system, run:"
+echo "   cd script/docker-compose-all"
+echo "   ./cold_start.sh"

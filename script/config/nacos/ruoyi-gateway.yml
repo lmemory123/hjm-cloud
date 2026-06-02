@@ -1,100 +1,40 @@
-# 将项目路径：config/下对应文件中内容复制到此处
-
-# 安全配置
+# Security
 security:
-  # 不校验白名单
   ignore:
     whites:
-      - /auth/code
-      - /auth/logout
-      - /auth/login
-      - /auth/front/login
-      - /auth/binding/*
-      - /auth/register
-      - /auth/front/register
-      - /auth/tenant/list
-      - /resource/sms/code
-      - /resource/sse/close
-      - /music/open/**
-      - /*/v3/api-docs
-      - /*/error
-      - /csrf
-      - /warm-flow-ui/**
+      - /auth/**
+      - /music/**
+      - /system/**
+      - /open/**
+
+# API Decrypt (Fix P0-1)
+api-decrypt:
+  enabled: false
+  header-flag: "encrypt-key"
 
 spring:
   cloud:
-    # 网关配置
     gateway:
-      httpclient:
-        connect-timeout: 10000
-        response-timeout: 120s
-      # 打印请求日志(自定义)
-      requestLog: true
-      server:
-        webflux:
-          discovery:
-            locator:
-              lowerCaseServiceId: true
-              enabled: true
-          routes:
-            # 认证中心
-            - id: ruoyi-auth
-              uri: lb://ruoyi-auth
-              predicates:
-                - Path=/auth/**
-              filters:
-                - StripPrefix=1
-            # 代码生成
-            - id: ruoyi-gen
-              uri: lb://ruoyi-gen
-              predicates:
-                - Path=/tool/**
-              filters:
-                - StripPrefix=1
-            # 系统模块
-            - id: ruoyi-system
-              uri: lb://ruoyi-system
-              predicates:
-                - Path=/system/**,/monitor/**
-              filters:
-                - StripPrefix=1
-            # 资源服务
-            - id: ruoyi-resource
-              uri: lb://ruoyi-resource
-              predicates:
-                - Path=/resource/**
-              filters:
-                - StripPrefix=1
-            # 音乐前台服务
-            - id: hjm-music-web
-              uri: lb://hjm-music-web
-              predicates:
-                - Path=/music/**
-              filters:
-                - StripPrefix=1
-            # workflow服务
-            - id: ruoyi-workflow
-              uri: lb://ruoyi-workflow
-              predicates:
-                - Path=/workflow/**
-              filters:
-                - StripPrefix=1
-            # warm-flow服务
-            - id: warm-flow
-              uri: lb://ruoyi-workflow
-              predicates:
-                - Path=/warm-flow-ui/**,/warm-flow/**
-            # 演示服务
-            - id: ruoyi-demo
-              uri: lb://ruoyi-demo
-              predicates:
-                - Path=/demo/**
-              filters:
-                - StripPrefix=1
-            # MQ演示服务
-            - id: ruoyi-test-mq
-              uri: lb://ruoyi-test-mq
-              predicates:
-                - Path=/test-mq/**
-              filters:
-                - StripPrefix=1
+      discovery:
+        locator:
+          lowerCaseServiceId: true
+          enabled: true
+      routes:
+        - id: music-route
+          uri: http://hjm-music-web:9212
+          predicates:
+            - Path=/music/**
+          filters:
+            - StripPrefix=1
+        - id: auth-route
+          uri: http://ruoyi-auth:9210
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
+        - id: system-route
+          uri: http://ruoyi-system:9201
+          predicates:
+            - Path=/system/**
+          filters:
+            - StripPrefix=1

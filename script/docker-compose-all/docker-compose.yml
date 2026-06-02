@@ -1,5 +1,3 @@
-version: '3.8'
-
 networks:
   hjm-network:
     driver: bridge
@@ -19,6 +17,11 @@ services:
     volumes:
       - ../sql/postgres:/docker-entrypoint-initdb.d
       - ./middleware/postgres/data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ruoyi -d ry-cloud"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     networks:
       - hjm-network
 
@@ -28,30 +31,37 @@ services:
     container_name: hjm-redis
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     networks:
       - hjm-network
 
   # Middleware: Nacos
   hjm-nacos:
-    image: ruoyi/ruoyi-nacos:2.5.1
+    build:
+      context: ../../ruoyi-visual/ruoyi-nacos
+      dockerfile: Dockerfile
     container_name: hjm-nacos
     environment:
       TZ: Asia/Shanghai
-      JAVA_OPTS: "-Xms256m -Xmx512m"
+      JAVA_OPTS: "-Xms256m -Xmx512m -Djava.net.preferIPv4Stack=true -Dspring.data.redis.timeout=10000 -Dspring.data.redis.database=0"
       MODE: standalone
-      SPRING_DATASOURCE_PLATFORM: postgresql
-      DB_ADDR: hjm-postgres:5432
-      DB_NAME: ry-cloud
-      DB_USER: ruoyi
-      DB_PASSWORD: ruoyi123
+      NACOS_AUTH_ENABLE: "false"
     ports:
       - "8848:8848"
       - "9848:9848"
       - "9849:9849"
-    volumes:
-      - ./middleware/nacos/logs:/root/nacos/logs
     depends_on:
-      - hjm-postgres
+      hjm-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8848/nacos/index.html"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
     networks:
       - hjm-network
 
@@ -65,6 +75,11 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     networks:
       - hjm-network
 
@@ -74,13 +89,32 @@ services:
       context: ../../ruoyi-gateway
       dockerfile: Dockerfile
     container_name: ruoyi-gateway
+    command: ["sh", "-c", "sleep 30 && java -Djava.security.egd=file:/dev/./urandom -jar app.jar"]
     ports:
       - "8080:8080"
     environment:
+      SPRING_CLOUD_NACOS_SERVER_ADDR: hjm-nacos:8848
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: hjm-nacos:8848
       SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR: hjm-nacos:8848
+      SPRING_CLOUD_NACOS_DISCOVERY_NAMESPACE: prod
+      SPRING_CLOUD_NACOS_CONFIG_NAMESPACE: prod
+      SPRING_CLOUD_NACOS_DISCOVERY_REGISTER_ENABLED: "false"
+      JAVA_OPTS: "-Djava.net.preferIPv4Stack=true -Dspring.data.redis.timeout=10000 -Dspring.data.redis.database=0 -Dspring.data.redis.host=hjm-redis"
+      SPRING_DATA_REDIS_HOST: hjm-redis
+      SPRING_REDIS_HOST: hjm-redis
+      SPRING_REDISSON_ADDRESS: redis://hjm-redis:6379
       SPRING_PROFILES_ACTIVE: prod
+      SEATA_ENABLED: "false"
     depends_on:
-      - hjm-nacos
+      hjm-nacos:
+        condition: service_healthy
+      hjm-redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/music/open/api/v1/meta"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
     networks:
       - hjm-network
 
@@ -90,11 +124,29 @@ services:
       context: ../../ruoyi-auth
       dockerfile: Dockerfile
     container_name: ruoyi-auth
+    command: ["sh", "-c", "sleep 30 && java -Djava.security.egd=file:/dev/./urandom -jar app.jar"]
     environment:
+      SPRING_CLOUD_NACOS_SERVER_ADDR: hjm-nacos:8848
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: hjm-nacos:8848
       SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR: hjm-nacos:8848
+      SPRING_CLOUD_NACOS_DISCOVERY_NAMESPACE: prod
+      SPRING_CLOUD_NACOS_CONFIG_NAMESPACE: prod
+      JAVA_OPTS: "-Djava.net.preferIPv4Stack=true -Dspring.data.redis.timeout=10000 -Dspring.data.redis.database=0 -Dspring.data.redis.host=hjm-redis"
+      SPRING_DATA_REDIS_HOST: hjm-redis
+      SPRING_REDIS_HOST: hjm-redis
+      SPRING_REDISSON_ADDRESS: redis://hjm-redis:6379
       SPRING_PROFILES_ACTIVE: prod
+      SEATA_ENABLED: "false"
     depends_on:
-      - hjm-nacos
+      hjm-nacos:
+        condition: service_healthy
+      hjm-redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9210/code"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
     networks:
       - hjm-network
 
@@ -104,12 +156,32 @@ services:
       context: ../../ruoyi-modules/ruoyi-system
       dockerfile: Dockerfile
     container_name: ruoyi-system
+    command: ["sh", "-c", "sleep 30 && java -Djava.security.egd=file:/dev/./urandom -jar app.jar"]
     environment:
+      SPRING_CLOUD_NACOS_SERVER_ADDR: hjm-nacos:8848
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: hjm-nacos:8848
       SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR: hjm-nacos:8848
+      SPRING_CLOUD_NACOS_DISCOVERY_NAMESPACE: prod
+      SPRING_CLOUD_NACOS_CONFIG_NAMESPACE: prod
+      JAVA_OPTS: "-Djava.net.preferIPv4Stack=true -Dspring.data.redis.timeout=10000 -Dspring.data.redis.database=0 -Dspring.data.redis.host=hjm-redis"
+      SPRING_DATA_REDIS_HOST: hjm-redis
+      SPRING_REDIS_HOST: hjm-redis
+      SPRING_REDISSON_ADDRESS: redis://hjm-redis:6379
       SPRING_PROFILES_ACTIVE: prod
+      SEATA_ENABLED: "false"
     depends_on:
-      - hjm-nacos
-      - hjm-postgres
+      hjm-nacos:
+        condition: service_healthy
+      hjm-postgres:
+        condition: service_healthy
+      hjm-redis:
+        condition: service_healthy
+    healthcheck:
+      # Fix P0-2: Use basic auth for actuator
+      test: ["CMD", "curl", "-u", "ruoyi:123456", "-f", "http://localhost:9201/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
     networks:
       - hjm-network
 
@@ -117,15 +189,36 @@ services:
   hjm-music-web:
     build:
       context: ../../ruoyi-modules/hjm-music-web
-      dockerfile: ../../../script/docker-compose-all/backend/Dockerfile.music-web
+      dockerfile: ../../script/docker-compose-all/backend/Dockerfile.music-web
     container_name: hjm-music-web
+    command: ["sh", "-c", "sleep 30 && java -Djava.security.egd=file:/dev/./urandom -jar app.jar"]
+    ports:
+      - "9212:9212"
     environment:
+      SPRING_CLOUD_NACOS_SERVER_ADDR: hjm-nacos:8848
+      SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: hjm-nacos:8848
       SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR: hjm-nacos:8848
+      SPRING_CLOUD_NACOS_DISCOVERY_NAMESPACE: prod
+      SPRING_CLOUD_NACOS_CONFIG_NAMESPACE: prod
+      JAVA_OPTS: "-Djava.net.preferIPv4Stack=true -Dspring.data.redis.timeout=10000 -Dspring.data.redis.database=0 -Dspring.data.redis.host=hjm-redis"
+      SPRING_DATA_REDIS_HOST: hjm-redis
+      SPRING_REDIS_HOST: hjm-redis
+      SPRING_REDISSON_ADDRESS: redis://hjm-redis:6379
+      MYBATIS_FLEX_MAPPER_PACKAGE: org.dromara.music.mapper
       SPRING_PROFILES_ACTIVE: prod
+      SEATA_ENABLED: "false"
     depends_on:
-      - hjm-nacos
-      - hjm-postgres
-      - hjm-redis
+      hjm-nacos:
+        condition: service_healthy
+      hjm-postgres:
+        condition: service_healthy
+      hjm-redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9212/checkAliveServer"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
     networks:
       - hjm-network
 
@@ -136,9 +229,17 @@ services:
       dockerfile: Dockerfile
     container_name: hjm-admin
     ports:
-      - "80:80"
+      - "81:80"
+    environment:
+      VITE_SERVICE_BASE_URL: http://localhost:8080
     depends_on:
-      - ruoyi-gateway
+      ruoyi-gateway:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
     networks:
       - hjm-network
 
@@ -151,8 +252,15 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NUXT_PUBLIC_API_BASE: http://ruoyi-gateway:8080
+      NUXT_API_BASE: http://ruoyi-gateway:8080
+      NUXT_PUBLIC_API_BASE: http://localhost:8080
     depends_on:
-      - ruoyi-gateway
+      ruoyi-gateway:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/').then(response => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
     networks:
       - hjm-network

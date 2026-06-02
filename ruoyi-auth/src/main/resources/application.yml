@@ -41,6 +41,6 @@ spring:
 
 security:
   front-auth:
-    client-id: ${FRONT_AUTH_CLIENT_ID:}
+    client-id: ${FRONT_AUTH_CLIENT_ID:7f57f2e3c3f14d15a7c4dd8b7e69a241}
     grant-type: password
     register-enabled: true

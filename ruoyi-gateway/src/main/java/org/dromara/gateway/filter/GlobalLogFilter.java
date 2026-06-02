@@ -59,7 +59,7 @@ public class GlobalLogFilter implements GlobalFilter, Ordered {
 
         // 打印请求参数
         if (WebFluxUtils.isJsonRequest(exchange)) {
-            if (apiDecryptProperties.getEnabled()
+            if (Boolean.TRUE.equals(apiDecryptProperties.getEnabled())
                 && ObjUtil.isNotNull(request.getHeaders().getFirst(apiDecryptProperties.getHeaderFlag()))) {
                 log.info("[PLUS]开始请求 => URL[{}],参数类型[encrypt]", url);
             } else {

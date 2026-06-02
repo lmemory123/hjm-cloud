@@ -15,25 +15,30 @@ spring:
     name: ruoyi-system
   profiles:
     # 环境配置
-    active: @profiles.active@
+    active: prod
   main:
     allow-bean-definition-overriding: true
---- # nacos 配置
-spring:
+  datasource:
+    dynamic:
+      primary: system-master
+      datasource:
+        system-master:
+          url: jdbc:postgresql://hjm-postgres:5432/ry-cloud?currentSchema=public&reWriteBatchedInserts=true
+          username: ruoyi
+          password: ruoyi123
+          driver-class-name: org.postgresql.Driver
   cloud:
     nacos:
       # nacos 服务地址
-      server-addr: @nacos.server@
-      username: @nacos.username@
-      password: @nacos.password@
+      server-addr: hjm-nacos:8848
       discovery:
         # 注册组
-        group: @nacos.discovery.group@
-        namespace: ${spring.profiles.active}
+        group: DEFAULT_GROUP
+        namespace: prod
       config:
         # 配置组
-        group: @nacos.config.group@
-        namespace: ${spring.profiles.active}
+        group: DEFAULT_GROUP
+        namespace: prod
   config:
     import:
       - optional:nacos:application-common.yml

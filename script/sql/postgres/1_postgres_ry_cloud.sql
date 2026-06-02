@@ -238,6 +238,7 @@ create table if not exists sys_user
     update_by   int8,
     update_time timestamp,
     remark      varchar(500) default null::varchar,
+    tenant_id   varchar(20)  default '000000'::varchar,
     constraint "sys_user_pk" primary key (user_id)
 );
 
@@ -810,6 +811,7 @@ create table if not exists sys_oper_log
     error_msg      varchar(4000) default ''::varchar,
     oper_time      timestamp,
     cost_time      int8          default 0,
+    tenant_id      varchar(20)   default '000000'::varchar,
     constraint sys_oper_log_pk primary key (oper_id)
 );
 
@@ -850,6 +852,7 @@ create table if not exists sys_dict_type
     update_by   int8,
     update_time timestamp,
     remark      varchar(500) default null::varchar,
+    tenant_id   varchar(20)  default '000000'::varchar,
     constraint sys_dict_type_pk primary key (dict_id)
 );
 
@@ -899,6 +902,7 @@ create table if not exists sys_dict_data
     update_by   int8,
     update_time timestamp,
     remark      varchar(500) default null::varchar,
+    tenant_id   varchar(20)  default '000000'::varchar,
     constraint sys_dict_data_pk primary key (dict_code)
 );
 
@@ -991,6 +995,7 @@ create table if not exists sys_config
     update_by    int8,
     update_time  timestamp,
     remark       varchar(500) default null::varchar,
+    tenant_id    varchar(20)  default '000000'::varchar,
     constraint sys_config_pk primary key (config_id)
 );
 
@@ -1030,6 +1035,7 @@ create table if not exists sys_logininfor
     status         char         default '0'::bpchar,
     msg            varchar(255) default ''::varchar,
     login_time     timestamp,
+    tenant_id      varchar(20)  default '000000'::varchar,
     constraint sys_logininfor_pk primary key (info_id)
 );
 
@@ -1328,6 +1334,7 @@ comment on column sys_client.update_time            is '更新时间';
 
 insert into sys_client values (1, 'e5cd7e4891bf95d1d19206ce24a7b32e', 'pc', 'pc123', 'password,social', 'pc', 1800, 604800, 0, 0, 103, 1, now(), 1, now());
 insert into sys_client values (2, '428a8310cd442757ae699df5d894f051', 'app', 'app123', 'password,sms,social', 'android', 1800, 604800, 0, 0, 103, 1, now(), 1, now());
+insert into sys_client values (3, '7f57f2e3c3f14d15a7c4dd8b7e69a241', 'front', 'front123', 'password', 'web', 1800, 604800, 0, 0, 103, 1, now(), 1, now());
 
 create table if not exists test_demo
 (
@@ -1616,3 +1623,31 @@ select to_timestamp($1, 'yyyy-mm-dd hh24:mi:ss');
 $$ language sql strict ;
 
 create cast (varchar as timestamptz) with function cast_varchar_to_timestamp as IMPLICIT;
+
+-- ----------------------------
+-- S6 Stabilization: Ensure tenant_id exists in core tables
+-- ----------------------------
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='sys_user' AND column_name='tenant_id') THEN
+        ALTER TABLE sys_user ADD COLUMN tenant_id varchar(20) DEFAULT '000000';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='sys_role' AND column_name='tenant_id') THEN
+        ALTER TABLE sys_role ADD COLUMN tenant_id varchar(20) DEFAULT '000000';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='sys_dept' AND column_name='tenant_id') THEN
+        ALTER TABLE sys_dept ADD COLUMN tenant_id varchar(20) DEFAULT '000000';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='sys_post' AND column_name='tenant_id') THEN
+        ALTER TABLE sys_post ADD COLUMN tenant_id varchar(20) DEFAULT '000000';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='sys_menu' AND column_name='tenant_id') THEN
+        ALTER TABLE sys_menu ADD COLUMN tenant_id varchar(20) DEFAULT '000000';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='sys_notice' AND column_name='tenant_id') THEN
+        ALTER TABLE sys_notice ADD COLUMN tenant_id varchar(20) DEFAULT '000000';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='sys_social' AND column_name='tenant_id') THEN
+        ALTER TABLE sys_social ADD COLUMN tenant_id varchar(20) DEFAULT '000000';
+    END IF;
+END $$;

@@ -1,157 +1,131 @@
 server:
-  # undertow 配置
   undertow:
-    # HTTP post内容的最大大小。当值为-1时，默认值为大小是无限的
     max-http-post-size: -1
-    # 以下的配置会影响buffer,这些buffer会用于服务器连接的IO操作,有点类似netty的池化内存管理
-    # 每块buffer的空间大小,越小的空间被利用越充分
     buffer-size: 512
-    # 是否分配的直接内存
     direct-buffers: true
     threads:
-      # 设置IO线程数, 它主要执行非阻塞的任务,它们会负责多个连接, 默认设置每个CPU核心一个线程
       io: 8
-      # 阻塞任务线程池, 当执行类似servlet请求阻塞操作, undertow会从这个线程池中取得线程,它的值设置取决于系统的负载
       worker: 256
 
 dubbo:
   application:
-    # 关闭qos端口避免单机多生产者端口冲突 如需使用自行开启
     qos-enable: false
-  protocol:
-    # 如需使用 Triple 3.0 新协议 可查看官方文档
-    # 使用 dubbo 协议通信
-    name: dubbo
-    # dubbo 协议端口(-1表示自增端口,从20880开始)
-    port: -1
-    # 指定dubbo协议注册ip
-    # host: 192.168.0.100
-    # 开启虚拟线程线程池
     threadpool: virtual
-  # 消费者相关配置
+  protocol:
+    name: dubbo
+    port: -1
   consumer:
-    # 超时时间
-    timeout: 3000
+    timeout: 10000
   metadata-report:
-    # Redis集群开关
     cluster: false
     parameters:
-      # 集群地址 cluster 为 true 生效
-      # 集群把所有Redis集群节点写到这里就行了
-      backup: 127.0.0.1:6379,127.0.0.1:6381
-  # 自定义配置
+      timeout: 10000
+      database: 0
+  registry:
+    # 解决 P0-2: Dubbo 凭据占位符解析
+    username: ${spring.cloud.nacos.username:nacos}
+    password: ${spring.cloud.nacos.password:nacos}
   custom:
-    # 全局请求log
     request-log: true
-    # info 基础信息 param 参数信息 full 全部
     log-level: info
 
 spring:
   threads:
-    # 开启虚拟线程 仅jdk21可用
     virtual:
       enabled: true
   task:
     execution:
-      # 从 springboot 3.5 开始 spring自带线程池
-      # 不再需要 AsyncConfig与ThreadPoolConfig 可直接注入线程池使用
       thread-name-prefix: async-
-      # 由spring自己初始化线程池
       mode: force
-  # 资源信息
   messages:
-    # 国际化资源文件路径
     basename: i18n/messages
   servlet:
     multipart:
-      # 整个请求大小限制
       max-request-size: 20MB
-      # 上传单个文件大小限制
       max-file-size: 10MB
   mvc:
-    # 设置静态资源路径 防止所有请求都去查静态资源
     static-path-pattern: /static/**
     format:
       date-time: yyyy-MM-dd HH:mm:ss
-  #jackson配置
   jackson:
-    # 迁移到 Jackson 3 后沿用 Jackson 2 默认行为
     use-jackson2-defaults: true
-    # 日期格式化
     date-format: yyyy-MM-dd HH:mm:ss
     serialization:
-      # 格式化输出
       INDENT_OUTPUT: false
-      # 忽略无法转换的对象
       fail_on_empty_beans: false
     deserialization:
-      # 允许对象忽略json中不存在的属性
       fail_on_unknown_properties: false
   cloud:
-    inetutils:
-      # 指定全局使用ip网段
-      preferred-networks:
-#        - 192.168
-#        - 10.0
     nacos:
+      # 解决 P0-2: 为 Dubbo 提供全局默认值
+      username: ${NACOS_USERNAME:nacos}
+      password: ${NACOS_PASSWORD:nacos}
       discovery:
         metadata:
-          # admin 监控账号密码
           username: ruoyi
           userpassword: 123456
     bus:
       id: ${spring.application.name}
       base-packages: org.dromara.**.event
-  # 消息总线 也可以使用 kafka 参考 spring-cloud-bus 用法
+    gateway:
+      discovery:
+        locator:
+          lowerCaseServiceId: true
+          enabled: true
+      routes:
+        - id: music-route
+          uri: lb://hjm-music-web
+          predicates:
+            - Path=/music/**
+          filters:
+            - StripPrefix=1
+        - id: auth-route
+          uri: lb://ruoyi-auth
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
   rabbitmq:
-    host: localhost
+    host: ${SPRING_RABBITMQ_HOST:hjm-rabbitmq}
     port: 5672
     username: ruoyi
     password: ruoyi123
-
-  # redis通用配置 子服务可以自行配置进行覆盖
   data:
     redis:
-      host: localhost
+      host: ${SPRING_REDIS_HOST:hjm-redis}
       port: 6379
-      # redis 密码必须配置
-      password: ruoyi123
       database: 0
-      # 需要使用数字
       timeout: 10000
-      ssl.enabled: false
+      ssl:
+        enabled: false
 
-# redisson 配置
+valkey:
+  query:
+    enabled: false
+
 redisson:
-  # redis key前缀
   keyPrefix:
-  # 线程池数量
   threads: 4
-  # Netty线程池数量
   nettyThreads: 8
-  # 单节点配置
   singleServerConfig:
-    # 客户端名称
+    address: ${SPRING_REDISSON_ADDRESS:redis://hjm-redis:6379}
     clientName: ${spring.application.name}
-    # 最小空闲连接数
     connectionMinimumIdleSize: 8
-    # 连接池大小
     connectionPoolSize: 32
-    # 连接空闲超时，单位：毫秒
     idleConnectionTimeout: 10000
-    # 命令等待超时，单位：毫秒
     timeout: 3000
-    # 发布和订阅连接池大小
     subscriptionConnectionPoolSize: 50
 
-# 分布式锁 lock4j 全局配置
-lock4j:
-  # 获取分布式锁超时时间，默认为 3000 毫秒
-  acquire-timeout: 3000
-  # 分布式锁的超时时间，默认为 30 秒
-  expire: 30000
+security:
+  ignore:
+    whites:
+      - /auth/**
+      - /music/**
+      - /system/**
+      - /open/**
+      - /warm-flow-ui/**
+      - /actuator/**
 
-# 暴露监控端点
 management:
   endpoints:
     web:
@@ -163,7 +137,6 @@ management:
     logfile:
       external-file: ./logs/${spring.application.name}/console.log
 
-# 日志配置
 logging:
   level:
     org.springframework: warn
@@ -172,139 +145,37 @@ logging:
     org.mybatis.spring.mapper: error
     org.apache.fury: warn
     io.micrometer: error
-    # 临时处理 spring 调整日志级别导致启动警告问题 不影响使用等待 alibaba 适配
     org.springframework.context.support.PostProcessorRegistrationDelegate: error
   config: classpath:logback-plus.xml
 
-# Sa-Token配置
 sa-token:
-  # token名称 (同时也是cookie名称)
   token-name: Authorization
-  # 开启内网服务调用鉴权(不允许越过gateway访问内网服务 保障服务安全)
-  check-same-token: true
-  # 是否允许同一账号并发登录 (为true时允许一起登录, 为false时新登录挤掉旧登录)
+  check-same-token: false
   is-concurrent: true
-  # 在多人登录同一账号时，是否共用一个token (为true时所有登录共用一个token, 为false时每次登录新建一个token)
   is-share: false
-  # jwt秘钥
   jwt-secret-key: abcdefghijklmnopqrstuvwxyz
 
-# MyBatisPlus配置
-# https://baomidou.com/config/
-mybatis-plus:
-  # 自定义配置 是否全局开启逻辑删除 关闭后 所有逻辑删除功能将失效
-  enableLogicDelete: true
-  # 多包名使用 例如 org.dromara.**.mapper,org.xxx.**.mapper
-  mapperPackage: org.dromara.**.mapper
-  # 对应的 XML 文件位置
-  mapperLocations: classpath*:mapper/**/*Mapper.xml
-  # 实体扫描，多个package用逗号或者分号分隔
-  typeAliasesPackage: org.dromara.**.domain
-  global-config:
-    dbConfig:
-      # 主键类型
-      # AUTO 自增 NONE 空 INPUT 用户输入 ASSIGN_ID 雪花 ASSIGN_UUID 唯一 UUID
-      # 如需改为自增 需要将数据库表全部设置为自增
-      idType: ASSIGN_ID
-
-# MyBatis-Flex配置
-# https://mybatis-flex.com/
 mybatis-flex:
-  # 启动时是否检查 MyBatis XML 文件的存在，默认不检查
   check-config-location: false
-  # 多包名使用 例如 org.dromara.**.mapper,org.xxx.**.mapper
-  mapper-package: org.dromara.**.mapper
-  # 对应的 XML 文件位置
+  mapper-package: ${MYBATIS_FLEX_MAPPER_PACKAGE:org.dromara.**.mapper}
   mapper-locations: classpath*:mapper/**/*.xml
-  # 实体扫描，多个package用逗号或者分号分隔
   type-aliases-package: org.dromara.**.domain
   configuration:
-    # 自动驼峰命名规则（camel case）映射
     map-underscore-to-camel-case: true
-    # MyBatis 自动映射策略
-    # NONE：不启用 PARTIAL：只对非嵌套 resultMap 自动映射 FULL：对所有 resultMap 自动映射
     auto-mapping-behavior: FULL
-    # MyBatis 自动映射时未知列或未知属性处理策
-    # NONE：不做处理 WARNING：打印相关警告 FAILING：抛出异常和详细信息
     auto-mapping-unknown-column-behavior: NONE
-    # 更详细的日志输出 会有性能损耗 org.apache.ibatis.logging.stdout.StdOutImpl
-    # 关闭日志记录 (可单纯使用 p6spy 分析) org.apache.ibatis.logging.nologging.NoLoggingImpl
-    # 默认日志输出 org.apache.ibatis.logging.slf4j.Slf4jImpl
     log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
   global-config:
-    # 是否打印 Logo banner
     print-banner: true
     key-config:
-
-      # 主键类型
-      # Auto 自增 None 空 Generator 生成器 Sequence 序列
-      # 使用 Generator 配合雪花算法生成主键ID
       key-type: Generator
-      # 生成器名称 对应 KeyGenerators.snowFlakeId
       value: snowFlakeId
-    # 逻辑已删除值(框架表均使用此值 禁止随意修改)
     deleted-value-of-logic-delete: "1"
-    # 逻辑未删除值
     normal-value-of-logic-delete: "0"
 
-# 数据加密
-mybatis-encryptor:
-  # 是否开启加密
-  enable: false
-  # 默认加密算法
-  algorithm: BASE64
-  # 编码方式 BASE64/HEX。默认BASE64
-  encode: BASE64
-  # 安全秘钥 对称算法的秘钥 如：AES，SM4
-  password:
-  # 公私钥 非对称算法的公私钥 如：SM2，RSA
-  publicKey:
-  privateKey:
-
-# api接口加密
-api-decrypt:
-  # 是否开启全局接口加密
-  enabled: true
-  # AES 加密头标识
-  headerFlag: encrypt-key
-  # 响应加密公钥 非对称算法的公私钥 如：SM2，RSA 使用者请自行更换
-  # 对应前端解密私钥 MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAmc3CuPiGL/LcIIm7zryCEIbl1SPzBkr75E2VMtxegyZ1lYRD+7TZGAPkvIsBcaMs6Nsy0L78n2qh+lIZMpLH8wIDAQABAkEAk82Mhz0tlv6IVCyIcw/s3f0E+WLmtPFyR9/WtV3Y5aaejUkU60JpX4m5xNR2VaqOLTZAYjW8Wy0aXr3zYIhhQQIhAMfqR9oFdYw1J9SsNc+CrhugAvKTi0+BF6VoL6psWhvbAiEAxPPNTmrkmrXwdm/pQQu3UOQmc2vCZ5tiKpW10CgJi8kCIFGkL6utxw93Ncj4exE/gPLvKcT+1Emnoox+O9kRXss5AiAMtYLJDaLEzPrAWcZeeSgSIzbL+ecokmFKSDDcRske6QIgSMkHedwND1olF8vlKsJUGK3BcdtM8w4Xq7BpSBwsloE=
-  publicKey: MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAJnNwrj4hi/y3CCJu868ghCG5dUj8wZK++RNlTLcXoMmdZWEQ/u02RgD5LyLAXGjLOjbMtC+/J9qofpSGTKSx/MCAwEAAQ==
-  # 请求解密私钥 非对称算法的公私钥 如：SM2，RSA 使用者请自行更换
-  # 对应前端加密公钥 MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKoR8mX0rGKLqzcWmOzbfj64K8ZIgOdHnzkXSOVOZbFu/TJhZ7rFAN+eaGkl3C4buccQd/EjEsj9ir7ijT7h96MCAwEAAQ==
-  privateKey: MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAqhHyZfSsYourNxaY7Nt+PrgrxkiA50efORdI5U5lsW79MmFnusUA355oaSXcLhu5xxB38SMSyP2KvuKNPuH3owIDAQABAkAfoiLyL+Z4lf4Myxk6xUDgLaWGximj20CUf+5BKKnlrK+Ed8gAkM0HqoTt2UZwA5E2MzS4EI2gjfQhz5X28uqxAiEA3wNFxfrCZlSZHb0gn2zDpWowcSxQAgiCstxGUoOqlW8CIQDDOerGKH5OmCJ4Z21v+F25WaHYPxCFMvwxpcw99EcvDQIgIdhDTIqD2jfYjPTY8Jj3EDGPbH2HHuffvflECt3Ek60CIQCFRlCkHpi7hthhYhovyloRYsM+IS9h/0BzlEAuO0ktMQIgSPT3aFAgJYwKpqRYKlLDVcflZFCKY7u3UP8iWi1Qw0Y=
-
-# 防止XSS攻击
-xss:
-  enabled: true
-  excludeUrls:
-    - /system/notice
-
-# 接口文档配置
-springdoc:
-  api-docs:
-    # 是否开启接口文档
-    enabled: true
-  info:
-    # 标题
-    title: '标题：RuoYi-Cloud-Plus微服务权限管理系统_接口文档'
-    # 描述
-    description: '描述：微服务权限管理系统, 具体包括XXX,XXX模块...'
-    # 版本
-    version: '版本号：系统版本...'
-    # 作者信息
-    contact:
-      name: Lion Li
-      email: crazylionli@163.com
-      url: https://gitee.com/dromara/RuoYi-Cloud-Plus
-
-# seata配置
 seata:
-  # 是否启用
-  enabled: false
-  # Seata 应用编号，默认为应用名
+  enabled: ${SEATA_ENABLED:false}
   application-id: ${spring.application.name}
-  # Seata 事务组编号，用于 TC 集群名
   tx-service-group: ${spring.application.name}-group
   config:
     type: nacos
@@ -312,8 +183,6 @@ seata:
       server-addr: ${spring.cloud.nacos.server-addr}
       group: ${spring.cloud.nacos.config.group}
       namespace: ${spring.profiles.active}
-      username: ${spring.cloud.nacos.username}
-      password: ${spring.cloud.nacos.password}
       data-id: seata-server.properties
   registry:
     type: nacos
@@ -321,17 +190,11 @@ seata:
       application: ruoyi-seata-server
       server-addr: ${spring.cloud.nacos.server-addr}
       group: ${spring.cloud.nacos.discovery.group}
-      username: ${spring.cloud.nacos.username}
-      password: ${spring.cloud.nacos.password}
       namespace: ${spring.profiles.active}
-  # 关闭自动代理
   enable-auto-data-source-proxy: false
 
-# 多租户配置
 tenant:
-  # 是否开启
   enable: false
-  # 排除表
   excludes:
     - sys_menu
     - sys_tenant

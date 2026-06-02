@@ -4,40 +4,35 @@ server:
   servlet:
     context-path: /
 
+# Security
+security:
+  ignore:
+    whites:
+      - /**
+
 # Spring
 spring:
   application:
-    # 应用名称
     name: ruoyi-gateway
-  profiles:
-    # 环境配置
-    active: @profiles.active@
-
-# Dubbo
-dubbo:
-  consumer:
-    # 超时时间 - 增加到 10 秒以支持权限加载
-    timeout: 10000
-
---- # nacos 配置
-spring:
   main:
     allow-bean-definition-overriding: true
   cloud:
-    nacos:
-      # nacos 服务地址
-      server-addr: @nacos.server@
-      username: @nacos.username@
-      password: @nacos.password@
-      discovery:
-        # 注册组
-        group: @nacos.discovery.group@
-        namespace: ${spring.profiles.active}
-      config:
-        # 配置组
-        group: @nacos.config.group@
-        namespace: ${spring.profiles.active}
-  config:
-    import:
-      - optional:nacos:application-common.yml
-      - optional:nacos:${spring.application.name}.yml
+    gateway:
+      requestLog: true
+      routes:
+        - id: music
+          uri: http://hjm-music-web:9212
+          predicates:
+            - Path=/music/**
+          filters:
+            - StripPrefix=1
+  data:
+    redis:
+      host: hjm-redis
+      port: 6379
+      database: 0
+
+# Sa-Token
+sa-token:
+  token-name: Authorization
+  check-same-token: false

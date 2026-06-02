@@ -46,3 +46,14 @@ nbdist/
 !*/build/*.xml
 
 .flattened-pom.xml
+
+######################################################################
+# Docker & Runtime Data
+script/docker-compose-all/middleware/postgres/data/
+script/docker-compose-all/middleware/nacos/logs/
+script/docker-compose-all/middleware/nacos/data/
+script/docker-compose-all/middleware/rabbitmq/data/
+script/docker-compose-all/middleware/redis/data/
+logs/
+*.jar
+!*/src/main/resources/lib/*.jar

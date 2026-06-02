@@ -12,7 +12,7 @@ security:
     charLength: 4
   front-auth:
     # 前台专用客户端ID，需在 sys_client 中先创建对应记录
-    client-id: ""
+    client-id: ${FRONT_AUTH_CLIENT_ID:7f57f2e3c3f14d15a7c4dd8b7e69a241}
     grant-type: password
     register-enabled: true
 

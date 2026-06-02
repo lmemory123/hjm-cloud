@@ -1,0 +1,17 @@
+# Spring
+spring:
+  application:
+    name: ruoyi-gateway
+  profiles:
+    active: prod
+  cloud:
+    nacos:
+      server-addr: hjm-nacos:8848
+      discovery:
+        enabled: true
+        group: DEFAULT_GROUP
+        namespace: prod
+      config:
+        enabled: true
+        group: DEFAULT_GROUP
+        namespace: prod

@@ -953,6 +953,7 @@ create table sys_client (
 
 insert into sys_client values (1, 'e5cd7e4891bf95d1d19206ce24a7b32e', 'pc', 'pc123', 'password,social', 'pc', 1800, 604800, 0, 0, 103, 1, sysdate(), 1, sysdate());
 insert into sys_client values (2, '428a8310cd442757ae699df5d894f051', 'app', 'app123', 'password,sms,social', 'android', 1800, 604800, 0, 0, 103, 1, sysdate(), 1, sysdate());
+insert into sys_client values (3, '7f57f2e3c3f14d15a7c4dd8b7e69a241', 'front', 'front123', 'password', 'web', 1800, 604800, 0, 0, 103, 1, sysdate(), 1, sysdate());
 
 CREATE TABLE test_demo
 (

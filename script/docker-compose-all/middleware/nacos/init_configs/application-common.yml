@@ -3,7 +3,6 @@ spring:
     redis:
       host: hjm-redis
       port: 6379
-      password: "" # Docker standalone redis usually has no password unless set
       database: 0
   rabbitmq:
     host: hjm-rabbitmq

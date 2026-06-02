@@ -799,84 +799,84 @@ COMMENT ON COLUMN music_draft.update_time IS '更新时间';
 -- =====================================================
 
 -- 审核状态
-INSERT INTO sys_dict_type VALUES (100, '000000', '音乐审核状态', 'music_audit_status', 103, 1, now(), NULL, NULL, '音乐审核状态列表') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_type VALUES (100, '音乐审核状态', 'music_audit_status', 103, 1, now(), NULL, NULL, '音乐审核状态列表') ON CONFLICT DO NOTHING;
 
 -- 资源状态
-INSERT INTO sys_dict_type VALUES (101, '000000', '音乐资源状态', 'music_resource_status', 103, 1, now(), NULL, NULL, '音乐资源状态列表') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_type VALUES (101, '音乐资源状态', 'music_resource_status', 103, 1, now(), NULL, NULL, '音乐资源状态列表') ON CONFLICT DO NOTHING;
 
 -- 来源平台
-INSERT INTO sys_dict_type VALUES (102, '000000', '音乐来源平台', 'music_source_type', 103, 1, now(), NULL, NULL, '音乐来源平台列表') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_type VALUES (102, '音乐来源平台', 'music_source_type', 103, 1, now(), NULL, NULL, '音乐来源平台列表') ON CONFLICT DO NOTHING;
 
 -- 关系类型
-INSERT INTO sys_dict_type VALUES (103, '000000', '原曲关系类型', 'music_relation_type', 103, 1, now(), NULL, NULL, '原曲关系类型列表') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_type VALUES (103, '原曲关系类型', 'music_relation_type', 103, 1, now(), NULL, NULL, '原曲关系类型列表') ON CONFLICT DO NOTHING;
 
 -- 标签类型
-INSERT INTO sys_dict_type VALUES (104, '000000', '音乐标签类型', 'music_tag_type', 103, 1, now(), NULL, NULL, '音乐标签类型列表') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_type VALUES (104, '音乐标签类型', 'music_tag_type', 103, 1, now(), NULL, NULL, '音乐标签类型列表') ON CONFLICT DO NOTHING;
 
 -- 链接检测结果
-INSERT INTO sys_dict_type VALUES (105, '000000', '链接检测结果', 'music_check_result', 103, 1, now(), NULL, NULL, '链接检测结果列表') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_type VALUES (105, '链接检测结果', 'music_check_result', 103, 1, now(), NULL, NULL, '链接检测结果列表') ON CONFLICT DO NOTHING;
 
 -- 通知类型
-INSERT INTO sys_dict_type VALUES (106, '000000', '音乐通知类型', 'music_notify_type', 103, 1, now(), NULL, NULL, '音乐通知类型列表') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_type VALUES (106, '音乐通知类型', 'music_notify_type', 103, 1, now(), NULL, NULL, '音乐通知类型列表') ON CONFLICT DO NOTHING;
 
 -- 处理状态
-INSERT INTO sys_dict_type VALUES (107, '000000', '资源处理状态', 'music_process_status', 103, 1, now(), NULL, NULL, '资源处理状态列表') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_type VALUES (107, '资源处理状态', 'music_process_status', 103, 1, now(), NULL, NULL, '资源处理状态列表') ON CONFLICT DO NOTHING;
 
 -- =====================================================
 -- 16. 字典数据 - 音乐模块
 -- =====================================================
 
 -- 审核状态
-INSERT INTO sys_dict_data VALUES (100, '000000', 1, '待审核', '0', 'music_audit_status', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (101, '000000', 2, '已通过', '1', 'music_audit_status', '', 'success', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (102, '000000', 3, '已拒绝', '2', 'music_audit_status', '', 'danger', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (103, '000000', 4, '已下架', '3', 'music_audit_status', '', 'warning', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (100, 1, '待审核', '0', 'music_audit_status', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (101, 2, '已通过', '1', 'music_audit_status', '', 'success', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (102, 3, '已拒绝', '2', 'music_audit_status', '', 'danger', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (103, 4, '已下架', '3', 'music_audit_status', '', 'warning', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
 
 -- 资源状态
-INSERT INTO sys_dict_data VALUES (104, '000000', 1, '正常', '0', 'music_resource_status', '', 'success', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (105, '000000', 2, '失效', '1', 'music_resource_status', '', 'danger', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (106, '000000', 3, '需补档', '2', 'music_resource_status', '', 'warning', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (107, '000000', 4, '处理中', '3', 'music_resource_status', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (104, 1, '正常', '0', 'music_resource_status', '', 'success', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (105, 2, '失效', '1', 'music_resource_status', '', 'danger', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (106, 3, '需补档', '2', 'music_resource_status', '', 'warning', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (107, 4, '处理中', '3', 'music_resource_status', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
 
 -- 来源平台
-INSERT INTO sys_dict_data VALUES (108, '000000', 1, '本地上传', 'local', 'music_source_type', '', 'primary', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (109, '000000', 2, 'B站', 'bilibili', 'music_source_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (110, '000000', 3, '网易云', 'netease', 'music_source_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (111, '000000', 4, 'YouTube', 'youtube', 'music_source_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (112, '000000', 5, 'SoundCloud', 'soundcloud', 'music_source_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (108, 1, '本地上传', 'local', 'music_source_type', '', 'primary', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (109, 2, 'B站', 'bilibili', 'music_source_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (110, 3, '网易云', 'netease', 'music_source_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (111, 4, 'YouTube', 'youtube', 'music_source_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (112, 5, 'SoundCloud', 'soundcloud', 'music_source_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
 
 -- 关系类型
-INSERT INTO sys_dict_data VALUES (113, '000000', 1, '原创', 'original', 'music_relation_type', '', 'success', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (114, '000000', 2, '翻唱', 'cover', 'music_relation_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (115, '000000', 3, '混音', 'remix', 'music_relation_type', '', 'warning', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (116, '000000', 4, '改编', 'arrange', 'music_relation_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (117, '000000', 5, '采样', 'sample', 'music_relation_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (113, 1, '原创', 'original', 'music_relation_type', '', 'success', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (114, 2, '翻唱', 'cover', 'music_relation_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (115, 3, '混音', 'remix', 'music_relation_type', '', 'warning', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (116, 4, '改编', 'arrange', 'music_relation_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (117, 5, '采样', 'sample', 'music_relation_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
 
 -- 标签类型
-INSERT INTO sys_dict_data VALUES (118, '000000', 1, '风格', 'style', 'music_tag_type', '', 'primary', 'N', 103, 1, now(), NULL, NULL, '摇滚、流行、古风等') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (119, '000000', 2, '情绪', 'mood', 'music_tag_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '欢快、伤感、燃等') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (120, '000000', 3, '场景', 'scene', 'music_tag_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '运动、学习、睡前等') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (121, '000000', 4, '语言', 'language', 'music_tag_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '中文、日文、英文等') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (122, '000000', 5, '乐器', 'instrument', 'music_tag_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '钢琴、吉他、电子等') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (123, '000000', 6, '年代', 'era', 'music_tag_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '80s、90s、现代等') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (124, '000000', 7, '主题', 'theme', 'music_tag_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '动漫、游戏、影视等') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (118, 1, '风格', 'style', 'music_tag_type', '', 'primary', 'N', 103, 1, now(), NULL, NULL, '摇滚、流行、古风等') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (119, 2, '情绪', 'mood', 'music_tag_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '欢快、伤感、燃等') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (120, 3, '场景', 'scene', 'music_tag_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '运动、学习、睡前等') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (121, 4, '语言', 'language', 'music_tag_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '中文、日文、英文等') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (122, 5, '乐器', 'instrument', 'music_tag_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '钢琴、吉他、电子等') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (123, 6, '年代', 'era', 'music_tag_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '80s、90s、现代等') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (124, 7, '主题', 'theme', 'music_tag_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '动漫、游戏、影视等') ON CONFLICT DO NOTHING;
 
 -- 链接检测结果
-INSERT INTO sys_dict_data VALUES (125, '000000', 1, '正常', '0', 'music_check_result', '', 'success', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (126, '000000', 2, '失效', '1', 'music_check_result', '', 'danger', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (127, '000000', 3, '超时', '2', 'music_check_result', '', 'warning', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (128, '000000', 4, '异常', '3', 'music_check_result', '', 'danger', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (125, 1, '正常', '0', 'music_check_result', '', 'success', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (126, 2, '失效', '1', 'music_check_result', '', 'danger', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (127, 3, '超时', '2', 'music_check_result', '', 'warning', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (128, 4, '异常', '3', 'music_check_result', '', 'danger', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
 
 -- 通知类型
-INSERT INTO sys_dict_data VALUES (129, '000000', 1, '链接失效', 'link_invalid', 'music_notify_type', '', 'danger', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (130, '000000', 2, '审核结果', 'audit_result', 'music_notify_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (131, '000000', 3, '资源更新', 'resource_update', 'music_notify_type', '', 'success', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (129, 1, '链接失效', 'link_invalid', 'music_notify_type', '', 'danger', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (130, 2, '审核结果', 'audit_result', 'music_notify_type', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (131, 3, '资源更新', 'resource_update', 'music_notify_type', '', 'success', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
 
 -- 处理状态
-INSERT INTO sys_dict_data VALUES (132, '000000', 1, '待处理', '0', 'music_process_status', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (133, '000000', 2, '处理中', '1', 'music_process_status', '', 'warning', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (134, '000000', 3, '已完成', '2', 'music_process_status', '', 'success', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
-INSERT INTO sys_dict_data VALUES (135, '000000', 4, '处理失败', '3', 'music_process_status', '', 'danger', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (132, 1, '待处理', '0', 'music_process_status', '', 'info', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (133, 2, '处理中', '1', 'music_process_status', '', 'warning', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (134, 3, '已完成', '2', 'music_process_status', '', 'success', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
+INSERT INTO sys_dict_data VALUES (135, 4, '处理失败', '3', 'music_process_status', '', 'danger', 'N', 103, 1, now(), NULL, NULL, '') ON CONFLICT DO NOTHING;
 
 -- =====================================================
 -- 执行完成

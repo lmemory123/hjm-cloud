@@ -29,7 +29,7 @@ INSERT INTO music (id, title, creator_id, creator_name, audit_status, is_public,
 
 -- 3. 歌曲资源 (music_resource)
 TRUNCATE TABLE music_resource CASCADE;
-INSERT INTO music_resource (id, music_id, res_type, url, file_size, content_type, create_time) VALUES
+INSERT INTO music_resource (id, music_id, res_type, url, file_size, file_format, create_time) VALUES
 (1, 1001, 'audio', 'https://oss.hajihami.com/songs/hajisong.mp3', 5242880, 'audio/mpeg', now()),
 (2, 1001, 'cover', 'https://oss.hajihami.com/covers/hajisong.jpg', 102400, 'image/jpeg', now()),
 (3, 1002, 'audio', 'https://oss.hajihami.com/songs/mambo.mp3', 4194304, 'audio/mpeg', now()),
@@ -63,15 +63,15 @@ INSERT INTO music_audit_log (id, music_id, action, reason, operator_id, create_t
 
 -- 7. 示例评论 (music_comment)
 TRUNCATE TABLE music_comment CASCADE;
-INSERT INTO music_comment (id, music_id, user_id, content, audit_status, is_public, create_time) VALUES
-(1, 1001, 3001, '太好听了，原教旨赛高！', '1', '1', now() - interval '2 hour'),
-(2, 1001, 3002, '曼波曼波，一起曼波', '1', '1', now() - interval '1 hour');
+INSERT INTO music_comment (id, music_id, user_id, content, create_time) VALUES
+(1, 1001, 3001, '太好听了，原教旨赛高！', now() - interval '2 hour'),
+(2, 1001, 3002, '曼波曼波，一起曼波', now() - interval '1 hour');
 
 -- 8. 榜单快照 (music_chart_snapshot)
 TRUNCATE TABLE music_chart_snapshot CASCADE;
-INSERT INTO music_chart_snapshot (id, chart_type, period_key, snapshot_time, status, create_time) VALUES
-(1, 'week', '2026W21', now() - interval '7 day', '1', now() - interval '7 day'),
-(2, 'month', '2026M05', now() - interval '1 day', '1', now() - interval '1 day');
+INSERT INTO music_chart_snapshot (id, chart_type, period_key, status, create_time) VALUES
+(1, 'week', '2026W21', '1', now() - interval '7 day'),
+(2, 'month', '2026M05', '1', now() - interval '1 day');
 
 INSERT INTO music_chart_item (id, snapshot_id, music_id, rank_no, score, play_count) VALUES
 (1, 1, 1002, 1, 12000, 12000),
