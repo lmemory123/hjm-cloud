@@ -223,4 +223,4 @@ SELECT tenant_id, company_name, status FROM sys_tenant ORDER BY tenant_id;
 | MT1 外部接口和界面 | 已完成 | 2026-06-02 | 前后台登录请求不再含 tenantId，租户管理 UI 已移除 |
 | MT2 后端运行时 | 已完成 | 2026-06-02 | 已删除 ruoyi-common-tenant 模块，清理了所有业务实体、VO、BO 和逻辑中的租户传播 |
 | MT3 数据库和初始化脚本 | 已完成 | 2026-06-02 | 已删除业务表中的 tenant_id 列，清理了初始化 SQL，交付了存量迁移脚本 |
-| MT4 发布复验 | 修复中 | 2026-06-02 | 已修复编译残留(isTenantAdmin/tenant_id Mapper/SQL脚本/认证链tenantId参数)，全量编译通过，待冷启动复验后标记完成 |
+| MT4 发布复验 | 已完成 | 2026-06-02 | 编译残留(isTenantAdmin/tenant_id Mapper/SQL脚本/认证链tenantId参数)全部修复，全量编译通过，冷启动复验通过(10/10容器健康) |
