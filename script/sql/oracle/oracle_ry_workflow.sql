@@ -20,8 +20,7 @@ create table FLOW_DEFINITION
     CREATE_BY       VARCHAR2(64) default '',
     UPDATE_TIME     DATE,
     UPDATE_BY       VARCHAR2(64) default '',
-    DEL_FLAG        VARCHAR2(1) default '0',
-    TENANT_ID       VARCHAR2(40)
+    DEL_FLAG        VARCHAR2(1) default '0'
 );
 
 alter table FLOW_DEFINITION
@@ -46,7 +45,6 @@ comment on column FLOW_DEFINITION.CREATE_BY is '创建人';
 comment on column FLOW_DEFINITION.UPDATE_TIME is '更新时间';
 comment on column FLOW_DEFINITION.UPDATE_BY is '更新人';
 comment on column FLOW_DEFINITION.DEL_FLAG is '删除标志';
-comment on column FLOW_DEFINITION.TENANT_ID is '租户id';
 
 create table FLOW_NODE
 (
@@ -69,8 +67,7 @@ create table FLOW_NODE
     UPDATE_TIME     DATE,
     UPDATE_BY       VARCHAR2(64) default '',
     EXT             CLOB,
-    DEL_FLAG        VARCHAR2(1)   default '0',
-    TENANT_ID       VARCHAR2(40)
+    DEL_FLAG        VARCHAR2(1)   default '0'
 );
 
 alter table FLOW_NODE
@@ -96,7 +93,6 @@ comment on column FLOW_NODE.UPDATE_TIME is '更新时间';
 comment on column FLOW_NODE.UPDATE_BY is '更新人';
 comment on column FLOW_NODE.EXT is '节点扩展属性';
 comment on column FLOW_NODE.DEL_FLAG is '删除标志';
-comment on column FLOW_NODE.TENANT_ID is '租户id';
 comment on column FLOW_NODE.PERMISSION_FLAG is '权限标识（权限类型:权限标识，可以多个，用@@隔开)';
 
 create table FLOW_SKIP
@@ -115,8 +111,7 @@ create table FLOW_SKIP
     CREATE_BY      VARCHAR2(64) default '',
     UPDATE_TIME    DATE,
     UPDATE_BY      VARCHAR2(64) default '',
-    DEL_FLAG       VARCHAR2(1) default '0',
-    TENANT_ID      VARCHAR2(40)
+    DEL_FLAG       VARCHAR2(1) default '0'
 );
 
 alter table FLOW_SKIP
@@ -138,7 +133,6 @@ comment on column FLOW_SKIP.CREATE_BY is '创建人';
 comment on column FLOW_SKIP.UPDATE_TIME is '更新时间';
 comment on column FLOW_SKIP.UPDATE_BY is '更新人';
 comment on column FLOW_SKIP.DEL_FLAG is '删除标志';
-comment on column FLOW_SKIP.TENANT_ID is '租户id';
 
 create table FLOW_INSTANCE
 (
@@ -157,8 +151,7 @@ create table FLOW_INSTANCE
     UPDATE_TIME     DATE,
     UPDATE_BY       VARCHAR2(64) default '',
     EXT             VARCHAR2(500),
-    DEL_FLAG        VARCHAR2(1)  default '0',
-    TENANT_ID       VARCHAR2(40)
+    DEL_FLAG        VARCHAR2(1)  default '0'
 );
 
 alter table FLOW_INSTANCE
@@ -181,7 +174,6 @@ comment on column FLOW_INSTANCE.UPDATE_TIME is '更新时间';
 comment on column FLOW_INSTANCE.UPDATE_BY is '更新人';
 comment on column FLOW_INSTANCE.EXT is '扩展字段，预留给业务系统使用';
 comment on column FLOW_INSTANCE.DEL_FLAG is '删除标志';
-comment on column FLOW_INSTANCE.TENANT_ID is '租户id';
 
 create table FLOW_TASK
 (
@@ -198,8 +190,7 @@ create table FLOW_TASK
     CREATE_BY     VARCHAR2(64) default '',
     UPDATE_TIME   DATE,
     UPDATE_BY     VARCHAR2(64) default '',
-    DEL_FLAG      VARCHAR2(1) default '0',
-    TENANT_ID     VARCHAR2(40)
+    DEL_FLAG      VARCHAR2(1) default '0'
 );
 
 alter table FLOW_TASK
@@ -220,7 +211,6 @@ comment on column FLOW_TASK.CREATE_BY is '创建人';
 comment on column FLOW_TASK.UPDATE_TIME is '更新时间';
 comment on column FLOW_TASK.UPDATE_BY is '更新人';
 comment on column FLOW_TASK.DEL_FLAG is '删除标志';
-comment on column FLOW_TASK.TENANT_ID is '租户id';
 
 create table FLOW_HIS_TASK
 (
@@ -245,8 +235,7 @@ create table FLOW_HIS_TASK
     EXT              CLOB,
     CREATE_TIME      DATE,
     UPDATE_TIME      DATE,
-    DEL_FLAG         VARCHAR2(1) default '0',
-    TENANT_ID        VARCHAR2(40)
+    DEL_FLAG         VARCHAR2(1) default '0'
 
 );
 
@@ -273,7 +262,6 @@ comment on column FLOW_HIS_TASK.EXT is '扩展字段，预留给业务系统使�
 comment on column FLOW_HIS_TASK.CREATE_TIME is '任务开始时间';
 comment on column FLOW_HIS_TASK.UPDATE_TIME is '审批完成时间';
 comment on column FLOW_HIS_TASK.DEL_FLAG is '删除标志';
-comment on column FLOW_HIS_TASK.TENANT_ID is '租户id';
 comment on column FLOW_HIS_TASK.APPROVER is '审批者';
 comment on column FLOW_HIS_TASK.COOPERATE_TYPE is '协作方式(1审批 2转办 3委派 4会签 5票签 6加签 7减签)';
 comment on column FLOW_HIS_TASK.COLLABORATOR is '协作人';
@@ -288,8 +276,7 @@ create table FLOW_USER
     CREATE_BY    VARCHAR2(64) default '',
     UPDATE_TIME  DATE,
     UPDATE_BY    VARCHAR2(64) default '',
-    DEL_FLAG     VARCHAR2(1) default '0',
-    TENANT_ID    VARCHAR2(40)
+    DEL_FLAG     VARCHAR2(1) default '0'
 );
 
 alter table FLOW_USER
@@ -305,7 +292,6 @@ comment on column FLOW_USER.CREATE_BY is '创建人';
 comment on column FLOW_USER.UPDATE_TIME is '更新时间';
 comment on column FLOW_USER.UPDATE_BY is '更新人';
 comment on column FLOW_USER.DEL_FLAG is '删除标志';
-comment on column FLOW_USER.TENANT_ID is '租户id';
 
 create index USER_PROCESSED_TYPE on FLOW_USER (PROCESSED_BY, TYPE);
 create index USER_ASSOCIATED_IDX on FLOW_USER (ASSOCIATED);

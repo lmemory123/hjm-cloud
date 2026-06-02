@@ -34,7 +34,6 @@
 请求体：
 ```json
 {
-  "tenantId": "000000",
   "username": "front_test_001",
   "password": "123456"
 }
@@ -46,7 +45,6 @@
 请求体：
 ```json
 {
-  "tenantId": "000000",
   "username": "front_test_001",
   "password": "123456"
 }

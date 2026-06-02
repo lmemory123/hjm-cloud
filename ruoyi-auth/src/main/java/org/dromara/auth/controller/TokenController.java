@@ -19,7 +19,6 @@ import org.dromara.auth.form.SocialLoginBody;
 import org.dromara.auth.service.IAuthStrategy;
 import org.dromara.auth.service.SysLoginService;
 import org.dromara.common.core.constant.SystemConstants;
-import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.domain.model.LoginBody;
 import org.dromara.common.core.utils.*;

@@ -11,7 +11,6 @@ import org.dromara.auth.service.IAuthStrategy;
 import org.dromara.auth.service.SysLoginService;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
-import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.core.exception.user.CaptchaExpireException;
 import org.dromara.common.core.utils.MessageUtils;
@@ -44,11 +43,10 @@ public class SmsAuthStrategy implements IAuthStrategy {
     public LoginVo login(String body, RemoteClientVo client) {
         SmsLoginBody loginBody = JsonUtils.parseObject(body, SmsLoginBody.class);
         ValidatorUtils.validate(loginBody);
-        String tenantId = TenantConstants.DEFAULT_TENANT_ID;
         String phonenumber = loginBody.getPhonenumber();
         String smsCode = loginBody.getSmsCode();
         LoginUser loginUser = remoteUserService.getUserInfoByPhonenumber(phonenumber);
-        loginService.checkLogin(LoginType.SMS, tenantId, loginUser.getUsername(), () -> !validateSmsCode(tenantId, phonenumber, smsCode));
+        loginService.checkLogin(LoginType.SMS, loginUser.getUsername(), () -> !validateSmsCode(phonenumber, smsCode));
         loginUser.setClientKey(client.getClientKey());
         loginUser.setDeviceType(client.getDeviceType());
         SaLoginParameter model = new SaLoginParameter();
@@ -71,10 +69,10 @@ public class SmsAuthStrategy implements IAuthStrategy {
     /**
      * 校验短信验证码
      */
-    private boolean validateSmsCode(String tenantId, String phonenumber, String smsCode) {
+    private boolean validateSmsCode(String phonenumber, String smsCode) {
         String code = RedisUtils.getCacheObject(GlobalConstants.CAPTCHA_CODE_KEY + phonenumber);
         if (StringUtils.isBlank(code)) {
-            loginService.recordLogininfor(tenantId, phonenumber, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
+            loginService.recordLogininfor(phonenumber, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
             throw new CaptchaExpireException();
         }
         return code.equals(smsCode);

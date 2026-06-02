@@ -13,7 +13,6 @@ import org.dromara.auth.properties.CaptchaProperties;
 import org.dromara.common.core.constant.CacheConstants;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
-import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.core.enums.UserType;
 import org.dromara.common.core.exception.ServiceException;
@@ -60,16 +59,15 @@ public class SysLoginService {
     /**
      * 登录
      */
-    public void login(String tenantId, String username, String password) {
+    public void login(String username, String password) {
         LoginUser user = remoteUserService.getUserInfo(username);
-        checkLogin(LoginType.PASSWORD, tenantId, username, () -> !BCrypt.checkpw(password, user.getPassword()));
+        checkLogin(LoginType.PASSWORD, username, () -> !BCrypt.checkpw(password, user.getPassword()));
     }
 
     /**
      * 注册
      */
     public void register(RegisterBody registerBody) {
-        String tenantId = TenantConstants.DEFAULT_TENANT_ID;
         String username = registerBody.getUsername();
         String password = registerBody.getPassword();
         // 校验用户类型是否存在
@@ -78,7 +76,7 @@ public class SysLoginService {
         boolean captchaEnabled = captchaProperties.getEnabled();
         // 验证码开关
         if (captchaEnabled) {
-            validateCaptcha(tenantId, username, registerBody.getCode(), registerBody.getUuid());
+            validateCaptcha(username, registerBody.getCode(), registerBody.getUuid());
         }
 
         // 注册用户信息
@@ -92,7 +90,7 @@ public class SysLoginService {
         if (!regFlag) {
             throw new UserException("user.register.error");
         }
-        recordLogininfor(tenantId, username, Constants.REGISTER, MessageUtils.message("user.register.success"));
+        recordLogininfor(username, Constants.REGISTER, MessageUtils.message("user.register.success"));
     }
 
     /**
@@ -101,7 +99,7 @@ public class SysLoginService {
     public void logout() {
         LoginUser loginUser = LoginHelper.getLoginUser();
         if (loginUser != null) {
-            recordLogininfor(TenantConstants.DEFAULT_TENANT_ID, loginUser.getUsername(), Constants.LOGOUT, MessageUtils.message("user.logout.success"));
+            recordLogininfor(loginUser.getUsername(), Constants.LOGOUT, MessageUtils.message("user.logout.success"));
         }
         StpUtil.logout();
     }
@@ -109,13 +107,12 @@ public class SysLoginService {
     /**
      * 记录登录信息
      *
-     * @param tenantId 租户ID
      * @param username 用户名
      * @param status   状态
      * @param message  消息
      * @param args     列表
      */
-    public void recordLogininfor(String tenantId, String username, String status, String message, Object... args) {
+    public void recordLogininfor(String username, String status, String message, Object... args) {
         LogininforEvent logininforEvent = new LogininforEvent();
         logininforEvent.setUsername(username);
         logininforEvent.setStatus(status);
@@ -127,10 +124,10 @@ public class SysLoginService {
     /**
      * 校验短信验证码
      */
-    public boolean validateSmsCode(String tenantId, String phonenumber, String smsCode) {
+    public boolean validateSmsCode(String phonenumber, String smsCode) {
         String code = RedisUtils.getCacheObject(GlobalConstants.CAPTCHA_CODE_KEY + phonenumber);
         if (StringUtils.isBlank(code)) {
-            recordLogininfor(tenantId, phonenumber, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
+            recordLogininfor(phonenumber, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
             throw new CaptchaExpireException();
         }
         return code.equals(smsCode);
@@ -139,10 +136,10 @@ public class SysLoginService {
     /**
      * 校验邮箱验证码
      */
-    public boolean validateEmailCode(String tenantId, String email, String emailCode) {
+    public boolean validateEmailCode(String email, String emailCode) {
         String code = RedisUtils.getCacheObject(GlobalConstants.CAPTCHA_CODE_KEY + email);
         if (StringUtils.isBlank(code)) {
-            recordLogininfor(tenantId, email, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
+            recordLogininfor(email, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
             throw new CaptchaExpireException();
         }
         return code.equals(emailCode);
@@ -151,21 +148,20 @@ public class SysLoginService {
     /**
      * 校验验证码
      *
-     * @param tenantId 租户ID
      * @param username 用户名
      * @param code     验证码
      * @param uuid     唯一标识
      */
-    public void validateCaptcha(String tenantId, String username, String code, String uuid) {
+    public void validateCaptcha(String username, String code, String uuid) {
         String verifyKey = GlobalConstants.CAPTCHA_CODE_KEY + StringUtils.defaultString(uuid, "");
         String captcha = RedisUtils.getCacheObject(verifyKey);
         RedisUtils.deleteObject(verifyKey);
         if (captcha == null) {
-            recordLogininfor(tenantId, username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
+            recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.expire"));
             throw new CaptchaExpireException();
         }
         if (!code.equalsIgnoreCase(captcha)) {
-            recordLogininfor(tenantId, username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error"));
+            recordLogininfor(username, Constants.LOGIN_FAIL, MessageUtils.message("user.jcaptcha.error"));
             throw new CaptchaException();
         }
     }
@@ -173,7 +169,7 @@ public class SysLoginService {
     /**
      * 登录校验
      */
-    public void checkLogin(LoginType loginType, String tenantId, String username, Supplier<Boolean> supplier) {
+    public void checkLogin(LoginType loginType, String username, Supplier<Boolean> supplier) {
         String errorKey = CacheConstants.PWD_ERR_CNT_KEY + username;
         String loginFail = Constants.LOGIN_FAIL;
 
@@ -185,7 +181,7 @@ public class SysLoginService {
 
         // 判断是否有锁
         if (ObjUtil.isNotNull(errorNumber) && errorNumber >= Constants.PASSWORD_MAX_RETRY_COUNT) {
-            recordLogininfor(tenantId, username, loginFail, MessageUtils.message("user.password.retry.limit.exceed", Constants.PASSWORD_MAX_RETRY_COUNT, lockTime));
+            recordLogininfor(username, loginFail, MessageUtils.message("user.password.retry.limit.exceed", Constants.PASSWORD_MAX_RETRY_COUNT, lockTime));
             throw new UserException("user.password.retry.limit.exceed", Constants.PASSWORD_MAX_RETRY_COUNT, lockTime);
         }
 
@@ -195,12 +191,12 @@ public class SysLoginService {
             // 达到最大错误次数记录次数
             if (errorNumber >= Constants.PASSWORD_MAX_RETRY_COUNT) {
                 RedisUtils.setCacheObject(errorKey, errorNumber, Duration.ofMinutes(lockTime));
-                recordLogininfor(tenantId, username, loginFail, MessageUtils.message("user.password.retry.limit.exceed", Constants.PASSWORD_MAX_RETRY_COUNT, lockTime));
+                recordLogininfor(username, loginFail, MessageUtils.message("user.password.retry.limit.exceed", Constants.PASSWORD_MAX_RETRY_COUNT, lockTime));
                 throw new UserException("user.password.retry.limit.exceed", Constants.PASSWORD_MAX_RETRY_COUNT, lockTime);
             } else {
                 // 未达到最大错误次数记录次数
                 RedisUtils.setCacheObject(errorKey, errorNumber);
-                recordLogininfor(tenantId, username, loginFail, MessageUtils.message("user.password.retry.limit.count", errorNumber));
+                recordLogininfor(username, loginFail, MessageUtils.message("user.password.retry.limit.count", errorNumber));
                 throw new UserException("user.password.retry.limit.count", errorNumber);
             }
         }
@@ -210,18 +206,9 @@ public class SysLoginService {
     }
 
     /**
-     * 校验租户
-     *
-     * @param tenantId 租户ID
-     */
-    public void checkTenant(String tenantId) {
-    }
-
-    /**
      * 第三方登录业务处理
      */
     public void socialRegister(AuthUser authUserData) {
-        String tenantId = TenantConstants.DEFAULT_TENANT_ID;
         RemoteSocialBo socialBo = new RemoteSocialBo();
         socialBo.setUserId(LoginHelper.getUserId());
         socialBo.setAuthId(authUserData.getSource() + authUserData.getUuid());

@@ -94,7 +94,6 @@ isEncrypt: true
 
 ```json
 {
-  "tenantId": "000000",
   "username": "front_test_001",
   "password": "123456",
   "code": "",
@@ -106,7 +105,6 @@ isEncrypt: true
 
 | 字段 | 是否必填 | 说明 |
 |---|---|---|
-| tenantId | 是 | 租户 ID，多租户场景建议必传 |
 | username | 是 | 用户名 |
 | password | 是 | 密码 |
 | code | 否 | 验证码开启时必传 |
@@ -161,7 +159,6 @@ Content-Type: application/json
 
 ```json
 {
-  "tenantId": "000000",
   "username": "front_test_001",
   "password": "123456",
   "code": "",
@@ -218,7 +215,6 @@ POST http://localhost:8080/auth/front/register
 Content-Type: application/json
 
 {
-  "tenantId": "000000",
   "username": "front_test_001",
   "password": "123456"
 }
@@ -228,7 +224,6 @@ POST http://localhost:8080/auth/front/login
 Content-Type: application/json
 
 {
-  "tenantId": "000000",
   "username": "front_test_001",
   "password": "123456"
 }

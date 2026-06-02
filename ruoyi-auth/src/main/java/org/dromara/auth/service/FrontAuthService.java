@@ -15,7 +15,6 @@ import org.dromara.auth.properties.CaptchaProperties;
 import org.dromara.auth.properties.FrontAuthProperties;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.SystemConstants;
-import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.core.enums.UserType;
 import org.dromara.common.core.exception.ServiceException;
@@ -52,19 +51,18 @@ public class FrontAuthService {
     public LoginVo login(FrontPasswordLoginBody body) {
         ValidatorUtils.validate(body);
         RemoteClientVo clientVo = getFrontClient();
-        String tenantId = TenantConstants.DEFAULT_TENANT_ID;
         String username = body.getUsername();
 
         if (Boolean.TRUE.equals(captchaProperties.getEnabled())) {
-            sysLoginService.validateCaptcha(tenantId, username, body.getCode(), body.getUuid());
+            sysLoginService.validateCaptcha(username, body.getCode(), body.getUuid());
         }
 
         LoginUser loginUser = remoteUserService.getUserInfo(username);
         if (ObjUtil.isNull(loginUser) || !Strings.CS.equals(loginUser.getUserType(), UserType.APP_USER.getUserType())) {
-            sysLoginService.recordLogininfor(tenantId, username, Constants.LOGIN_FAIL, "前台用户不存在或类型不匹配");
+            sysLoginService.recordLogininfor(username, Constants.LOGIN_FAIL, "前台用户不存在或类型不匹配");
             throw new UserException("user.not.exists", username);
         }
-        sysLoginService.checkLogin(LoginType.PASSWORD, tenantId, username,
+        sysLoginService.checkLogin(LoginType.PASSWORD, username,
             () -> !BCrypt.checkpw(body.getPassword(), loginUser.getPassword()));
 
         loginUser.setClientKey(clientVo.getClientKey());
@@ -86,12 +84,11 @@ public class FrontAuthService {
 
     public void register(FrontRegisterBody body) {
         ValidatorUtils.validate(body);
-        String tenantId = TenantConstants.DEFAULT_TENANT_ID;
         String username = body.getUsername();
         String password = body.getPassword();
 
         if (Boolean.TRUE.equals(captchaProperties.getEnabled())) {
-            sysLoginService.validateCaptcha(tenantId, username, body.getCode(), body.getUuid());
+            sysLoginService.validateCaptcha(username, body.getCode(), body.getUuid());
         }
         if (!Boolean.TRUE.equals(frontAuthProperties.getRegisterEnabled())) {
             throw new ServiceException("当前系统没有开启前台注册功能！");
@@ -107,7 +104,7 @@ public class FrontAuthService {
         if (!regFlag) {
             throw new UserException("user.register.error");
         }
-        sysLoginService.recordLogininfor(tenantId, username, Constants.REGISTER, MessageUtils.message("user.register.success"));
+        sysLoginService.recordLogininfor(username, Constants.REGISTER, MessageUtils.message("user.register.success"));
     }
 
     private RemoteClientVo getFrontClient() {

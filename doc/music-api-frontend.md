@@ -81,14 +81,12 @@ Authorization: Bearer {access_token}
 
 ```json
 {
-  "tenantId": "000000",
   "username": "front_test_001",
   "password": "123456"
 }
 ```
 
 字段说明：
-- `tenantId`：可选，默认租户可传 `000000`
 - `username`：必填，长度 2-30
 - `password`：必填，长度 5-30
 - `code`：验证码开启时传
@@ -104,7 +102,6 @@ Authorization: Bearer {access_token}
 
 ```json
 {
-  "tenantId": "000000",
   "username": "front_test_001",
   "password": "123456"
 }
