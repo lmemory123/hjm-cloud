@@ -95,3 +95,9 @@
 - 每完成一个阶段，必须更新第 4 节“当前完成记录”。
 - 每次开始新阶段前，先更新第 5 节“后续交接区”。
 - 验证失败必须在第 6 节“已知风险”记录原因。
+
+## 8. 下一专项：业务系统去多租户化
+
+哈基哈米按单站点音乐社区运行，不需要 SaaS 多租户能力。后续按独立专项删除业务多租户入口、运行时隔离逻辑、租户 CRUD 和应用数据库字段。
+
+执行前必须阅读 [`hajihami-remove-multitenancy-plan.md`](./hajihami-remove-multitenancy-plan.md)。特别注意：Nacos 自身 schema 和 HTTP API 中的 `tenant` 参数用于配置 namespace，必须保留。
