@@ -37,10 +37,8 @@ create table sys_social
 -- ----------------------------
 -- 租户表
 -- ----------------------------
-create table sys_tenant
 (
     id                bigint(20)    not null        comment 'id',
-    tenant_id         varchar(20)   not null        comment '租户编号',
     contact_user_name varchar(20)                   comment '联系人',
     contact_phone     varchar(20)                   comment '联系电话',
     company_name      varchar(30)                   comment '企业名称',
@@ -67,13 +65,11 @@ create table sys_tenant
 -- 初始化-租户表数据
 -- ----------------------------
 
-insert into sys_tenant values(1, '000000', '管理组', '15888888888', 'XXX有限公司', NULL, NULL, '多租户通用后台管理管理系统', NULL, NULL, NULL, NULL, -1, '0', '0', 103, 1, sysdate(), NULL, NULL);
 
 
 -- ----------------------------
 -- 租户套餐表
 -- ----------------------------
-create table sys_tenant_package (
     package_id              bigint(20)     not null    comment '租户套餐id',
     package_name            varchar(20)                comment '套餐名称',
     menu_ids                varchar(3000)              comment '关联菜单id',

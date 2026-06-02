@@ -12,7 +12,7 @@
     <artifactId>ruoyi-job</artifactId>
 
     <description>
-        ruoyi-job 任务调度模块
+        ruoyi-job定时任务
     </description>
 
     <dependencies>
@@ -30,17 +30,12 @@
 
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>ruoyi-common-web</artifactId>
+            <artifactId>ruoyi-common-security</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>ruoyi-common-dubbo</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.dromara</groupId>
-            <artifactId>ruoyi-common-mybatis</artifactId>
+            <artifactId>ruoyi-common-translation</artifactId>
         </dependency>
 
         <dependency>
@@ -50,24 +45,26 @@
 
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>ruoyi-common-tenant</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.dromara</groupId>
-                    <artifactId>ruoyi-common-mybatis</artifactId>
-                </exclusion>
-            </exclusions>
+            <artifactId>ruoyi-common-idempotent</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>ruoyi-common-security</artifactId>
+            <artifactId>ruoyi-common-doc</artifactId>
         </dependency>
 
-        <!-- RuoYi Api System -->
         <dependency>
             <groupId>org.dromara</groupId>
-            <artifactId>ruoyi-api-system</artifactId>
+            <artifactId>ruoyi-common-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dromara</groupId>
+            <artifactId>hjm-mybatis-flex</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
         </dependency>
 
     </dependencies>

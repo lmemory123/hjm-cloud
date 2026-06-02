@@ -193,16 +193,3 @@ seata:
       namespace: ${spring.profiles.active}
   enable-auto-data-source-proxy: false
 
-tenant:
-  enable: false
-  excludes:
-    - sys_menu
-    - sys_tenant
-    - sys_tenant_package
-    - sys_role_dept
-    - sys_role_menu
-    - sys_user_post
-    - sys_user_role
-    - sys_client
-    - sys_oss_config
-    - flow_spel

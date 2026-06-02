@@ -29,7 +29,6 @@ public class VelocityUtils {
 
     private static final Set<String> BASE_ENTITY_FIELDS = Set.of(
             "createDept", "createBy", "createTime", "updateBy", "updateTime");
-    private static final String TENANT_ID_FIELD = "tenantId";
 
     /**
      * 项目空间路径
@@ -59,8 +58,7 @@ public class VelocityUtils {
         String functionName = genTable.getFunctionName();
 
         VelocityContext velocityContext = new VelocityContext();
-        boolean useTenantEntity = shouldUseTenantEntity(genTable);
-        boolean useBaseEntity = shouldUseBaseEntity(genTable, useTenantEntity);
+        boolean useBaseEntity = shouldUseBaseEntity(genTable);
         velocityContext.put("tplCategory", genTable.getTplCategory());
         velocityContext.put("tableName", genTable.getTableName());
         velocityContext.put("functionName", StringUtils.isNotEmpty(functionName) ? functionName : "【请填写功能名称】");
@@ -84,7 +82,6 @@ public class VelocityUtils {
         velocityContext.put("pkColumn", genTable.getPkColumn());
         velocityContext.put("columns", genTable.getColumns());
         velocityContext.put("table", genTable);
-        velocityContext.put("useTenantEntity", useTenantEntity);
         velocityContext.put("useBaseEntity", useBaseEntity);
         velocityContext.put("StrUtil", new StrUtil());
         setMenuVelocityContext(velocityContext, genTable);
@@ -233,9 +230,8 @@ public class VelocityUtils {
     public static HashSet<String> getImportList(GenTable genTable) {
         List<GenTableColumn> columns = genTable.getColumns();
         HashSet<String> importList = new HashSet<>();
-        boolean useTenantEntity = shouldUseTenantEntity(genTable);
-        boolean useBaseEntity = shouldUseBaseEntity(genTable, useTenantEntity);
-        boolean useSuperColumns = useTenantEntity || useBaseEntity;
+        boolean useBaseEntity = shouldUseBaseEntity(genTable);
+        boolean useSuperColumns = useBaseEntity;
         for (GenTableColumn column : columns) {
             boolean isSuperColumn = useSuperColumns && column.isSuperColumn();
             if (!isSuperColumn && GenConstants.TYPE_DATE.equals(column.getJavaType())) {
@@ -400,12 +396,8 @@ public class VelocityUtils {
         return num;
     }
 
-    private static boolean shouldUseTenantEntity(GenTable genTable) {
-        return hasJavaField(genTable, TENANT_ID_FIELD) && hasAllJavaFields(genTable, BASE_ENTITY_FIELDS);
-    }
-
-    private static boolean shouldUseBaseEntity(GenTable genTable, boolean useTenantEntity) {
-        return !useTenantEntity && hasAllJavaFields(genTable, BASE_ENTITY_FIELDS);
+    private static boolean shouldUseBaseEntity(GenTable genTable) {
+        return hasAllJavaFields(genTable, BASE_ENTITY_FIELDS);
     }
 
     private static boolean hasAllJavaFields(GenTable genTable, Set<String> fields) {

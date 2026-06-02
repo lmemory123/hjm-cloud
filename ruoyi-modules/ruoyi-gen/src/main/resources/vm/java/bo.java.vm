@@ -1,10 +1,8 @@
 package ${packageName}.domain.bo;
 
-#set($useSuperColumns = $useBaseEntity || $useTenantEntity)
+#set($useSuperColumns = $useBaseEntity)
 import ${packageName}.domain.${ClassName};
-#if($useTenantEntity)
-import org.dromara.common.tenant.core.TenantEntity;
-#elseif($useBaseEntity)
+#if($useBaseEntity)
 import org.dromara.common.mybatisflex.core.domain.BaseEntity;
 #else
 import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
@@ -28,9 +26,7 @@ import ${import};
  */
 @Data
 #set($Entity="")
-#if($useTenantEntity)
-#set($Entity="TenantEntity")
-#elseif($useBaseEntity)
+#if($useBaseEntity)
 #set($Entity="BaseEntity")
 #end
 @EqualsAndHashCode(callSuper = true)

@@ -5,7 +5,7 @@ import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.system.domain.base.SystemTenantEntity;
+import org.dromara.common.mybatisflex.core.domain.BaseEntity;
 
 import java.io.Serial;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table("sys_dept")
-public class SysDept extends SystemTenantEntity {
+public class SysDept extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;

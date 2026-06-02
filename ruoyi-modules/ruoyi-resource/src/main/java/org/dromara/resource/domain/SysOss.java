@@ -23,11 +23,6 @@ public class SysOss extends BaseEntity {
     private Long ossId;
 
     /**
-     * 租户编号
-     */
-    private String tenantId;
-
-    /**
      * 文件名
      */
     private String fileName;

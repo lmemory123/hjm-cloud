@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.dromara.common.core.constant.SystemConstants;
-import org.dromara.system.domain.base.SystemTenantEntity;
+import org.dromara.common.mybatisflex.core.domain.BaseEntity;
 
 import java.util.Date;
 
@@ -21,7 +21,7 @@ import java.util.Date;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table("sys_user")
-public class SysUser extends SystemTenantEntity {
+public class SysUser extends BaseEntity {
 
     /**
      * 用户ID

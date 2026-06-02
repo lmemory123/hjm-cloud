@@ -39,7 +39,6 @@
         <module>ruoyi-common-sensitive</module>
         <module>ruoyi-common-json</module>
         <module>ruoyi-common-encrypt</module>
-        <module>ruoyi-common-tenant</module>
         <module>momao-valkey-search</module>
         <module>ruoyi-common-websocket</module>
         <module>ruoyi-common-social</module>

@@ -58,7 +58,12 @@ public interface Constants {
     String REGISTER = "Register";
 
     /**
-     * 登录失败
+     * 登录密码错误限制次数
+     */
+    int PASSWORD_MAX_RETRY_COUNT = 5;
+
+    /**
+     * 登录名
      */
     String LOGIN_FAIL = "Error";
 

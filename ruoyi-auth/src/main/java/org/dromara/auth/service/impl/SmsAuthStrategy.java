@@ -11,6 +11,7 @@ import org.dromara.auth.service.IAuthStrategy;
 import org.dromara.auth.service.SysLoginService;
 import org.dromara.common.core.constant.Constants;
 import org.dromara.common.core.constant.GlobalConstants;
+import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.enums.LoginType;
 import org.dromara.common.core.exception.user.CaptchaExpireException;
 import org.dromara.common.core.utils.MessageUtils;
@@ -19,7 +20,6 @@ import org.dromara.common.core.utils.ValidatorUtils;
 import org.dromara.common.json.utils.JsonUtils;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.common.satoken.utils.LoginHelper;
-import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.api.RemoteUserService;
 import org.dromara.system.api.domain.vo.RemoteClientVo;
 import org.dromara.system.api.model.LoginUser;
@@ -44,14 +44,11 @@ public class SmsAuthStrategy implements IAuthStrategy {
     public LoginVo login(String body, RemoteClientVo client) {
         SmsLoginBody loginBody = JsonUtils.parseObject(body, SmsLoginBody.class);
         ValidatorUtils.validate(loginBody);
-        String tenantId = loginBody.getTenantId();
+        String tenantId = TenantConstants.DEFAULT_TENANT_ID;
         String phonenumber = loginBody.getPhonenumber();
         String smsCode = loginBody.getSmsCode();
-        LoginUser loginUser = TenantHelper.dynamic(tenantId, () -> {
-            LoginUser user = remoteUserService.getUserInfoByPhonenumber(phonenumber, tenantId);
-            loginService.checkLogin(LoginType.SMS, tenantId, user.getUsername(), () -> !validateSmsCode(tenantId, phonenumber, smsCode));
-            return user;
-        });
+        LoginUser loginUser = remoteUserService.getUserInfoByPhonenumber(phonenumber);
+        loginService.checkLogin(LoginType.SMS, tenantId, loginUser.getUsername(), () -> !validateSmsCode(tenantId, phonenumber, smsCode));
         loginUser.setClientKey(client.getClientKey());
         loginUser.setDeviceType(client.getDeviceType());
         SaLoginParameter model = new SaLoginParameter();

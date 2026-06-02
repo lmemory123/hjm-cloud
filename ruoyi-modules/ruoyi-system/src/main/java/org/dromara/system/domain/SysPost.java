@@ -4,7 +4,8 @@ import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.system.domain.base.SystemTenantEntity;
+import lombok.NoArgsConstructor;
+import org.dromara.common.mybatisflex.core.domain.BaseEntity;
 
 /**
  * 岗位表 sys_post
@@ -13,10 +14,10 @@ import org.dromara.system.domain.base.SystemTenantEntity;
  */
 
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table("sys_post")
-public class SysPost extends SystemTenantEntity {
-
+public class SysPost extends BaseEntity {
     /**
      * 岗位序号
      */

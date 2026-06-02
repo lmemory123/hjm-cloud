@@ -4,7 +4,8 @@ import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.system.domain.base.SystemTenantEntity;
+import lombok.NoArgsConstructor;
+import org.dromara.common.mybatisflex.core.domain.BaseEntity;
 
 /**
  * 参数配置表 sys_config
@@ -13,10 +14,10 @@ import org.dromara.system.domain.base.SystemTenantEntity;
  */
 
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table("sys_config")
-public class SysConfig extends SystemTenantEntity {
-
+public class SysConfig extends BaseEntity {
     /**
      * 参数主键
      */

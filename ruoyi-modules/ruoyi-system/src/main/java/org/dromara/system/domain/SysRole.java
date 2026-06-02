@@ -6,7 +6,7 @@ import com.mybatisflex.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.dromara.system.domain.base.SystemTenantEntity;
+import org.dromara.common.mybatisflex.core.domain.BaseEntity;
 
 /**
  * 角色表 sys_role
@@ -18,7 +18,7 @@ import org.dromara.system.domain.base.SystemTenantEntity;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table("sys_role")
-public class SysRole extends SystemTenantEntity {
+public class SysRole extends BaseEntity {
 
     /**
      * 角色ID

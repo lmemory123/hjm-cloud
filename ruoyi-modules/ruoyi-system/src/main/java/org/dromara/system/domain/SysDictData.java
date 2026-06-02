@@ -4,8 +4,9 @@ import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.dromara.common.core.constant.SystemConstants;
-import org.dromara.system.domain.base.SystemTenantEntity;
+import org.dromara.common.mybatisflex.core.domain.BaseEntity;
 
 /**
  * 字典数据表 sys_dict_data
@@ -14,10 +15,10 @@ import org.dromara.system.domain.base.SystemTenantEntity;
  */
 
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table("sys_dict_data")
-public class SysDictData extends SystemTenantEntity {
-
+public class SysDictData extends BaseEntity {
     /**
      * 字典编码
      */

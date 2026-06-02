@@ -17,7 +17,6 @@ import org.dromara.common.core.utils.StreamUtils;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.core.utils.ThreadUtils;
 import org.dromara.common.mybatisflex.helper.DataPermissionHelper;
-import org.dromara.common.tenant.helper.TenantHelper;
 import org.dromara.system.api.RemoteUserService;
 import org.dromara.system.api.domain.bo.RemoteUserBo;
 import org.dromara.system.api.domain.vo.RemoteUserVo;
@@ -67,92 +66,80 @@ public class RemoteUserServiceImpl implements RemoteUserService {
      * 通过用户名查询用户信息
      *
      * @param username 用户名
-     * @param tenantId 租户id
      * @return 结果
      */
     @Override
-    public LoginUser getUserInfo(String username, String tenantId) throws UserException {
-        return TenantHelper.dynamic(tenantId, () -> {
-            SysUserVo sysUser = userMapper.selectVoOne(QueryWrapper.create().eq(SysUser::getUserName, username));
-            if (ObjUtil.isNull(sysUser)) {
-                throw new UserException("user.not.exists", username);
-            }
-            if (UserStatus.DISABLE.getCode().equals(sysUser.getStatus())) {
-                throw new UserException("user.blocked", username);
-            }
-            // 框架登录不限制从什么表查询 只要最终构建出 LoginUser 即可
-            // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
-            return buildLoginUser(sysUser);
-        });
+    public LoginUser getUserInfo(String username) throws UserException {
+        SysUserVo sysUser = userMapper.selectVoOne(QueryWrapper.create().eq(SysUser::getUserName, username));
+        if (ObjUtil.isNull(sysUser)) {
+            throw new UserException("user.not.exists", username);
+        }
+        if (UserStatus.DISABLE.getCode().equals(sysUser.getStatus())) {
+            throw new UserException("user.blocked", username);
+        }
+        // 框架登录不限制从什么表查询 只要最终构建出 LoginUser 即可
+        // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
+        return buildLoginUser(sysUser);
     }
 
     /**
      * 通过用户id查询用户信息
      *
      * @param userId   用户id
-     * @param tenantId 租户id
      * @return 结果
      */
     @Override
-    public LoginUser getUserInfo(Long userId, String tenantId) throws UserException {
-        return TenantHelper.dynamic(tenantId, () -> {
-            SysUserVo sysUser = userMapper.selectVoById(userId);
-            if (ObjUtil.isNull(sysUser)) {
-                throw new UserException("user.not.exists", "");
-            }
-            if (UserStatus.DISABLE.getCode().equals(sysUser.getStatus())) {
-                throw new UserException("user.blocked", sysUser.getUserName());
-            }
-            // 框架登录不限制从什么表查询 只要最终构建出 LoginUser 即可
-            // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
-            return buildLoginUser(sysUser);
-        });
+    public LoginUser getUserInfo(Long userId) throws UserException {
+        SysUserVo sysUser = userMapper.selectVoById(userId);
+        if (ObjUtil.isNull(sysUser)) {
+            throw new UserException("user.not.exists", "");
+        }
+        if (UserStatus.DISABLE.getCode().equals(sysUser.getStatus())) {
+            throw new UserException("user.blocked", sysUser.getUserName());
+        }
+        // 框架登录不限制从什么表查询 只要最终构建出 LoginUser 即可
+        // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
+        return buildLoginUser(sysUser);
     }
 
     /**
      * 通过手机号查询用户信息
      *
      * @param phonenumber 手机号
-     * @param tenantId    租户id
      * @return 结果
      */
     @Override
-    public LoginUser getUserInfoByPhonenumber(String phonenumber, String tenantId) throws UserException {
-        return TenantHelper.dynamic(tenantId, () -> {
-            SysUserVo sysUser = userMapper.selectVoOne(QueryWrapper.create().eq(SysUser::getPhonenumber, phonenumber));
-            if (ObjUtil.isNull(sysUser)) {
-                throw new UserException("user.not.exists", phonenumber);
-            }
-            if (UserStatus.DISABLE.getCode().equals(sysUser.getStatus())) {
-                throw new UserException("user.blocked", phonenumber);
-            }
-            // 框架登录不限制从什么表查询 只要最终构建出 LoginUser 即可
-            // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
-            return buildLoginUser(sysUser);
-        });
+    public LoginUser getUserInfoByPhonenumber(String phonenumber) throws UserException {
+        SysUserVo sysUser = userMapper.selectVoOne(QueryWrapper.create().eq(SysUser::getPhonenumber, phonenumber));
+        if (ObjUtil.isNull(sysUser)) {
+            throw new UserException("user.not.exists", phonenumber);
+        }
+        if (UserStatus.DISABLE.getCode().equals(sysUser.getStatus())) {
+            throw new UserException("user.blocked", phonenumber);
+        }
+        // 框架登录不限制从什么表查询 只要最终构建出 LoginUser 即可
+        // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
+        return buildLoginUser(sysUser);
     }
 
     /**
      * 通过邮箱查询用户信息
      *
      * @param email    邮箱
-     * @param tenantId 租户id
      * @return 结果
      */
     @Override
-    public LoginUser getUserInfoByEmail(String email, String tenantId) throws UserException {
-        return TenantHelper.dynamic(tenantId, () -> {
-            SysUserVo user = userMapper.selectVoOne(QueryWrapper.create().eq(SysUser::getEmail, email));
-            if (ObjUtil.isNull(user)) {
-                throw new UserException("user.not.exists", email);
-            }
-            if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
-                throw new UserException("user.blocked", email);
-            }
-            // 框架登录不限制从什么表查询 只要最终构建出 LoginUser 即可
-            // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
-            return buildLoginUser(user);
-        });
+    public LoginUser getUserInfoByEmail(String email) throws UserException {
+        SysUserVo user = userMapper.selectVoOne(QueryWrapper.create().eq(SysUser::getEmail, email));
+        if (ObjUtil.isNull(user)) {
+            throw new UserException("user.not.exists", email);
+        }
+        if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+            throw new UserException("user.blocked", email);
+        }
+        // 框架登录不限制从什么表查询 只要最终构建出 LoginUser 即可
+        // 此处可根据登录用户的数据不同 自行创建 loginUser 属性不够用继承扩展就行了
+        return buildLoginUser(user);
     }
 
     /**
@@ -192,17 +179,15 @@ public class RemoteUserServiceImpl implements RemoteUserService {
     public Boolean registerUserInfo(RemoteUserBo remoteUserBo) throws UserException, ServiceException {
         SysUserBo sysUserBo = MapstructUtils.convert(remoteUserBo, SysUserBo.class);
         String username = sysUserBo.getUserName();
-        boolean exist = TenantHelper.dynamic(remoteUserBo.getTenantId(), () -> {
-            if (!("true".equals(configService.selectConfigByKey("sys.account.registerUser")))) {
-                throw new ServiceException("当前系统没有开启注册功能");
-            }
-            return userMapper.selectCountByQuery(QueryWrapper.create()
-                .eq(SysUser::getUserName, sysUserBo.getUserName())) > 0;
-        });
+        if (!("true".equals(configService.selectConfigByKey("sys.account.registerUser")))) {
+            throw new ServiceException("当前系统没有开启注册功能");
+        }
+        boolean exist = userMapper.selectCountByQuery(QueryWrapper.create()
+            .eq(SysUser::getUserName, sysUserBo.getUserName())) > 0;
         if (exist) {
             throw new UserException("user.register.save.error", username);
         }
-        return userService.registerUser(sysUserBo, remoteUserBo.getTenantId());
+        return userService.registerUser(sysUserBo);
     }
 
     /**
@@ -215,14 +200,12 @@ public class RemoteUserServiceImpl implements RemoteUserService {
     public Boolean registerFrontUserInfo(RemoteUserBo remoteUserBo) throws UserException, ServiceException {
         SysUserBo sysUserBo = MapstructUtils.convert(remoteUserBo, SysUserBo.class);
         String username = sysUserBo.getUserName();
-        boolean exist = TenantHelper.dynamic(remoteUserBo.getTenantId(), () ->
-            userMapper.selectCountByQuery(QueryWrapper.create()
-                .eq(SysUser::getUserName, sysUserBo.getUserName())) > 0
-        );
+        boolean exist = userMapper.selectCountByQuery(QueryWrapper.create()
+                .eq(SysUser::getUserName, sysUserBo.getUserName())) > 0;
         if (exist) {
             throw new UserException("user.register.save.error", username);
         }
-        return userService.registerUser(sysUserBo, remoteUserBo.getTenantId());
+        return userService.registerUser(sysUserBo);
     }
 
     /**
@@ -286,7 +269,6 @@ public class RemoteUserServiceImpl implements RemoteUserService {
     private LoginUser buildLoginUser(SysUserVo userVo) {
         LoginUser loginUser = new LoginUser();
         Long userId = userVo.getUserId();
-        loginUser.setTenantId(userVo.getTenantId());
         loginUser.setUserId(userId);
         loginUser.setDeptId(userVo.getDeptId());
         loginUser.setUsername(userVo.getUserName());

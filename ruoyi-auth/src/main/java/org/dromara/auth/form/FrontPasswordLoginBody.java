@@ -11,11 +11,6 @@ import org.hibernate.validator.constraints.Length;
 public class FrontPasswordLoginBody {
 
     /**
-     * 租户ID
-     */
-    private String tenantId;
-
-    /**
      * 验证码
      */
     private String code;

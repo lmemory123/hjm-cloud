@@ -1,9 +1,7 @@
 package ${packageName}.domain;
 
-#set($useSuperColumns = $useBaseEntity || $useTenantEntity)
-#if($useTenantEntity)
-import org.dromara.common.tenant.core.TenantEntity;
-#elseif($useBaseEntity)
+#set($useSuperColumns = $useBaseEntity)
+#if($useBaseEntity)
 import org.dromara.common.mybatisflex.core.domain.BaseEntity;
 #else
 import org.dromara.common.mybatisflex.core.domain.QueryBaseEntity;
@@ -24,9 +22,7 @@ import ${import};
  * @date ${datetime}
  */
 #set($Entity="")
-#if($useTenantEntity)
-#set($Entity="TenantEntity")
-#elseif($useBaseEntity)
+#if($useBaseEntity)
 #set($Entity="BaseEntity")
 #end
 @Data

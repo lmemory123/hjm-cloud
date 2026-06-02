@@ -4,19 +4,20 @@ import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.dromara.system.domain.base.SystemTenantEntity;
-
+import lombok.NoArgsConstructor;
+import org.dromara.common.mybatisflex.core.domain.BaseEntity;
 
 /**
  * 通知公告表 sys_notice
  *
  * @author Lion Li
  */
+
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Table("sys_notice")
-public class SysNotice extends SystemTenantEntity {
-
+public class SysNotice extends BaseEntity {
     /**
      * 公告ID
      */

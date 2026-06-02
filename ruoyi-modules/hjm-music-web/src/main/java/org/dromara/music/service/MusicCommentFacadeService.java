@@ -182,7 +182,7 @@ public class MusicCommentFacadeService {
                 return item.getUserName();
             }, (left, right) -> left));
         } catch (Exception ex) {
-            log.warn("批量查询评论用户昵称失败, tenantId={}", LoginHelper.getTenantId(), ex);
+            log.warn("批量查询评论用户昵称失败", ex);
             return Collections.emptyMap();
         }
     }
