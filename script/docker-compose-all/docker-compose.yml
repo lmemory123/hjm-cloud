@@ -101,7 +101,6 @@ services:
       SPRING_CLOUD_NACOS_DISCOVERY_REGISTER_ENABLED: "false"
       JAVA_OPTS: "-Djava.net.preferIPv4Stack=true -Dspring.data.redis.timeout=10000 -Dspring.data.redis.database=0 -Dspring.data.redis.host=hjm-valkey"
       SPRING_DATA_REDIS_HOST: hjm-valkey
-      SPRING_REDIS_HOST: hjm-valkey
       SPRING_REDISSON_ADDRESS: redis://hjm-valkey:6379
       SPRING_PROFILES_ACTIVE: prod
       JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD}
@@ -134,7 +133,6 @@ services:
       SPRING_CLOUD_NACOS_CONFIG_NAMESPACE: prod
       JAVA_OPTS: "-Djava.net.preferIPv4Stack=true -Dspring.data.redis.timeout=10000 -Dspring.data.redis.database=0 -Dspring.data.redis.host=hjm-valkey"
       SPRING_DATA_REDIS_HOST: hjm-valkey
-      SPRING_REDIS_HOST: hjm-valkey
       SPRING_REDISSON_ADDRESS: redis://hjm-valkey:6379
       SPRING_PROFILES_ACTIVE: prod
       JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD}
@@ -167,7 +165,6 @@ services:
       SPRING_CLOUD_NACOS_CONFIG_NAMESPACE: prod
       JAVA_OPTS: "-Djava.net.preferIPv4Stack=true -Dspring.data.redis.timeout=10000 -Dspring.data.redis.database=0 -Dspring.data.redis.host=hjm-valkey"
       SPRING_DATA_REDIS_HOST: hjm-valkey
-      SPRING_REDIS_HOST: hjm-valkey
       SPRING_REDISSON_ADDRESS: redis://hjm-valkey:6379
       SPRING_PROFILES_ACTIVE: prod
       JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD}
@@ -205,7 +202,6 @@ services:
       SPRING_CLOUD_NACOS_CONFIG_NAMESPACE: prod
       JAVA_OPTS: "-Djava.net.preferIPv4Stack=true -Dspring.data.redis.timeout=10000 -Dspring.data.redis.database=0 -Dspring.data.redis.host=hjm-valkey"
       SPRING_DATA_REDIS_HOST: hjm-valkey
-      SPRING_REDIS_HOST: hjm-valkey
       SPRING_REDISSON_ADDRESS: redis://hjm-valkey:6379
       MYBATIS_FLEX_MAPPER_PACKAGE: org.dromara.music.mapper
       SPRING_PROFILES_ACTIVE: prod

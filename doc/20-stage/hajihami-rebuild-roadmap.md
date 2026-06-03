@@ -69,6 +69,7 @@
 | S7.1 生产安全与门禁 | 已完成 | 2026-06-02 | 落实 Jasypt 秘钥加密、OpenAPI 60次/min 限频、日志脱敏及部署演练 |
 | S8 技术栈补丁升级 | 已完成 | 2026-06-03 | Spring Boot 4.0.6、Nuxt 4.4.7、Vue 3.5.35、Admin 依赖小版本升级；编译、类型检查、构建、Docker 运行时和 E2E 通过 |
 | S8.1 Valkey Search 检索替换 | 已完成 | 2026-06-03 | Docker 部署取消 Redis，启用 `hjm-valkey`；公开歌曲索引 `idx:music:public` 同步 4/4 成功；中文关键词搜索经网关返回正确结果 |
+| S8.2 Valkey 配置清理 | 已完成 | 2026-06-04 | 移除 Docker 后端服务中的旧 `SPRING_REDIS_HOST` 兼容变量，Nacos 改读 `SPRING_DATA_REDIS_HOST`，后端重启后不再出现 `spring.redis.host` 迁移警告 |
 
 ## 4.1 S8 验证记录
 
@@ -86,6 +87,7 @@
 - Valkey 运行时：`RESET_DATA=1 ./cold_start.sh` 通过，容器清单中仅存在 `hjm-valkey`，不存在 `hjm-redis`。
 - Valkey Search：`docker exec hjm-valkey valkey-cli FT._LIST` 返回 `idx:music:public`；`MusicSearchIndexService` 日志显示 `submitted=4, succeeded=4, failed=0`。
 - Valkey Search API：`/music/open/song/list?keyword=曼波&pageNum=1&pageSize=5` 返回 `曼波曼波`，`/music/open/song/list?keyword=哈基&pageNum=1&pageSize=5` 返回 `哈基之歌`，并包含高亮与 `searchScore`。
+- Valkey 配置清理：`push_nacos_all.sh` 后重建 `ruoyi-gateway`、`ruoyi-auth`、`ruoyi-system`、`hjm-music-web`，4/4 healthy；启动日志未再出现 `spring.redis.host` 迁移警告。
 
 ## 5. 后续交接区 (S7.2 - S7.4)
 

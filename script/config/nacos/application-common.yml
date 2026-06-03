@@ -96,7 +96,7 @@ spring:
     password: ENC(Eev20Zc+W9kVw8s63hlEgT4yhVoNDjk+NdnKCFWXxO3Q6912F6z+7WbFADdopdbd)
   data:
     redis:
-      host: ${SPRING_REDIS_HOST:hjm-valkey}
+      host: ${SPRING_DATA_REDIS_HOST:hjm-valkey}
       port: 6379
       database: 0
       timeout: 10000
