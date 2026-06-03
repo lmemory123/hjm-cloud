@@ -1401,8 +1401,12 @@ create table if not exists music_audit_log
 (
     id                int8            not null,
     music_id          int8            not null,
+    target_type       varchar(32),
     action            int2            not null,
+    old_status        int4,
+    new_status        int4,
     reason            varchar(500),
+    snapshot          jsonb,
     operator_id       int8,
     create_time       timestamp       default current_timestamp,
     constraint "pk_music_audit_log" primary key (id)
@@ -1410,8 +1414,12 @@ create table if not exists music_audit_log
 
 -- 注释
 comment on table music_audit_log is '音乐审核流水日志表';
-comment on column music_audit_log.action is '审核动作: 1通过 2拒绝 3下架';
+comment on column music_audit_log.target_type is '目标类型: music/comment';
+comment on column music_audit_log.action is '审核动作: 1通过 2拒绝 3下架 4举报';
+comment on column music_audit_log.old_status is '修改前状态 / 举报处理状态';
+comment on column music_audit_log.new_status is '修改后状态 / 举报处理状态: 0待处理 1已解决 2已忽略';
 comment on column music_audit_log.reason is '拒绝或下架原因';
+comment on column music_audit_log.snapshot is '下架/审核快照(JSONB)';
 comment on column music_audit_log.operator_id is '操作人ID (后台管理员ID)';
 comment on column music_audit_log.create_time is '操作时间';
 
