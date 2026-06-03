@@ -20,6 +20,18 @@
             <groupId>io.github.lmemory123</groupId>
             <artifactId>valkey-query-spring-boot-starter</artifactId>
             <version>${valkey-querydsl.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.valkey</groupId>
+                    <artifactId>valkey-glide</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.valkey</groupId>
+            <artifactId>valkey-glide</artifactId>
+            <version>2.2.7</version>
+            <classifier>${valkey.glide.runtime.classifier}</classifier>
         </dependency>
     </dependencies>
 

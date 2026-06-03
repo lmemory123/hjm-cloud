@@ -2,6 +2,23 @@
 mybatis-flex:
   mapper-package: org.dromara.music.mapper
 
+valkey:
+  query:
+    enabled: true
+    mode: standalone
+    request-timeout: 5000
+    connection-timeout: 5000
+    standalone:
+      nodes:
+        - host: ${VALKEY_HOST:hjm-valkey}
+          port: ${VALKEY_PORT:6379}
+    index-management:
+      mode: NONE
+    sync:
+      enabled: true
+      initial-delay: 15000
+      fixed-delay: 300000
+
 # Logging
 logging:
   level:

@@ -16,6 +16,16 @@ compose_up() {
     "${COMPOSE[@]}" up -d --build "$@"
 }
 
+compose_up_no_deps() {
+    if [ "${SKIP_BUILD:-0}" = "1" ]; then
+        "${COMPOSE[@]}" up -d --no-deps "$@"
+        return
+    fi
+
+    "${COMPOSE[@]}" build "$@"
+    "${COMPOSE[@]}" up -d --no-deps "$@"
+}
+
 wait_for_healthy() {
     local container="$1"
     local elapsed=0
@@ -46,9 +56,9 @@ if [ "${RESET_DATA:-0}" = "1" ]; then
 fi
 
 echo "Starting middleware and Nacos..."
-compose_up hjm-postgres hjm-redis hjm-rabbitmq hjm-nacos
+compose_up hjm-postgres hjm-valkey hjm-rabbitmq hjm-nacos
 wait_for_healthy hjm-postgres
-wait_for_healthy hjm-redis
+wait_for_healthy hjm-valkey
 wait_for_healthy hjm-rabbitmq
 wait_for_healthy hjm-nacos
 
@@ -63,7 +73,7 @@ wait_for_healthy ruoyi-system
 wait_for_healthy hjm-music-web
 
 echo "Starting admin and Nuxt frontend..."
-compose_up hjm-admin hjm-frontend
+compose_up_no_deps hjm-admin hjm-frontend
 wait_for_healthy hjm-admin
 wait_for_healthy hjm-frontend
 

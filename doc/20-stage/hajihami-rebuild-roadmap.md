@@ -6,7 +6,7 @@
 
 ## 1. 当前状态
 
-当前处于 **S8：技术栈补丁升级专项** 阶段。S0-S7 及去多租户专项已完成当前轮次闭环，S8 聚焦依赖升级和构建门禁复验。
+当前处于 **S8：技术栈与检索运行时升级专项** 阶段。S0-S7 及去多租户专项已完成当前轮次闭环，S8 聚焦依赖升级、Valkey Search 接入和构建门禁复验。
 
 当前覆盖：
 - 前台：单站点 MVP 功能完整，支持游客浏览与注册用户投稿互动；SSR 水合与性能优化初步完成。
@@ -18,7 +18,7 @@
 
 - 前台：Nuxt 4 + Vue 3 + TypeScript + SCSS + Nuxt i18n。
 - 后台：Soybean Admin + Vite + Vue 3 + Naive UI。
-- 后端：RuoYi Cloud JDK 21 (Postgres + Redis/Valkey + Nacos + RabbitMQ)。
+- 后端：RuoYi Cloud JDK 21 (Postgres + Valkey/Valkey Search + Nacos + RabbitMQ)。部署层不再启动 Redis，Redis 协议缓存由 Valkey 承担。
 - 模式：单站点模式（已移除 SaaS 多租户）。
 
 ## 3. 阶段路线图
@@ -51,6 +51,11 @@
 - 后台 Admin 小版本升级：Vue、Naive UI、VueUse、UnoCSS、ECharts、vue-tsc、Sass 等；暂不升级 Vite 8、Vue Router 5、TypeScript 6、ESLint 10。
 - 修复后台包装组件 `useAttrs()` 透传类型断言，以及 `file-upload` TSX 中 `NP` 组件显式导入。
 - 修复后台 Docker 构建：复制 `.npmrc` 进入构建层并使用 npmmirror 安装 pnpm，新增 `.dockerignore`，避免 Docker 内依赖下载长尾和上下文噪音。
+- 替换本地 Docker Redis 服务为 `hjm-valkey`，使用 `valkey-bundle:9.1.0` 同时承载缓存和 Valkey Search。
+- 接入 `momao-valkey-search` 到音乐公开检索：公开歌曲启动时同步到 `idx:music:public`，`/music/open/song/list` 优先走 Valkey Search，异常时保留数据库回退。
+- 关闭第三方库 `RECREATE` 自动索引管理，改由 `MusicSearchIndexService.checkAndCreateIndex()` 冷启动幂等建索引，避免空索引 drop 报错。
+- 修复 Valkey Glide native classifier：部署构建默认打入 `linux-aarch_64`，避免 macOS 构建出的 `osx-aarch_64` native 包进入 Linux 容器。
+- 为中文搜索补充 2-4 字符短词 token，保证 `曼波`、`哈基` 等短词可命中连续中文标题和作者名。
 
 ## 4. 当前完成记录
 
@@ -63,6 +68,7 @@
 | S7.0 文档校准与清理 | 已完成 | 2026-06-02 | 同步 S7 路线图，清理 stale 文档，移除 TenantConstants 残留，停止跟踪 transient 文件 |
 | S7.1 生产安全与门禁 | 已完成 | 2026-06-02 | 落实 Jasypt 秘钥加密、OpenAPI 60次/min 限频、日志脱敏及部署演练 |
 | S8 技术栈补丁升级 | 已完成 | 2026-06-03 | Spring Boot 4.0.6、Nuxt 4.4.7、Vue 3.5.35、Admin 依赖小版本升级；编译、类型检查、构建、Docker 运行时和 E2E 通过 |
+| S8.1 Valkey Search 检索替换 | 已完成 | 2026-06-03 | Docker 部署取消 Redis，启用 `hjm-valkey`；公开歌曲索引 `idx:music:public` 同步 4/4 成功；中文关键词搜索经网关返回正确结果 |
 
 ## 4.1 S8 验证记录
 
@@ -77,6 +83,9 @@
 - 后台：`pnpm typecheck` 通过。
 - 后台：`pnpm build` 通过。
 - 后台 Docker：`docker compose build --no-cache hjm-admin` 通过，已确认升级后的后台镜像可生产构建并启动健康。
+- Valkey 运行时：`RESET_DATA=1 ./cold_start.sh` 通过，容器清单中仅存在 `hjm-valkey`，不存在 `hjm-redis`。
+- Valkey Search：`docker exec hjm-valkey valkey-cli FT._LIST` 返回 `idx:music:public`；`MusicSearchIndexService` 日志显示 `submitted=4, succeeded=4, failed=0`。
+- Valkey Search API：`/music/open/song/list?keyword=曼波&pageNum=1&pageSize=5` 返回 `曼波曼波`，`/music/open/song/list?keyword=哈基&pageNum=1&pageSize=5` 返回 `哈基之歌`，并包含高亮与 `searchScore`。
 
 ## 5. 后续交接区 (S7.2 - S7.4)
 
@@ -97,3 +106,4 @@
 - 前台 Nuxt build 仍有 Tailwind/VueUse sourcemap/PURE 注释类非阻断警告，后续可作为构建噪声专项处理。
 - 后台 pnpm 安装提示部分构建脚本被忽略，当前不影响 typecheck/build，生产 CI 可按组织策略决定是否执行 `pnpm approve-builds`。
 - 机器人平台接入目前仅为方案验证，需真实 API 凭证进行 S7.4 最终验收。
+- `ruoyi-common-redis` 仍是 Spring/Redisson 协议适配模块命名，部署层已切到 Valkey；是否重命名模块需单独评估，避免影响上游框架兼容。

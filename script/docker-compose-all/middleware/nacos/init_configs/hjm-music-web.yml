@@ -1,6 +1,16 @@
 valkey:
   query:
+    enabled: true
+    mode: standalone
+    request-timeout: 5000
+    connection-timeout: 5000
     standalone:
       nodes:
-        - host: hjm-redis
-          port: 6379
+        - host: ${VALKEY_HOST:hjm-valkey}
+          port: ${VALKEY_PORT:6379}
+    index-management:
+      mode: NONE
+    sync:
+      enabled: true
+      initial-delay: 15000
+      fixed-delay: 300000

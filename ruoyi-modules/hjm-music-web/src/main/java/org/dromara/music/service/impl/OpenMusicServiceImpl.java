@@ -3,6 +3,7 @@ package org.dromara.music.service.impl;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.momao.valkey.core.SearchCondition;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryCondition;
 import com.mybatisflex.core.query.QueryWrapper;
@@ -17,6 +18,9 @@ import org.dromara.music.domain.MusicChartSnapshot;
 import org.dromara.music.domain.Tag;
 import org.dromara.music.domain.vo.*;
 import org.dromara.music.mapper.*;
+import org.dromara.music.search.MusicSearchDocument;
+import org.dromara.music.search.MusicSearchDocumentQuery;
+import org.dromara.music.search.MusicSearchRepository;
 import org.dromara.music.service.IOpenMusicService;
 import org.dromara.music.service.MusicInteractionService;
 import org.redisson.client.protocol.ScoredEntry;
@@ -86,6 +90,7 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
     private final MusicTagRelMapper tagRelMapper;
     private final TagMapper tagMapper;
     private final MusicInteractionService musicInteractionService;
+    private final MusicSearchRepository musicSearchRepository;
 
     @Value("${music.search.synonyms:}")
     private String customSynonymsConfig;
@@ -93,7 +98,12 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
     @Override
     public TableDataInfo<MusicVo> searchPublic(String keyword, String tag, String tags, String style, String sort, String isOriginal, String isAi, String resourceStatus, String startDate, String endDate, Long playCountMin, Long playCountMax, PageQuery pageQuery) {
         recordSearchKeyword(keyword);
-        return searchFromDatabase(keyword, tag, tags, style, sort, isOriginal, isAi, resourceStatus, startDate, endDate, playCountMin, playCountMax, pageQuery);
+        try {
+            return searchFromValkey(keyword, tag, tags, style, sort, isOriginal, isAi, resourceStatus, startDate, endDate, playCountMin, playCountMax, pageQuery);
+        } catch (Exception ex) {
+            log.warn("Valkey 搜索失败，回退数据库查询。keyword={}, tag={}, tags={}, style={}", keyword, tag, tags, style, ex);
+            return searchFromDatabase(keyword, tag, tags, style, sort, isOriginal, isAi, resourceStatus, startDate, endDate, playCountMin, playCountMax, pageQuery);
+        }
     }
 
     @Override
@@ -293,6 +303,126 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
         musicInteractionService.fillDynamicStats(result.getRecords());
         applySearchHighlights(result.getRecords(), keyword);
         return TableDataInfo.build(result);
+    }
+
+    private TableDataInfo<MusicVo> searchFromValkey(String keyword, String tag, String tags, String style, String sort, String isOriginal, String isAi, String resourceStatus, String startDate, String endDate, Long playCountMin, Long playCountMax, PageQuery pageQuery) {
+        if (musicSearchRepository == null) {
+            throw new IllegalStateException("MusicSearchRepository is not available");
+        }
+        Page<MusicVo> requestedPage = pageQuery.build();
+        int pageNumber = Math.max(1, (int) requestedPage.getPageNumber());
+        int pageSize = Math.max(1, (int) requestedPage.getPageSize());
+        int offset = (pageNumber - 1) * pageSize;
+        SearchCondition condition = buildValkeySearchCondition(keyword, tag, tags, style, sort, isOriginal, isAi, resourceStatus, startDate, endDate, playCountMin, playCountMax);
+        com.momao.valkey.core.Page<MusicSearchDocument> result = musicSearchRepository.page(condition, offset, pageSize);
+        List<MusicVo> rows = result.records().stream().map(this::toMusicVo).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        musicInteractionService.fillDynamicStats(rows);
+        applySearchHighlights(rows, keyword);
+        if (isRelevanceSort(sort, keyword)) {
+            applyRelevanceRanking(rows, keyword, tag, tags, style);
+        }
+        return new TableDataInfo<>(rows, result.total());
+    }
+
+    private SearchCondition buildValkeySearchCondition(String keyword, String tag, String tags, String style, String sort, String isOriginal, String isAi, String resourceStatus, String startDate, String endDate, Long playCountMin, Long playCountMax) {
+        MusicSearchDocumentQuery q = new MusicSearchDocumentQuery();
+        SearchCondition condition = q.auditStatus.eq(AUDIT_APPROVED).and(q.isPublic.eq(PUBLIC_VISIBLE));
+        SearchCondition keywordCondition = buildValkeyKeywordCondition(q, buildExpandedSearchTerms(keyword));
+        if (keywordCondition != null) {
+            condition = condition.and(keywordCondition);
+        }
+        for (String tagValue : parseTagFilters(tag, tags, style)) {
+            condition = condition.and(q.tags.eq(tagValue));
+        }
+        String normalizedOriginal = normalizeOriginalFilter(isOriginal);
+        if (StringUtils.isNotBlank(normalizedOriginal)) {
+            condition = condition.and(q.isOriginal.eq(normalizedOriginal));
+        }
+        String normalizedAi = normalizeBooleanLikeFilter(isAi);
+        if (StringUtils.isNotBlank(normalizedAi)) {
+            condition = condition.and(q.isAi.eq(normalizedAi));
+        }
+        if (StringUtils.isNotBlank(resourceStatus)) {
+            condition = condition.and(q.resourceStatus.eq(resourceStatus.trim()));
+        }
+        if (playCountMin != null && playCountMin >= 0) {
+            condition = condition.and(q.playCount.gte(playCountMin));
+        }
+        if (playCountMax != null && playCountMax >= 0) {
+            condition = condition.and(q.playCount.lte(playCountMax));
+        }
+        java.util.Date parsedStartDate = parseDateStart(startDate);
+        if (parsedStartDate != null) {
+            condition = condition.and(q.publishTimeMillis.gte(parsedStartDate.getTime()));
+        }
+        java.util.Date parsedEndDate = parseDateEnd(endDate);
+        if (parsedEndDate != null) {
+            condition = condition.and(q.publishTimeMillis.lte(parsedEndDate.getTime()));
+        }
+        if (!isRelevanceSort(sort, keyword)) {
+            SortSpec sortSpec = resolveSort(sort);
+            condition = condition.sortBy(sortSpec.field(), sortSpec.asc());
+        }
+        return condition;
+    }
+
+    private SearchCondition buildValkeyKeywordCondition(MusicSearchDocumentQuery q, List<String> terms) {
+        if (terms == null || terms.isEmpty()) {
+            return null;
+        }
+        SearchCondition combined = null;
+        for (String term : terms) {
+            SearchCondition current = q.title.contains(term)
+                .or(q.subtitle.contains(term))
+                .or(q.originalTitle.contains(term))
+                .or(q.creatorName.contains(term))
+                .or(q.searchText.contains(term));
+            combined = combined == null ? current : combined.and(current);
+        }
+        return combined;
+    }
+
+    private MusicVo toMusicVo(MusicSearchDocument document) {
+        MusicVo vo = new MusicVo();
+        vo.setId(parseLong(document.getId()));
+        vo.setTitle(document.getTitle());
+        vo.setSubtitle(document.getSubtitle());
+        vo.setOriginalTitle(document.getOriginalTitle());
+        vo.setCreatorId(document.getCreatorId());
+        vo.setCreatorName(document.getCreatorName());
+        vo.setCreatorLink(document.getCreatorLink());
+        vo.setProducerMark(document.getProducerMark());
+        vo.setDuration(document.getDuration());
+        vo.setBpm(document.getBpm());
+        vo.setPublishTime(document.getPublishTimeMillis() == null || document.getPublishTimeMillis() <= 0 ? null : new java.util.Date(document.getPublishTimeMillis()));
+        vo.setPlayCount(document.getPlayCount());
+        vo.setLikeCount(document.getLikeCount());
+        vo.setCollectCount(document.getCollectCount());
+        vo.setCommentCount(document.getCommentCount());
+        vo.setShareCount(document.getShareCount());
+        vo.setDownloadCount(document.getDownloadCount());
+        vo.setOriginalData(document.getOriginalData());
+        vo.setResourceData(document.getResourceData());
+        vo.setTagsSnapshot(document.getTagsSnapshot());
+        vo.setExtendData(document.getExtendData());
+        vo.setAuditStatus(document.getAuditStatus());
+        vo.setIsPublic(document.getIsPublic());
+        vo.setIsOriginal(document.getIsOriginal());
+        vo.setResourceStatus(document.getResourceStatus());
+        vo.setCopyrightInfo(document.getCopyrightInfo());
+        vo.setRemark(document.getRemark());
+        return vo;
+    }
+
+    private Long parseLong(String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 
     private TableDataInfo<MusicVo> searchByRelevance(String keyword, String tag, String tags, String style, String isOriginal, String isAi, String resourceStatus, String startDate, String endDate, Long playCountMin, Long playCountMax, PageQuery pageQuery) {

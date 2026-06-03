@@ -25,14 +25,14 @@ services:
     networks:
       - hjm-network
 
-  # Middleware: Redis
-  hjm-redis:
-    image: redis:7.2.8-alpine
-    container_name: hjm-redis
+  # Middleware: Valkey
+  hjm-valkey:
+    image: valkey-bundle:9.1.0
+    container_name: hjm-valkey
     ports:
       - "6379:6379"
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "valkey-cli", "ping"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -99,17 +99,17 @@ services:
       SPRING_CLOUD_NACOS_DISCOVERY_NAMESPACE: prod
       SPRING_CLOUD_NACOS_CONFIG_NAMESPACE: prod
       SPRING_CLOUD_NACOS_DISCOVERY_REGISTER_ENABLED: "false"
-      JAVA_OPTS: "-Djava.net.preferIPv4Stack=true -Dspring.data.redis.timeout=10000 -Dspring.data.redis.database=0 -Dspring.data.redis.host=hjm-redis"
-      SPRING_DATA_REDIS_HOST: hjm-redis
-      SPRING_REDIS_HOST: hjm-redis
-      SPRING_REDISSON_ADDRESS: redis://hjm-redis:6379
+      JAVA_OPTS: "-Djava.net.preferIPv4Stack=true -Dspring.data.redis.timeout=10000 -Dspring.data.redis.database=0 -Dspring.data.redis.host=hjm-valkey"
+      SPRING_DATA_REDIS_HOST: hjm-valkey
+      SPRING_REDIS_HOST: hjm-valkey
+      SPRING_REDISSON_ADDRESS: redis://hjm-valkey:6379
       SPRING_PROFILES_ACTIVE: prod
       JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD}
       SEATA_ENABLED: "false"
     depends_on:
       hjm-nacos:
         condition: service_healthy
-      hjm-redis:
+      hjm-valkey:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/music/open/api/v1/meta"]
@@ -132,17 +132,17 @@ services:
       SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR: hjm-nacos:8848
       SPRING_CLOUD_NACOS_DISCOVERY_NAMESPACE: prod
       SPRING_CLOUD_NACOS_CONFIG_NAMESPACE: prod
-      JAVA_OPTS: "-Djava.net.preferIPv4Stack=true -Dspring.data.redis.timeout=10000 -Dspring.data.redis.database=0 -Dspring.data.redis.host=hjm-redis"
-      SPRING_DATA_REDIS_HOST: hjm-redis
-      SPRING_REDIS_HOST: hjm-redis
-      SPRING_REDISSON_ADDRESS: redis://hjm-redis:6379
+      JAVA_OPTS: "-Djava.net.preferIPv4Stack=true -Dspring.data.redis.timeout=10000 -Dspring.data.redis.database=0 -Dspring.data.redis.host=hjm-valkey"
+      SPRING_DATA_REDIS_HOST: hjm-valkey
+      SPRING_REDIS_HOST: hjm-valkey
+      SPRING_REDISSON_ADDRESS: redis://hjm-valkey:6379
       SPRING_PROFILES_ACTIVE: prod
       JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD}
       SEATA_ENABLED: "false"
     depends_on:
       hjm-nacos:
         condition: service_healthy
-      hjm-redis:
+      hjm-valkey:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9210/code"]
@@ -165,10 +165,10 @@ services:
       SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR: hjm-nacos:8848
       SPRING_CLOUD_NACOS_DISCOVERY_NAMESPACE: prod
       SPRING_CLOUD_NACOS_CONFIG_NAMESPACE: prod
-      JAVA_OPTS: "-Djava.net.preferIPv4Stack=true -Dspring.data.redis.timeout=10000 -Dspring.data.redis.database=0 -Dspring.data.redis.host=hjm-redis"
-      SPRING_DATA_REDIS_HOST: hjm-redis
-      SPRING_REDIS_HOST: hjm-redis
-      SPRING_REDISSON_ADDRESS: redis://hjm-redis:6379
+      JAVA_OPTS: "-Djava.net.preferIPv4Stack=true -Dspring.data.redis.timeout=10000 -Dspring.data.redis.database=0 -Dspring.data.redis.host=hjm-valkey"
+      SPRING_DATA_REDIS_HOST: hjm-valkey
+      SPRING_REDIS_HOST: hjm-valkey
+      SPRING_REDISSON_ADDRESS: redis://hjm-valkey:6379
       SPRING_PROFILES_ACTIVE: prod
       JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD}
       SEATA_ENABLED: "false"
@@ -177,7 +177,7 @@ services:
         condition: service_healthy
       hjm-postgres:
         condition: service_healthy
-      hjm-redis:
+      hjm-valkey:
         condition: service_healthy
     healthcheck:
       # Fix P0-2: Use basic auth for actuator
@@ -203,10 +203,10 @@ services:
       SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR: hjm-nacos:8848
       SPRING_CLOUD_NACOS_DISCOVERY_NAMESPACE: prod
       SPRING_CLOUD_NACOS_CONFIG_NAMESPACE: prod
-      JAVA_OPTS: "-Djava.net.preferIPv4Stack=true -Dspring.data.redis.timeout=10000 -Dspring.data.redis.database=0 -Dspring.data.redis.host=hjm-redis"
-      SPRING_DATA_REDIS_HOST: hjm-redis
-      SPRING_REDIS_HOST: hjm-redis
-      SPRING_REDISSON_ADDRESS: redis://hjm-redis:6379
+      JAVA_OPTS: "-Djava.net.preferIPv4Stack=true -Dspring.data.redis.timeout=10000 -Dspring.data.redis.database=0 -Dspring.data.redis.host=hjm-valkey"
+      SPRING_DATA_REDIS_HOST: hjm-valkey
+      SPRING_REDIS_HOST: hjm-valkey
+      SPRING_REDISSON_ADDRESS: redis://hjm-valkey:6379
       MYBATIS_FLEX_MAPPER_PACKAGE: org.dromara.music.mapper
       SPRING_PROFILES_ACTIVE: prod
       JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD}
@@ -216,7 +216,7 @@ services:
         condition: service_healthy
       hjm-postgres:
         condition: service_healthy
-      hjm-redis:
+      hjm-valkey:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9212/checkAliveServer"]

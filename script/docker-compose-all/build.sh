@@ -6,11 +6,17 @@ set -e
 echo "🚀 Starting backend build (hjm-cloud)..."
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="${SCRIPT_DIR}/../.."
+VALKEY_GLIDE_CLASSIFIER="${VALKEY_GLIDE_CLASSIFIER:-linux-aarch_64}"
 
 cd "${ROOT_DIR}"
-mvn clean package -Dmaven.test.skip=true -pl ruoyi-gateway,ruoyi-auth,ruoyi-modules/ruoyi-system,ruoyi-modules/hjm-music-web,ruoyi-visual/ruoyi-nacos -am
+mvn clean package \
+  -Dmaven.test.skip=true \
+  -Dvalkey.glide.runtime.classifier="${VALKEY_GLIDE_CLASSIFIER}" \
+  -pl ruoyi-gateway,ruoyi-auth,ruoyi-modules/ruoyi-system,ruoyi-modules/hjm-music-web,ruoyi-visual/ruoyi-nacos \
+  -am
 
 echo "✅ Backend build completed!"
+echo "✅ Valkey Glide runtime classifier: ${VALKEY_GLIDE_CLASSIFIER}"
 echo "💡 To start the system, run:"
 echo "   cd script/docker-compose-all"
 echo "   ./cold_start.sh"

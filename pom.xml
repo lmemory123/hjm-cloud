@@ -61,6 +61,7 @@
         <rocketmq.version>2.3.4</rocketmq.version>
         <jasypt.version>3.0.5</jasypt.version>
         <valkey-querydsl.version>1.1.0-RC5</valkey-querydsl.version>
+        <valkey.glide.runtime.classifier>linux-aarch_64</valkey.glide.runtime.classifier>
         <!-- mqtt配置 -->
         <mica-mqtt.version>2.4.3</mica-mqtt.version>
         <!-- elasticsearch配置 -->

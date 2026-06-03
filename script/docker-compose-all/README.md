@@ -11,7 +11,7 @@
 - `frontend/`: 前台 Dockerfile。
 - `middleware/`: 中间件持久化数据及初始化配置。
 - `docker-compose.yml`: 主编排文件。
-- `build.sh`: 一键构建后端 JAR 包脚本。
+- `build.sh`: 一键构建后端 JAR 包脚本，默认按 Docker Linux arm64 运行环境打入 Valkey Glide native 库。
 - `.env.example`: 本地密钥示例，复制为 `.env` 后填写 `JASYPT_ENCRYPTOR_PASSWORD`。
 
 ## 2. 快速开始
@@ -33,6 +33,10 @@
    chmod +x build.sh
    ./build.sh
    ```
+   如目标 Docker 主机是 x86_64，可显式指定：
+   ```bash
+   VALKEY_GLIDE_CLASSIFIER=linux-x86_64 ./build.sh
+   ```
 3. **启动所有服务**：
    ```bash
    docker compose -f docker-compose.yml up --build -d
@@ -52,7 +56,7 @@
 
 ### 4.1 Nacos 配置导入
 首次启动后，需登录 Nacos 将以下配置导入到 `prod` 命名空间或 `DEFAULT_GROUP` 中：
-- `application-common.yml`: 通用 Redis/RabbitMQ/Nacos 地址。
+- `application-common.yml`: 通用 Valkey/RabbitMQ/Nacos 地址。Valkey 同时承担 Redis 协议缓存和 Valkey Search 检索职责。
 - `datasource.yml`: 数据库连接池信息（已预置指向 `hjm-postgres`）。
 - `hjm-music-web.yml`: 音乐模块特有配置（如 Valkey 节点）。
 

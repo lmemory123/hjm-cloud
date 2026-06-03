@@ -8,9 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *
  * @author ruoyi
  */
-@SpringBootApplication(exclude = {
-    com.momao.valkey.autoconfigure.ValkeyQueryAutoConfiguration.class
-})
+@SpringBootApplication
 public class MusicWebApplication {
     public static void main(String[] args) {
         SpringApplication.run(MusicWebApplication.class, args);

@@ -96,7 +96,7 @@ spring:
     password: ENC(Eev20Zc+W9kVw8s63hlEgT4yhVoNDjk+NdnKCFWXxO3Q6912F6z+7WbFADdopdbd)
   data:
     redis:
-      host: ${SPRING_REDIS_HOST:hjm-redis}
+      host: ${SPRING_REDIS_HOST:hjm-valkey}
       port: 6379
       database: 0
       timeout: 10000
@@ -112,7 +112,7 @@ redisson:
   threads: 4
   nettyThreads: 8
   singleServerConfig:
-    address: ${SPRING_REDISSON_ADDRESS:redis://hjm-redis:6379}
+    address: ${SPRING_REDISSON_ADDRESS:redis://hjm-valkey:6379}
     clientName: ${spring.application.name}
     connectionMinimumIdleSize: 8
     connectionPoolSize: 32

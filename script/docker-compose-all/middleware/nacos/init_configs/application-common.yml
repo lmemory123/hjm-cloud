@@ -1,7 +1,7 @@
 spring:
   data:
     redis:
-      host: hjm-redis
+      host: hjm-valkey
       port: 6379
       database: 0
   rabbitmq:
