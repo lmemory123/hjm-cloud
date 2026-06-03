@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.dromara.music.domain.table.MusicDraftTableDef.MUSIC_DRAFT;
 import static org.dromara.music.domain.table.TagTableDef.TAG;
 
 /**
@@ -74,7 +75,27 @@ public class PortalDraftServiceImpl implements IPortalDraftService {
         vo.setId(draft.getId());
         vo.setUserId(draft.getUserId());
         vo.setContent(draft.getContent());
+        vo.setCreateTime(draft.getCreateTime());
+        vo.setUpdateTime(draft.getUpdateTime());
         return vo;
+    }
+
+    @Override
+    public List<MusicDraftVo> listDrafts(Long userId) {
+        List<MusicDraft> drafts = draftMapper.selectListByQuery(
+            QueryWrapper.create().where(MUSIC_DRAFT.USER_ID.eq(userId)).orderBy(MUSIC_DRAFT.UPDATE_TIME.desc())
+        );
+        List<MusicDraftVo> vos = new ArrayList<>(drafts.size());
+        for (MusicDraft draft : drafts) {
+            MusicDraftVo vo = new MusicDraftVo();
+            vo.setId(draft.getId());
+            vo.setUserId(draft.getUserId());
+            vo.setContent(draft.getContent());
+            vo.setCreateTime(draft.getCreateTime());
+            vo.setUpdateTime(draft.getUpdateTime());
+            vos.add(vo);
+        }
+        return vos;
     }
 
     @Override

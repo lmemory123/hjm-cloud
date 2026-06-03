@@ -29,6 +29,10 @@ dubbo:
     request-log: true
     log-level: info
 
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD:}
+
 spring:
   threads:
     virtual:
@@ -89,7 +93,7 @@ spring:
     host: ${SPRING_RABBITMQ_HOST:hjm-rabbitmq}
     port: 5672
     username: ruoyi
-    password: ruoyi123
+    password: ENC(Eev20Zc+W9kVw8s63hlEgT4yhVoNDjk+NdnKCFWXxO3Q6912F6z+7WbFADdopdbd)
   data:
     redis:
       host: ${SPRING_REDIS_HOST:hjm-redis}
@@ -153,7 +157,7 @@ sa-token:
   check-same-token: false
   is-concurrent: true
   is-share: false
-  jwt-secret-key: abcdefghijklmnopqrstuvwxyz
+  jwt-secret-key: ENC(8JAddK4AXcDdpy+aD9tVwtZMGEFVK+tVAc0oJYRLRKQQD8a3OzY9paJ/YrCnerv7LaiVWjSnqi9iNZyyFhsX1w==)
 
 mybatis-flex:
   check-config-location: false
@@ -172,6 +176,12 @@ mybatis-flex:
       value: snowFlakeId
     deleted-value-of-logic-delete: "1"
     normal-value-of-logic-delete: "0"
+
+mybatis-encryptor:
+  enable: true
+  password: ENC(QhNuj2Lynwv26A7v9y0/IB53ekCS8JOQDTcGIinZnYyfJtdHc0jxxHuWWY8SqDRgIE6YWecUYsMkN/mQ+OF1Ug==)
+  algorithm: AES
+  encode: BASE64
 
 seata:
   enabled: ${SEATA_ENABLED:false}
@@ -192,4 +202,3 @@ seata:
       group: ${spring.cloud.nacos.discovery.group}
       namespace: ${spring.profiles.active}
   enable-auto-data-source-proxy: false
-

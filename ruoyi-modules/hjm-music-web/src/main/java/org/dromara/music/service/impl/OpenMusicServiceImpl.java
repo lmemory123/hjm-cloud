@@ -144,6 +144,24 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
     }
 
     @Override
+    public List<OpenUserProfileVo> queryUserFollows(String uid, Integer limit) {
+        List<String> ids = musicInteractionService.queryFollowIds(uid, limit);
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return ids.stream().map(this::queryPublicUserProfile).filter(Objects::nonNull).toList();
+    }
+
+    @Override
+    public List<OpenUserProfileVo> queryUserFans(String uid, Integer limit) {
+        List<String> ids = musicInteractionService.queryFanIds(uid, limit);
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return ids.stream().map(this::queryPublicUserProfile).filter(Objects::nonNull).toList();
+    }
+
+    @Override
     public List<MusicVo> queryRandomPublic(Integer limit) {
         int size = normalizeLimit(limit, DEFAULT_RANDOM_LIMIT, MAX_RANDOM_LIMIT);
         QueryWrapper wrapper = QueryWrapper.create().where(MUSIC.AUDIT_STATUS.eq(AUDIT_APPROVED).and(MUSIC.IS_PUBLIC.eq(PUBLIC_VISIBLE))).orderBy("random()", true);

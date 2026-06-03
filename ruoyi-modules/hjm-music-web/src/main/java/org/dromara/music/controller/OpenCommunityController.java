@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.utils.StringUtils;
+import org.dromara.common.ratelimiter.annotation.RateLimiter;
+import org.dromara.common.ratelimiter.enums.LimitType;
 import org.dromara.common.redis.utils.RedisUtils;
 import org.dromara.music.domain.vo.OpenCommunityLinkVo;
 import org.dromara.system.api.RemoteConfigService;
@@ -32,6 +34,7 @@ public class OpenCommunityController {
     @DubboReference
     private final RemoteConfigService remoteConfigService;
 
+    @RateLimiter(count = 60, limitType = LimitType.IP)
     @SaIgnore
     @GetMapping
     public R<List<OpenCommunityLinkVo>> list() {
@@ -43,6 +46,7 @@ public class OpenCommunityController {
         return R.ok(links);
     }
 
+    @RateLimiter(count = 60, limitType = LimitType.IP)
     @SaIgnore
     @PostMapping("/{id}/click")
     public R<Void> click(@PathVariable("id") String id) {

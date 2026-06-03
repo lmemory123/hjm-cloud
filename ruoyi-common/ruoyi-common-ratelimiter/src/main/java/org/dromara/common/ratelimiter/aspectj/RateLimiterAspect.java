@@ -37,6 +37,8 @@ import java.lang.reflect.Method;
 @Aspect
 public class RateLimiterAspect {
 
+    private static final int TOO_MANY_REQUESTS = 429;
+
     /**
      * 定义spel表达式解析器
      */
@@ -68,7 +70,7 @@ public class RateLimiterAspect {
                 if (Strings.CS.startsWith(message, "{") && Strings.CS.endsWith(message, "}")) {
                     message = MessageUtils.message(StringUtils.substring(message, 1, message.length() - 1));
                 }
-                throw new ServiceException(message);
+                throw new ServiceException(message, TOO_MANY_REQUESTS);
             }
             log.info("限制令牌 => {}, 剩余令牌 => {}, 缓存key => '{}'", count, number, combineKey);
         } catch (Exception e) {

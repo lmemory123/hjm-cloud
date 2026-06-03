@@ -104,6 +104,7 @@ services:
       SPRING_REDIS_HOST: hjm-redis
       SPRING_REDISSON_ADDRESS: redis://hjm-redis:6379
       SPRING_PROFILES_ACTIVE: prod
+      JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD}
       SEATA_ENABLED: "false"
     depends_on:
       hjm-nacos:
@@ -136,6 +137,7 @@ services:
       SPRING_REDIS_HOST: hjm-redis
       SPRING_REDISSON_ADDRESS: redis://hjm-redis:6379
       SPRING_PROFILES_ACTIVE: prod
+      JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD}
       SEATA_ENABLED: "false"
     depends_on:
       hjm-nacos:
@@ -168,6 +170,7 @@ services:
       SPRING_REDIS_HOST: hjm-redis
       SPRING_REDISSON_ADDRESS: redis://hjm-redis:6379
       SPRING_PROFILES_ACTIVE: prod
+      JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD}
       SEATA_ENABLED: "false"
     depends_on:
       hjm-nacos:
@@ -206,6 +209,7 @@ services:
       SPRING_REDISSON_ADDRESS: redis://hjm-redis:6379
       MYBATIS_FLEX_MAPPER_PACKAGE: org.dromara.music.mapper
       SPRING_PROFILES_ACTIVE: prod
+      JASYPT_ENCRYPTOR_PASSWORD: ${JASYPT_ENCRYPTOR_PASSWORD}
       SEATA_ENABLED: "false"
     depends_on:
       hjm-nacos:

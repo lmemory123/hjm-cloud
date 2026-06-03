@@ -181,6 +181,30 @@ public class MusicInteractionService {
         return hasAction(userId, targetUserId, TARGET_TYPE_USER_FOLLOW, ACTION_FOLLOW);
     }
 
+    public List<String> queryFollowIds(String uid, Integer limit) {
+        Long sourceUserId = resolveCreatorUserId(uid);
+        int size = limit == null || limit <= 0 ? 60 : Math.min(limit, 100);
+        List<MusicAction> actions = musicActionMapper.selectListByQuery(QueryWrapper.create()
+            .where(MUSIC_ACTION.USER_ID.eq(sourceUserId)
+                .and(MUSIC_ACTION.TARGET_TYPE.eq(TARGET_TYPE_USER_FOLLOW))
+                .and(MUSIC_ACTION.ACTION.eq(ACTION_FOLLOW)))
+            .orderBy(MUSIC_ACTION.CREATE_TIME.desc())
+            .limit(size));
+        return actions.stream().map(a -> String.valueOf(a.getTargetId())).toList();
+    }
+
+    public List<String> queryFanIds(String uid, Integer limit) {
+        Long targetUserId = resolveCreatorUserId(uid);
+        int size = limit == null || limit <= 0 ? 60 : Math.min(limit, 100);
+        List<MusicAction> actions = musicActionMapper.selectListByQuery(QueryWrapper.create()
+            .where(MUSIC_ACTION.TARGET_ID.eq(targetUserId)
+                .and(MUSIC_ACTION.TARGET_TYPE.eq(TARGET_TYPE_USER_FOLLOW))
+                .and(MUSIC_ACTION.ACTION.eq(ACTION_FOLLOW)))
+            .orderBy(MUSIC_ACTION.CREATE_TIME.desc())
+            .limit(size));
+        return actions.stream().map(a -> String.valueOf(a.getUserId())).toList();
+    }
+
     public boolean reportSong(Long musicId, Long userId, String reason, String description) {
         ensurePublicMusic(musicId);
         writeReportLog(musicId, TARGET_TYPE_SONG_REPORT, userId, reason, Map.of(

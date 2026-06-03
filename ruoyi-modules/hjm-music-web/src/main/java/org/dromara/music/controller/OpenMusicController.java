@@ -16,6 +16,8 @@ import org.dromara.music.domain.vo.OpenSearchSuggestVo;
 import org.dromara.music.service.IOpenMusicService;
 import org.dromara.music.service.MusicCommentFacadeService;
 import org.dromara.music.service.MusicInteractionService;
+import org.dromara.common.ratelimiter.annotation.RateLimiter;
+import org.dromara.common.ratelimiter.enums.LimitType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +38,7 @@ public class OpenMusicController {
     private final MusicInteractionService musicInteractionService;
     private final MusicCommentFacadeService musicCommentFacadeService;
 
+    @RateLimiter(count = 60, limitType = LimitType.IP)
     @SaIgnore
     @GetMapping("/list")
     public TableDataInfo<MusicVo> list(@RequestParam(value = "keyword", required = false) String keyword,
@@ -55,18 +58,21 @@ public class OpenMusicController {
             startDate, endDate, playCountMin, playCountMax, pageQuery);
     }
 
+    @RateLimiter(count = 60, limitType = LimitType.IP)
     @SaIgnore
     @GetMapping("/{id}")
     public R<MusicDetailVo> detail(@NotNull(message = "主键不能为空") @PathVariable("id") Long id) {
         return R.ok(openMusicService.queryPublicDetail(id));
     }
 
+    @RateLimiter(count = 60, limitType = LimitType.IP)
     @SaIgnore
     @GetMapping("/random")
     public R<List<MusicVo>> random(@RequestParam(value = "limit", required = false) Integer limit) {
         return R.ok(openMusicService.queryRandomPublic(limit));
     }
 
+    @RateLimiter(count = 60, limitType = LimitType.IP)
     @SaIgnore
     @GetMapping("/suggest")
     public R<List<OpenSearchSuggestVo>> suggest(@RequestParam(value = "keyword", required = false) String keyword,
@@ -74,6 +80,7 @@ public class OpenMusicController {
         return R.ok(openMusicService.querySearchSuggestions(keyword, limit));
     }
 
+    @RateLimiter(count = 60, limitType = LimitType.IP)
     @SaIgnore
     @GetMapping("/hot-keywords")
     public R<List<String>> hotKeywords(@RequestParam(value = "limit", required = false) Integer limit,
@@ -81,6 +88,7 @@ public class OpenMusicController {
         return R.ok(openMusicService.queryHotKeywords(limit, days));
     }
 
+    @RateLimiter(count = 60, limitType = LimitType.IP)
     @SaIgnore
     @GetMapping("/panel")
     public R<OpenSearchPanelVo> panel(@RequestParam(value = "keyword", required = false) String keyword,
@@ -100,6 +108,7 @@ public class OpenMusicController {
             startDate, endDate, playCountMin, playCountMax, limit));
     }
 
+    @RateLimiter(count = 60, limitType = LimitType.IP)
     @SaIgnore
     @GetMapping("/chart/{type}")
     public R<OpenChartVo> chart(@PathVariable("type") String type,
@@ -108,6 +117,7 @@ public class OpenMusicController {
         return R.ok(openMusicService.queryPublicChart(type, period, limit));
     }
 
+    @RateLimiter(count = 60, limitType = LimitType.IP)
     @SaIgnore
     @GetMapping("/chart/{type}/archives")
     public R<List<OpenChartArchiveVo>> chartArchives(@PathVariable("type") String type,
@@ -115,12 +125,14 @@ public class OpenMusicController {
         return R.ok(openMusicService.queryChartArchives(type, limit));
     }
 
+    @RateLimiter(count = 60, limitType = LimitType.IP)
     @SaIgnore
     @GetMapping("/{id}/comments")
     public R<List<OpenCommentVo>> comments(@NotNull(message = "主键不能为空") @PathVariable("id") Long id) {
         return R.ok(musicCommentFacadeService.queryPublicComments(id));
     }
 
+    @RateLimiter(count = 60, limitType = LimitType.IP)
     @SaIgnore
     @PostMapping("/{id}/play")
     public R<Void> play(@NotNull(message = "主键不能为空") @PathVariable("id") Long id) {
@@ -128,6 +140,7 @@ public class OpenMusicController {
         return R.ok();
     }
 
+    @RateLimiter(count = 60, limitType = LimitType.IP)
     @SaIgnore
     @PostMapping("/{id}/share")
     public R<Void> share(@NotNull(message = "主键不能为空") @PathVariable("id") Long id) {
@@ -135,6 +148,7 @@ public class OpenMusicController {
         return R.ok();
     }
 
+    @RateLimiter(count = 60, limitType = LimitType.IP)
     @SaIgnore
     @PostMapping("/{id}/download")
     public R<Void> download(@NotNull(message = "主键不能为空") @PathVariable("id") Long id) {

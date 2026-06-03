@@ -3,6 +3,8 @@ package org.dromara.music.controller;
 import lombok.RequiredArgsConstructor;
 import cn.dev33.satoken.annotation.SaIgnore;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.ratelimiter.annotation.RateLimiter;
+import org.dromara.common.ratelimiter.enums.LimitType;
 import org.dromara.music.domain.vo.OpenTagTreeVo;
 import org.dromara.music.service.IPortalTagService;
 import org.dromara.music.domain.vo.TagVo;
@@ -23,6 +25,7 @@ public class OpenTagController {
 
     private final IPortalTagService portalTagService;
 
+    @RateLimiter(count = 60, limitType = LimitType.IP)
     @SaIgnore
     @GetMapping("/list")
     public R<List<TagVo>> list(@RequestParam(value = "keyword", required = false) String keyword,
@@ -30,6 +33,7 @@ public class OpenTagController {
         return R.ok(portalTagService.listTags(keyword, type));
     }
 
+    @RateLimiter(count = 60, limitType = LimitType.IP)
     @SaIgnore
     @GetMapping("/tree")
     public R<List<OpenTagTreeVo>> tree(@RequestParam(value = "keyword", required = false) String keyword,

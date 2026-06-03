@@ -69,6 +69,16 @@ public interface SystemConstants {
     Long SUPER_ADMIN_ID = 1L;
 
     /**
+     * 超级管理员角色 roleKey
+     */
+    String SUPER_ADMIN_ROLE_KEY = "superadmin";
+
+    /**
+     * 管理员角色 roleKey
+     */
+    String ADMIN_ROLE_KEY = "admin";
+
+    /**
      * 根部门祖级列表
      */
     String ROOT_DEPT_ANCESTORS = "0";
@@ -76,6 +86,6 @@ public interface SystemConstants {
     /**
      * 排除敏感属性字段
      */
-    String[] EXCLUDE_PROPERTIES = { "password", "oldPassword", "newPassword", "confirmPassword" };
+    String[] EXCLUDE_PROPERTIES = { "password", "oldPassword", "newPassword", "confirmPassword", "phonenumber", "email", "mobile", "token" };
 
 }

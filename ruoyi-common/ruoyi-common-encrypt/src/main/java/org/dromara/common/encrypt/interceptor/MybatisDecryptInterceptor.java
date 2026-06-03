@@ -2,6 +2,7 @@ package org.dromara.common.encrypt.interceptor;
 
 import cn.hutool.v7.core.collection.CollUtil;
 import cn.hutool.v7.core.convert.ConvertUtil;
+import cn.hutool.v7.core.reflect.FieldUtil;
 import cn.hutool.v7.core.util.ObjUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,8 @@ import org.dromara.common.encrypt.enumd.EncodeType;
 import org.dromara.common.encrypt.properties.EncryptorProperties;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.sql.Statement;
 import java.util.*;
 
@@ -42,13 +45,18 @@ public class MybatisDecryptInterceptor implements Interceptor {
     public Object intercept(Invocation invocation) throws Throwable {
         // 开始进行参数解密
         ResultSetHandler resultSetHandler = (ResultSetHandler) invocation.getTarget();
-        Field parameterHandlerField = resultSetHandler.getClass().getDeclaredField("parameterHandler");
-        parameterHandlerField.setAccessible(true);
-        Object target = parameterHandlerField.get(resultSetHandler);
-        if (target instanceof ParameterHandler parameterHandler) {
-            Object parameterObject = parameterHandler.getParameterObject();
-            if (ObjUtil.isNotNull(parameterObject) && !(parameterObject instanceof String)) {
-                this.decryptHandler(parameterObject);
+        // 解决 NoSuchFieldException: 适配 MyBatis 插件多层代理对象
+        Object targetHandler = unwrap(resultSetHandler);
+
+        Field parameterHandlerField = FieldUtil.getField(targetHandler.getClass(), "parameterHandler");
+        if (parameterHandlerField != null) {
+            parameterHandlerField.setAccessible(true);
+            Object target = parameterHandlerField.get(targetHandler);
+            if (target instanceof ParameterHandler parameterHandler) {
+                Object parameterObject = parameterHandler.getParameterObject();
+                if (ObjUtil.isNotNull(parameterObject) && !(parameterObject instanceof String)) {
+                    this.decryptHandler(parameterObject);
+                }
             }
         }
         // 获取执行mysql执行结果
@@ -58,6 +66,16 @@ public class MybatisDecryptInterceptor implements Interceptor {
         }
         this.decryptHandler(result);
         return result;
+    }
+
+    private Object unwrap(Object target) {
+        if (Proxy.isProxyClass(target.getClass())) {
+            InvocationHandler handler = Proxy.getInvocationHandler(target);
+            if (handler instanceof Plugin plugin) {
+                return unwrap(FieldUtil.getFieldValue(plugin, "target"));
+            }
+        }
+        return target;
     }
 
     /**

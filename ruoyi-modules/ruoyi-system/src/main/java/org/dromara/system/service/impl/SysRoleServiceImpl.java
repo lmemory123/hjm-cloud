@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.Strings;
 import org.dromara.common.core.constant.CacheNames;
 import org.dromara.common.core.constant.SystemConstants;
-import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.exception.ServiceException;
 import org.dromara.common.core.utils.MapstructUtils;
 import org.dromara.common.core.utils.StreamUtils;
@@ -228,7 +227,7 @@ public class SysRoleServiceImpl implements ISysRoleService {
         if (ObjUtil.isNotNull(role.getRoleId()) && LoginHelper.isSuperAdmin(role.getRoleId())) {
             throw new ServiceException("不允许操作超级管理员角色");
         }
-        String[] keys = new String[]{TenantConstants.SUPER_ADMIN_ROLE_KEY, TenantConstants.TENANT_ADMIN_ROLE_KEY};
+        String[] keys = new String[]{SystemConstants.SUPER_ADMIN_ROLE_KEY, SystemConstants.ADMIN_ROLE_KEY};
         // 新增不允许使用 管理员标识符
         if (ObjUtil.isNull(role.getRoleId())
             && Strings.CS.equalsAny(role.getRoleKey(), keys)) {

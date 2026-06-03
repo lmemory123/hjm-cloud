@@ -3,7 +3,7 @@ datasource:
   system-master:
     url: jdbc:postgresql://hjm-postgres:5432/ry-cloud?currentSchema=public&reWriteBatchedInserts=true
     username: ruoyi
-    password: ruoyi123
+    password: ENC(Eev20Zc+W9kVw8s63hlEgT4yhVoNDjk+NdnKCFWXxO3Q6912F6z+7WbFADdopdbd)
     driver-class-name: org.postgresql.Driver
 
 spring:

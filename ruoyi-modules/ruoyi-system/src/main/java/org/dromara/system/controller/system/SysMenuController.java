@@ -7,7 +7,6 @@ import cn.hutool.core.lang.tree.Tree;
 import cn.hutool.v7.core.tree.MapTree;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.constant.SystemConstants;
-import org.dromara.common.core.constant.TenantConstants;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.core.utils.StringUtils;
 import org.dromara.common.idempotent.annotation.RepeatSubmit;
@@ -54,8 +53,8 @@ public class SysMenuController extends BaseController {
      * 获取菜单列表
      */
     @SaCheckRole(value = {
-        TenantConstants.SUPER_ADMIN_ROLE_KEY,
-        TenantConstants.TENANT_ADMIN_ROLE_KEY
+        SystemConstants.SUPER_ADMIN_ROLE_KEY,
+        SystemConstants.ADMIN_ROLE_KEY
     }, mode = SaMode.OR)
     @SaCheckPermission("system:menu:list")
     @GetMapping("/list")
@@ -70,8 +69,8 @@ public class SysMenuController extends BaseController {
      * @param menuId 菜单ID
      */
     @SaCheckRole(value = {
-        TenantConstants.SUPER_ADMIN_ROLE_KEY,
-        TenantConstants.TENANT_ADMIN_ROLE_KEY
+        SystemConstants.SUPER_ADMIN_ROLE_KEY,
+        SystemConstants.ADMIN_ROLE_KEY
     }, mode = SaMode.OR)
     @SaCheckPermission("system:menu:query")
     @GetMapping(value = "/{menuId}")
@@ -107,7 +106,7 @@ public class SysMenuController extends BaseController {
     /**
      * 新增菜单
      */
-    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
+    @SaCheckRole(SystemConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:menu:add")
     @Log(title = "菜单管理", businessType = BusinessType.INSERT)
     @RepeatSubmit()
@@ -126,7 +125,7 @@ public class SysMenuController extends BaseController {
     /**
      * 修改菜单
      */
-    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
+    @SaCheckRole(SystemConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:menu:edit")
     @Log(title = "菜单管理", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
@@ -149,7 +148,7 @@ public class SysMenuController extends BaseController {
      *
      * @param menuId 菜单ID
      */
-    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
+    @SaCheckRole(SystemConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:menu:remove")
     @Log(title = "菜单管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{menuId}")
@@ -177,7 +176,7 @@ public class SysMenuController extends BaseController {
      *
      * @param menuIds 菜单ID串
      */
-    @SaCheckRole(TenantConstants.SUPER_ADMIN_ROLE_KEY)
+    @SaCheckRole(SystemConstants.SUPER_ADMIN_ROLE_KEY)
     @SaCheckPermission("system:menu:remove")
     @Log(title = "菜单管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/cascade/{menuIds}")

@@ -5,6 +5,8 @@ import cn.hutool.v7.core.map.Dict;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.ratelimiter.annotation.RateLimiter;
+import org.dromara.common.ratelimiter.enums.LimitType;
 import org.dromara.music.domain.vo.OpenOperationVo;
 import org.dromara.system.api.RemoteConfigService;
 import org.springframework.validation.annotation.Validated;
@@ -27,6 +29,7 @@ public class OpenOperationController {
     @DubboReference
     private final RemoteConfigService remoteConfigService;
 
+    @RateLimiter(count = 60, limitType = LimitType.IP)
     @SaIgnore
     @GetMapping
     public R<OpenOperationVo> detail() {

@@ -42,5 +42,17 @@ public class MusicDraftVo implements Serializable {
     @ExcelProperty(value = "表单草稿")
     private String content;
 
+    /**
+     * 创建时间
+     */
+    @ExcelProperty(value = "创建时间")
+    private java.util.Date createTime;
+
+    /**
+     * 更新时间
+     */
+    @ExcelProperty(value = "更新时间")
+    private java.util.Date updateTime;
+
 
 }

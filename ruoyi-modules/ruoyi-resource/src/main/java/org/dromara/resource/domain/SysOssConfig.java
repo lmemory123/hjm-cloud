@@ -4,6 +4,7 @@ import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.dromara.common.encrypt.annotation.EncryptField;
 import org.dromara.common.mybatisflex.core.domain.BaseEntity;
 
 /**
@@ -30,11 +31,13 @@ public class SysOssConfig extends BaseEntity {
     /**
      * accessKey
      */
+    @EncryptField
     private String accessKey;
 
     /**
      * 秘钥
      */
+    @EncryptField
     private String secretKey;
 
     /**

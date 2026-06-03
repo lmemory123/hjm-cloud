@@ -57,3 +57,4 @@ script/docker-compose-all/middleware/redis/data/
 logs/
 *.jar
 !*/src/main/resources/lib/*.jar
+script/docker-compose-all/.env

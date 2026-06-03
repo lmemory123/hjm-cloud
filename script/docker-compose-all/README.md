@@ -12,6 +12,7 @@
 - `middleware/`: 中间件持久化数据及初始化配置。
 - `docker-compose.yml`: 主编排文件。
 - `build.sh`: 一键构建后端 JAR 包脚本。
+- `.env.example`: 本地密钥示例，复制为 `.env` 后填写 `JASYPT_ENCRYPTOR_PASSWORD`。
 
 ## 2. 快速开始
 
@@ -22,15 +23,19 @@
 - Node.js & pnpm (仅构建需要)
 
 ### 2.2 构建与启动
-1. **构建后端 JAR 包**：
+1. **准备本地密钥**：
    ```bash
-   chmod +x docker/build.sh
-   ./docker/build.sh
+   cp .env.example .env
+   # 将 .env 内的 JASYPT_ENCRYPTOR_PASSWORD 改为本机密钥
    ```
-2. **启动所有服务**：
+2. **构建后端 JAR 包**：
    ```bash
-   cd docker
-   docker-compose up --build -d
+   chmod +x build.sh
+   ./build.sh
+   ```
+3. **启动所有服务**：
+   ```bash
+   docker compose -f docker-compose.yml up --build -d
    ```
 
 ## 3. 访问入口

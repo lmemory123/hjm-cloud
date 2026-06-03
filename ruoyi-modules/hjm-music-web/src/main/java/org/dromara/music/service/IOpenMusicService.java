@@ -32,6 +32,10 @@ public interface IOpenMusicService {
 
     OpenUserProfileVo queryPublicUserProfile(String uid);
 
+    List<OpenUserProfileVo> queryUserFollows(String uid, Integer limit);
+
+    List<OpenUserProfileVo> queryUserFans(String uid, Integer limit);
+
     List<MusicVo> queryRandomPublic(Integer limit);
 
     OpenChartVo queryPublicChart(String chartType, String periodKey, Integer limit);
