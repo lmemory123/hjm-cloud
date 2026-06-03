@@ -26,6 +26,13 @@
     <artifactId>ruoyi-seata-server</artifactId>
     <packaging>jar</packaging>
 
+    <repositories>
+        <repository>
+            <id>seata-local</id>
+            <url>file://${project.basedir}/repo</url>
+        </repository>
+    </repositories>
+
     <properties>
         <seata.version>2.5.0</seata.version>
         <spring-boot-for-server.version>4.0.1</spring-boot-for-server.version>
@@ -115,8 +122,6 @@
             <groupId>org.apache.seata</groupId>
             <artifactId>seata-server</artifactId>
             <version>${seata.version}</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/lib/seata-server-${seata.version}.jar</systemPath>
         </dependency>
 
         <dependency>
@@ -292,8 +297,6 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <!-- 作用:项目打成jar的同时将本地jar包也引入进去 -->
-                    <includeSystemScope>true</includeSystemScope>
                 </configuration>
             </plugin>
         </plugins>

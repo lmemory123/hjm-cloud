@@ -4,6 +4,7 @@ import cn.hutool.v7.core.util.ObjUtil;
 import cn.hutool.v7.http.meta.HttpStatus;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -56,9 +57,12 @@ public class GlobalExceptionHandler {
      * 业务异常
      */
     @ExceptionHandler(ServiceException.class)
-    public R<Void> handleServiceException(ServiceException e, HttpServletRequest request) {
-        log.error(e.getMessage(),e);
+    public R<Void> handleServiceException(ServiceException e, HttpServletRequest request, HttpServletResponse response) {
+        log.error(e.getMessage(), e);
         Integer code = e.getCode();
+        if (ObjUtil.isNotNull(code) && code == 429) {
+            response.setStatus(429);
+        }
         return ObjUtil.isNotNull(code) ? R.fail(code, e.getMessage()) : R.fail(e.getMessage());
     }
 
