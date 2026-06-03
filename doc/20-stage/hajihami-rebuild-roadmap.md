@@ -12,7 +12,7 @@
 - 前台：单站点 MVP 功能完整，支持游客浏览与注册用户投稿互动；SSR 水合与性能优化初步完成。
 - 后台：Soybean Admin 管理端已适配单站点模式，移除所有租户管理入口；支持 OpenAPI 与 Webhook 可视化。
 - 后端：RuoYi Cloud jdk21 适配完成，移除运行时租户隔离逻辑；Nacos 配置同步与冷启动流程已硬化。
-- 质量：Playwright E2E 覆盖核心链路；后端单元测试已补齐数据库回退路径；S8 本轮已完成编译、类型检查和生产构建验证，Docker 冷启动需在 Docker 可用环境复验。
+- 质量：Playwright E2E 覆盖核心链路；后端单元测试已补齐数据库回退路径；S8 本轮已完成编译、类型检查、生产构建和 Docker 运行时复验。
 
 ## 2. 技术边界
 
@@ -50,6 +50,7 @@
 - 前台 Nuxt 4 小版本升级：Nuxt、Vue、Nuxt UI、Nuxt i18n、VueUse、Iconify、Sass、vue-tsc。
 - 后台 Admin 小版本升级：Vue、Naive UI、VueUse、UnoCSS、ECharts、vue-tsc、Sass 等；暂不升级 Vite 8、Vue Router 5、TypeScript 6、ESLint 10。
 - 修复后台包装组件 `useAttrs()` 透传类型断言，以及 `file-upload` TSX 中 `NP` 组件显式导入。
+- 修复后台 Docker 构建：复制 `.npmrc` 进入构建层并使用 npmmirror 安装 pnpm，新增 `.dockerignore`，避免 Docker 内依赖下载长尾和上下文噪音。
 
 ## 4. 当前完成记录
 
@@ -61,7 +62,7 @@
 | MT 去多租户专项 | 已完成 | 2026-06-02 | 业务层完全去租户化，单站点冷启动复验通过 |
 | S7.0 文档校准与清理 | 已完成 | 2026-06-02 | 同步 S7 路线图，清理 stale 文档，移除 TenantConstants 残留，停止跟踪 transient 文件 |
 | S7.1 生产安全与门禁 | 已完成 | 2026-06-02 | 落实 Jasypt 秘钥加密、OpenAPI 60次/min 限频、日志脱敏及部署演练 |
-| S8 技术栈补丁升级 | 已完成 | 2026-06-03 | Spring Boot 4.0.6、Nuxt 4.4.7、Vue 3.5.35、Admin 依赖小版本升级；编译、类型检查和构建通过 |
+| S8 技术栈补丁升级 | 已完成 | 2026-06-03 | Spring Boot 4.0.6、Nuxt 4.4.7、Vue 3.5.35、Admin 依赖小版本升级；编译、类型检查、构建、Docker 运行时和 E2E 通过 |
 
 ## 4.1 S8 验证记录
 
@@ -69,9 +70,13 @@
 - 后端：`mvn -pl ruoyi-modules/hjm-music-web -am -DskipTests=false -Dmaven.test.skip=false test` 通过，实际执行 `EncryptTest` 和 `OpenMusicServiceDatabaseTest`。
 - 前台：`pnpm exec vue-tsc --noEmit --skipLibCheck` 通过。
 - 前台：`pnpm build` 通过；仍存在 Tailwind/VueUse sourcemap/PURE 注释类非阻断警告。
-- 前台 E2E：`pnpm test:e2e` 未通过，原因是本机未启动 `localhost:3000` 前台和 `localhost:81` 后台服务，属于运行环境缺失，不是测试断言失败。
+- Docker 运行时：`RESET_DATA=1 ./cold_start.sh` 在 Docker 可用环境复验；后端、中间件、前台、后台核心 10 个容器均为 healthy。
+- Nacos 服务注册：`ruoyi-auth`、`ruoyi-system`、`hjm-music-web` 3/3 注册并存在 healthy 实例。
+- 网关 smoke：`/auth/code`、`/music/open/song/list?pageNum=1&pageSize=1`、`/music/open/user/1` 返回 200；前台 `http://localhost:3000/` 和后台 `http://localhost:81/` 返回 200。
+- 前台 E2E：完整运行环境启动后 `pnpm test:e2e` 通过，6/6 passed，覆盖首页、搜索、注册登录无 `tenantId`、歌曲详情跳转和后台登录。
 - 后台：`pnpm typecheck` 通过。
 - 后台：`pnpm build` 通过。
+- 后台 Docker：`docker compose build --no-cache hjm-admin` 通过，已确认升级后的后台镜像可生产构建并启动健康。
 
 ## 5. 后续交接区 (S7.2 - S7.4)
 
@@ -89,8 +94,6 @@
 ## 6. 已知风险
 
 - 后台 `gen/soy` 目录仍被主 typecheck 排除，生成产物需独立验收。
-- 本机 Docker 环境未在 S8 本轮执行冷启动复验；合并前需在 Docker 可用环境执行 `RESET_DATA=1 ./cold_start.sh`。
-- 前台 E2E 需要先启动前台 `localhost:3000`、后台 `localhost:81` 及后端网关后再执行。
 - 前台 Nuxt build 仍有 Tailwind/VueUse sourcemap/PURE 注释类非阻断警告，后续可作为构建噪声专项处理。
 - 后台 pnpm 安装提示部分构建脚本被忽略，当前不影响 typecheck/build，生产 CI 可按组织策略决定是否执行 `pnpm approve-builds`。
 - 机器人平台接入目前仅为方案验证，需真实 API 凭证进行 S7.4 最终验收。
