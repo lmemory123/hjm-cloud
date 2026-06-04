@@ -22,7 +22,7 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/music/emoji")
+@RequestMapping("/emoji")
 public class EmojiController extends BaseController {
 
     private final IEmojiService emojiService;

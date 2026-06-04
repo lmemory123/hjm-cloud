@@ -1,9 +1,12 @@
 package org.dromara.music.controller;
 
+import cn.dev33.satoken.annotation.SaIgnore;
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
 import org.dromara.common.mybatisflex.core.page.PageQuery;
 import org.dromara.common.mybatisflex.core.page.TableDataInfo;
+import org.dromara.common.ratelimiter.annotation.RateLimiter;
+import org.dromara.common.ratelimiter.enums.LimitType;
 import org.dromara.music.domain.bo.EmojiBo;
 import org.dromara.music.domain.vo.EmojiVo;
 import org.dromara.music.service.IOpenEmojiService;
@@ -28,6 +31,8 @@ public class OpenEmojiController {
     /**
      * 查询已通过的表情包列表
      */
+    @RateLimiter(count = 60, limitType = LimitType.IP)
+    @SaIgnore
     @GetMapping("/list")
     public TableDataInfo<EmojiVo> list(EmojiBo bo, PageQuery pageQuery) {
         bo.setStatus(1); // 仅查询已通过审核的
@@ -37,6 +42,8 @@ public class OpenEmojiController {
     /**
      * 获取表情包分类列表
      */
+    @RateLimiter(count = 60, limitType = LimitType.IP)
+    @SaIgnore
     @GetMapping("/category")
     public R<List<String>> category() {
         return R.ok(emojiService.queryCategoryList());

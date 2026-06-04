@@ -27,7 +27,8 @@ public class OpenEmojiServiceImpl implements IOpenEmojiService {
         QueryWrapper wrapper = QueryWrapper.create()
                 .where(EMOJI.NAME.like(bo.getName(), StringUtils.isNotBlank(bo.getName())))
                 .and(EMOJI.CATEGORY.eq(bo.getCategory(), StringUtils.isNotBlank(bo.getCategory())))
-                .and(EMOJI.STATUS.eq(bo.getStatus(), bo.getStatus() != null));
+                .and(EMOJI.STATUS.eq(bo.getStatus(), bo.getStatus() != null))
+                .orderBy(EMOJI.CREATE_TIME.desc());
 
         Page<EmojiVo> result = emojiMapper.selectVoPage(pageQuery.build(), wrapper);
         return TableDataInfo.build(result);

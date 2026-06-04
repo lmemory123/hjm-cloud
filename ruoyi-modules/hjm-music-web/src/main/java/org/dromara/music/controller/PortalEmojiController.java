@@ -2,6 +2,7 @@ package org.dromara.music.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.dromara.common.core.domain.R;
+import org.dromara.common.core.validate.AddGroup;
 import org.dromara.music.domain.bo.EmojiBo;
 import org.dromara.music.service.IPortalEmojiService;
 import org.springframework.validation.annotation.Validated;
@@ -25,7 +26,7 @@ public class PortalEmojiController {
      * 提交表情包
      */
     @PostMapping("/submit")
-    public R<Void> submit(@Validated @RequestBody EmojiBo bo) {
+    public R<Void> submit(@Validated(AddGroup.class) @RequestBody EmojiBo bo) {
         bo.setStatus(0); // 待审核
         return emojiService.submitEmoji(bo) ? R.ok() : R.fail();
     }
