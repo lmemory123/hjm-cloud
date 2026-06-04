@@ -15,11 +15,6 @@ public class MusicDetailVo extends MusicVo {
     private List<MusicOriginalVo> originals;
 
     /**
-     * 资源信息
-     */
-    private List<MusicResourceVo> resources;
-
-    /**
      * 标签信息
      */
     private List<TagVo> tags;

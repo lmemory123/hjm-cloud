@@ -26,27 +26,27 @@ INSERT INTO music (
   audit_status, is_public, is_original, publish_time, create_time
 ) VALUES
 (1001, 'Call of Silence', '本地 FLAC 样本', 'Call of Silence', 2001, 'Allen', 123, 8600, 260, 98, 18, 42, 16,
- '{"audioUrl":"/media/local/Allen%20-%20Call%20of%20Silence.flac","coverUrl":"/images/music-cover-placeholder.svg","mediaType":"audio","qualityTier":"flac","bitrate":"lossless","container":"flac","codec":"flac","sampleRate":"48kHz"}'::jsonb,
+ '[{"url":"/media/local/Allen%20-%20Call%20of%20Silence.flac","posterUrl":"/images/music-cover-placeholder.svg","mediaType":"audio","qualityTier":"flac","bitrate":"lossless","container":"flac","codec":"flac","sampleRate":"48kHz","size":15740953,"duration":123}]'::jsonb,
  '[{"id":"12","name":"电音","type":"style"},{"id":"17","name":"高音质","type":"quality"}]'::jsonb,
  '{"source":"local-dev","hasVideo":false,"preloadPolicy":"metadata"}'::jsonb,
  '1', '1', '0', now() - interval '5 hour', now() - interval '5 hour'),
 (1002, '玉门关', '本地 OGG 320k 样本', '玉门关', 2002, 'GZQ', 355, 7200, 190, 73, 12, 31, 11,
- '{"audioUrl":"/media/local/GZQ%20-%20%E7%8E%89%E9%97%A8%E5%85%B3.ogg","coverUrl":"/images/music-cover-placeholder.svg","mediaType":"audio","qualityTier":"320k","bitrate":"320k","container":"ogg","codec":"vorbis","sampleRate":"44.1kHz"}'::jsonb,
+ '[{"url":"/media/local/GZQ%20-%20%E7%8E%89%E9%97%A8%E5%85%B3.ogg","posterUrl":"/images/music-cover-placeholder.svg","mediaType":"audio","qualityTier":"320k","bitrate":"320k","container":"ogg","codec":"vorbis","sampleRate":"44.1kHz","size":13765382,"duration":355}]'::jsonb,
  '[{"id":"15","name":"原创","type":"genre"},{"id":"17","name":"高音质","type":"quality"}]'::jsonb,
  '{"source":"local-dev","hasVideo":false,"preloadPolicy":"metadata"}'::jsonb,
  '1', '1', '1', now() - interval '9 hour', now() - interval '9 hour'),
 (1003, 'Trap Queen', '本地 MP3 128k 样本', 'Trap Queen', 2003, 'MKJEightfold', 317, 6400, 144, 56, 9, 24, 8,
- '{"audioUrl":"/media/local/MKJEightfold%20-%20Trap%20Queen.mp3","coverUrl":"/images/music-cover-placeholder.svg","mediaType":"audio","qualityTier":"128k","bitrate":"128k","container":"mp3","codec":"mp3","sampleRate":"44.1kHz"}'::jsonb,
+ '[{"url":"/media/local/MKJEightfold%20-%20Trap%20Queen.mp3","posterUrl":"/images/music-cover-placeholder.svg","mediaType":"audio","qualityTier":"128k","bitrate":"128k","container":"mp3","codec":"mp3","sampleRate":"44.1kHz","size":5099868,"duration":317}]'::jsonb,
  '[{"id":"12","name":"电音","type":"style"},{"id":"14","name":"翻唱","type":"genre"}]'::jsonb,
  '{"source":"local-dev","hasVideo":false,"preloadPolicy":"metadata"}'::jsonb,
  '1', '1', '0', now() - interval '1 day', now() - interval '1 day'),
 (1004, 'Prayer X', '本地 OGG 320k 样本', 'Prayer X', 2004, 'King Gnu', 198, 5900, 132, 48, 7, 20, 6,
- '{"audioUrl":"/media/local/King%20Gnu%20-%20Prayer%20X.ogg","coverUrl":"/images/music-cover-placeholder.svg","mediaType":"audio","qualityTier":"320k","bitrate":"320k","container":"ogg","codec":"vorbis","sampleRate":"44.1kHz"}'::jsonb,
+ '[{"url":"/media/local/King%20Gnu%20-%20Prayer%20X.ogg","posterUrl":"/images/music-cover-placeholder.svg","mediaType":"audio","qualityTier":"320k","bitrate":"320k","container":"ogg","codec":"vorbis","sampleRate":"44.1kHz","size":7670255,"duration":198}]'::jsonb,
  '[{"id":"13","name":"鬼畜","type":"genre"},{"id":"14","name":"翻唱","type":"genre"}]'::jsonb,
  '{"source":"local-dev","hasVideo":false,"preloadPolicy":"metadata"}'::jsonb,
  '1', '1', '0', now() - interval '2 day', now() - interval '2 day'),
 (1005, '醒', '本地 MP3 320k 样本', '醒', 2005, '把那碗饭给我', 169, 5100, 118, 42, 6, 18, 5,
- '{"audioUrl":"/media/local/%E6%8A%8A%E9%82%A3%E7%A2%97%E9%A5%AD%E7%BB%99%E6%88%91%20-%20%E9%86%92.mp3","coverUrl":"/images/music-cover-placeholder.svg","mediaType":"audio","qualityTier":"320k","bitrate":"320k","container":"mp3","codec":"mp3","sampleRate":"48kHz"}'::jsonb,
+ '[{"url":"/media/local/%E6%8A%8A%E9%82%A3%E7%A2%97%E9%A5%AD%E7%BB%99%E6%88%91%20-%20%E9%86%92.mp3","posterUrl":"/images/music-cover-placeholder.svg","mediaType":"audio","qualityTier":"320k","bitrate":"320k","container":"mp3","codec":"mp3","sampleRate":"48kHz","size":6916195,"duration":169}]'::jsonb,
  '[{"id":"10","name":"原教旨","type":"genre"},{"id":"15","name":"原创","type":"genre"}]'::jsonb,
  '{"source":"local-dev","hasVideo":false,"preloadPolicy":"metadata"}'::jsonb,
  '1', '1', '1', now() - interval '3 day', now() - interval '3 day');
@@ -56,11 +56,11 @@ TRUNCATE TABLE music_resource CASCADE;
 INSERT INTO music_resource (
   id, music_id, res_type, quality_tier, source_type, url, file_name, file_format, file_size, spec_info, is_primary, status, process_status, sort_order, create_time
 ) VALUES
-(1, 1001, 'audio', 'flac', 'local', '/media/local/Allen%20-%20Call%20of%20Silence.flac', 'Allen - Call of Silence.flac', 'flac', 15740953, '{"bitrate":"lossless","codec":"flac","sampleRate":"48kHz","duration":123}'::jsonb, '1', '0', '2', 1, now()),
-(2, 1002, 'audio', '320k', 'local', '/media/local/GZQ%20-%20%E7%8E%89%E9%97%A8%E5%85%B3.ogg', 'GZQ - 玉门关.ogg', 'ogg', 13765382, '{"bitrate":"320k","codec":"vorbis","sampleRate":"44.1kHz","duration":355}'::jsonb, '1', '0', '2', 1, now()),
-(3, 1003, 'audio', '128k', 'local', '/media/local/MKJEightfold%20-%20Trap%20Queen.mp3', 'MKJEightfold - Trap Queen.mp3', 'mp3', 5099868, '{"bitrate":"128k","codec":"mp3","sampleRate":"44.1kHz","duration":317}'::jsonb, '1', '0', '2', 1, now()),
-(4, 1004, 'audio', '320k', 'local', '/media/local/King%20Gnu%20-%20Prayer%20X.ogg', 'King Gnu - Prayer X.ogg', 'ogg', 7670255, '{"bitrate":"320k","codec":"vorbis","sampleRate":"44.1kHz","duration":198}'::jsonb, '1', '0', '2', 1, now()),
-(5, 1005, 'audio', '320k', 'local', '/media/local/%E6%8A%8A%E9%82%A3%E7%A2%97%E9%A5%AD%E7%BB%99%E6%88%91%20-%20%E9%86%92.mp3', '把那碗饭给我 - 醒.mp3', 'mp3', 6916195, '{"bitrate":"320k","codec":"mp3","sampleRate":"48kHz","duration":169}'::jsonb, '1', '0', '2', 1, now());
+(1, 1001, 'audio', 'flac', 'local', '/media/local/Allen%20-%20Call%20of%20Silence.flac', 'Allen - Call of Silence.flac', 'flac', 15740953, '{"bitrate":"lossless","codec":"flac","sampleRate":"48kHz","duration":123,"posterUrl":"/images/music-cover-placeholder.svg"}'::jsonb, '1', '0', '2', 1, now()),
+(2, 1002, 'audio', '320k', 'local', '/media/local/GZQ%20-%20%E7%8E%89%E9%97%A8%E5%85%B3.ogg', 'GZQ - 玉门关.ogg', 'ogg', 13765382, '{"bitrate":"320k","codec":"vorbis","sampleRate":"44.1kHz","duration":355,"posterUrl":"/images/music-cover-placeholder.svg"}'::jsonb, '1', '0', '2', 1, now()),
+(3, 1003, 'audio', '128k', 'local', '/media/local/MKJEightfold%20-%20Trap%20Queen.mp3', 'MKJEightfold - Trap Queen.mp3', 'mp3', 5099868, '{"bitrate":"128k","codec":"mp3","sampleRate":"44.1kHz","duration":317,"posterUrl":"/images/music-cover-placeholder.svg"}'::jsonb, '1', '0', '2', 1, now()),
+(4, 1004, 'audio', '320k', 'local', '/media/local/King%20Gnu%20-%20Prayer%20X.ogg', 'King Gnu - Prayer X.ogg', 'ogg', 7670255, '{"bitrate":"320k","codec":"vorbis","sampleRate":"44.1kHz","duration":198,"posterUrl":"/images/music-cover-placeholder.svg"}'::jsonb, '1', '0', '2', 1, now()),
+(5, 1005, 'audio', '320k', 'local', '/media/local/%E6%8A%8A%E9%82%A3%E7%A2%97%E9%A5%AD%E7%BB%99%E6%88%91%20-%20%E9%86%92.mp3', '把那碗饭给我 - 醒.mp3', 'mp3', 6916195, '{"bitrate":"320k","codec":"mp3","sampleRate":"48kHz","duration":169,"posterUrl":"/images/music-cover-placeholder.svg"}'::jsonb, '1', '0', '2', 1, now());
 
 -- 4. 统计数据 (music_stat)
 TRUNCATE TABLE music_stat CASCADE;

@@ -169,5 +169,52 @@ public class MusicResourceVo implements Serializable {
     @ExcelProperty(value = "排序号")
     private Long sortOrder;
 
+    /**
+     * 媒体类型 (audio, video, etc)
+     */
+    @ExcelProperty(value = "媒体类型")
+    private String mediaType;
+
+    /**
+     * 码率
+     */
+    @ExcelProperty(value = "码率")
+    private String bitrate;
+
+    /**
+     * 编码格式
+     */
+    @ExcelProperty(value = "编码格式")
+    private String codec;
+
+    /**
+     * 封装格式
+     */
+    @ExcelProperty(value = "封装格式")
+    private String container;
+
+    /**
+     * 采样率
+     */
+    @ExcelProperty(value = "采样率")
+    private String sampleRate;
+
+    /**
+     * 时长(秒)
+     */
+    @ExcelProperty(value = "时长")
+    private Long duration;
+
+    /**
+     * 视频封面/海报
+     */
+    @ExcelProperty(value = "视频封面")
+    private String posterUrl;
+
+    /**
+     * 资源大小
+     */
+    @ExcelProperty(value = "资源大小")
+    private Long size;
 
 }

@@ -9,6 +9,7 @@ import org.dromara.music.domain.Music;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -217,5 +218,9 @@ public class MusicVo implements Serializable {
      */
     private Double searchScore;
 
+    /**
+     * 明确资源数组
+     */
+    private List<MusicResourceVo> resources;
 
 }

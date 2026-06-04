@@ -117,6 +117,7 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
         BeanUtils.copyProperties(musicVo, detail);
         List<MusicOriginalVo> originals = originalMapper.selectVoList(QueryWrapper.create().where(MUSIC_ORIGINAL.MUSIC_ID.eq(id)));
         List<MusicResourceVo> resources = resourceMapper.selectVoList(QueryWrapper.create().where(MUSIC_RESOURCE.MUSIC_ID.eq(id)));
+        fillResourceSpecInfo(resources);
         List<MusicTagRelVo> rels = tagRelMapper.selectVoList(QueryWrapper.create().where(MUSIC_TAG_REL.MUSIC_ID.eq(id)));
         List<Long> tagIds = rels.stream().map(MusicTagRelVo::getTagId).filter(Objects::nonNull).toList();
         List<TagVo> tagList = tagIds.isEmpty() ? Collections.emptyList() : tagMapper.selectVoList(QueryWrapper.create().where(TAG.ID.in(tagIds)));
@@ -301,6 +302,7 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
         applySort(wrapper, sort);
         Page<MusicVo> result = musicMapper.selectVoPage(pageQuery.build(), wrapper);
         musicInteractionService.fillDynamicStats(result.getRecords());
+        fillResourceList(result.getRecords());
         applySearchHighlights(result.getRecords(), keyword);
         return TableDataInfo.build(result);
     }
@@ -317,6 +319,7 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
         com.momao.valkey.core.Page<MusicSearchDocument> result = musicSearchRepository.page(condition, offset, pageSize);
         List<MusicVo> rows = result.records().stream().map(this::toMusicVo).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         musicInteractionService.fillDynamicStats(rows);
+        fillResourceList(rows);
         applySearchHighlights(rows, keyword);
         if (isRelevanceSort(sort, keyword)) {
             applyRelevanceRanking(rows, keyword, tag, tags, style);
@@ -433,6 +436,7 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
         Page<MusicVo> candidatePage = musicMapper.selectVoPage(new Page<>(1, fetchSize), wrapper);
         List<MusicVo> candidates = candidatePage.getRecords() == null ? new ArrayList<>() : new ArrayList<>(candidatePage.getRecords());
         musicInteractionService.fillDynamicStats(candidates);
+        fillResourceList(candidates);
         applySearchHighlights(candidates, keyword);
         applyRelevanceRanking(candidates, keyword, tag, tags, style);
         int fromIndex = (int) Math.max(0, (requestedPage.getPageNumber() - 1) * requestedPage.getPageSize());
@@ -1212,5 +1216,73 @@ public class OpenMusicServiceImpl implements IOpenMusicService {
     }
 
     private record SortSpec(String field, boolean asc) {
+    }
+
+    private void fillResourceList(List<MusicVo> rows) {
+        if (rows == null || rows.isEmpty()) return;
+        for (MusicVo row : rows) {
+            if (StringUtils.isBlank(row.getResourceData())) {
+                row.setResources(Collections.emptyList());
+                continue;
+            }
+            try {
+                String jsonData = row.getResourceData().trim();
+                List<MusicResourceVo> resources;
+                if (jsonData.startsWith("{")) {
+                    MusicResourceVo res = JSON.parseObject(jsonData, MusicResourceVo.class);
+                    JSONObject obj = JSON.parseObject(jsonData);
+                    if (res != null && res.getSize() == null && obj.containsKey("size")) {
+                        res.setSize(obj.getLong("size"));
+                    }
+                    resources = res != null ? Collections.singletonList(res) : new ArrayList<>();
+                } else {
+                    resources = JSON.parseArray(jsonData, MusicResourceVo.class);
+                    JSONArray arr = JSON.parseArray(jsonData);
+                    if (resources != null && arr != null) {
+                        for (int i = 0; i < resources.size(); i++) {
+                            JSONObject obj = arr.getJSONObject(i);
+                            if (resources.get(i) != null && resources.get(i).getSize() == null && obj.containsKey("size")) {
+                                resources.get(i).setSize(obj.getLong("size"));
+                            }
+                        }
+                    }
+                }
+                
+                if (resources != null) {
+                    fillResourceSpecInfo(resources);
+                    row.setResources(resources);
+                } else {
+                    row.setResources(Collections.emptyList());
+                }
+            } catch (Exception e) {
+                log.warn("Failed to parse resource data for music id {}", row.getId(), e);
+                row.setResources(Collections.emptyList());
+            }
+        }
+    }
+
+    private void fillResourceSpecInfo(List<MusicResourceVo> resources) {
+        if (resources == null || resources.isEmpty()) return;
+        for (MusicResourceVo res : resources) {
+            res.setMediaType(StringUtils.defaultIfBlank(res.getMediaType(), res.getResType()));
+            if (res.getSize() == null) res.setSize(res.getFileSize());
+            if (StringUtils.isBlank(res.getContainer())) res.setContainer(res.getFileFormat());
+            if (StringUtils.isBlank(res.getSpecInfo())) continue;
+            try {
+                JSONObject spec = JSON.parseObject(res.getSpecInfo());
+                if (spec == null) continue;
+                if (StringUtils.isBlank(res.getBitrate())) res.setBitrate(spec.getString("bitrate"));
+                if (StringUtils.isBlank(res.getCodec())) res.setCodec(spec.getString("codec"));
+                if (StringUtils.isBlank(res.getContainer()) || res.getContainer().equals(res.getFileFormat())) {
+                    String specContainer = spec.getString("container");
+                    if (StringUtils.isNotBlank(specContainer)) res.setContainer(specContainer);
+                }
+                if (StringUtils.isBlank(res.getSampleRate())) res.setSampleRate(spec.getString("sampleRate"));
+                if (res.getDuration() == null) res.setDuration(spec.getLong("duration"));
+                if (StringUtils.isBlank(res.getPosterUrl())) res.setPosterUrl(spec.getString("posterUrl"));
+            } catch (Exception e) {
+                log.warn("Failed to parse spec info for resource id {}", res.getId(), e);
+            }
+        }
     }
 }
