@@ -251,9 +251,12 @@ services:
     container_name: hjm-frontend
     ports:
       - "3000:3000"
+    volumes:
+      - /Users/momao/Music/网易云音乐:/app/local-media:ro
     environment:
       NUXT_API_BASE: http://ruoyi-gateway:8080
       NUXT_PUBLIC_API_BASE: http://localhost:8080
+      LOCAL_MEDIA_DIR: /app/local-media
     depends_on:
       ruoyi-gateway:
         condition: service_healthy
