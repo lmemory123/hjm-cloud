@@ -177,6 +177,7 @@ comment on column sys_user.remark       is '备注';
 insert into sys_user values(1, 103, 'admin', '疯狂的狮子Li', 'sys_user', 'crazyLionLi@163.com', '15888888888', '1', null, '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', '0', '0', '127.0.0.1', now(), 103, 1, now(), null, null, '管理员');
 insert into sys_user values(3, 108, 'test', '本部门及以下 密码666666', 'sys_user', '', '', '0', null, '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', now(), 103, 1, now(), 3, now(), NULL);
 insert into sys_user values(4, 102, 'test1', '仅本人 密码666666', 'sys_user', '', '', '0', null, '$2a$10$b8yUzN0C71sbz.PhNOCgJe.Tu1yWC3RNrTyjSQ8p1W0.aaUXUJ.Ne', '0', '0', '127.0.0.1', now(), 103, 1, now(), 4, now(), NULL);
+insert into sys_user values(10001, null, 'front_demo', 'front_demo', 'app_user', '', '', '2', null, '$2a$10$brP/D2hn34t5reCgF/8c6u/uKKwNNdsLFHAKbf88nBYiwd5ttq7Wm', '0', '0', '', null, null, null, now(), null, null, '前台测试账号，密码123456');
 
 
 -- ----------------------------
@@ -1517,4 +1518,3 @@ select to_timestamp($1, 'yyyy-mm-dd hh24:mi:ss');
 $$ language sql strict ;
 
 create cast (varchar as timestamptz) with function cast_varchar_to_timestamp as IMPLICIT;
-
