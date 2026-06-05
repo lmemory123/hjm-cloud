@@ -47,6 +47,13 @@ public class OssFactory {
             throw new OssException("系统异常, '" + configKey + "'配置信息不存在!");
         }
         OssProperties properties = JsonUtils.parseObject(json, OssProperties.class);
+        org.springframework.core.env.Environment env = org.dromara.common.core.utils.SpringUtils.getBean(org.springframework.core.env.Environment.class);
+        if (properties.getAccessKey() != null && properties.getAccessKey().startsWith("${")) {
+            properties.setAccessKey(env.resolvePlaceholders(properties.getAccessKey()));
+        }
+        if (properties.getSecretKey() != null && properties.getSecretKey().startsWith("${")) {
+            properties.setSecretKey(env.resolvePlaceholders(properties.getSecretKey()));
+        }
         String key = configKey;
         OssClient client = CLIENT_CACHE.get(key);
         // 客户端不存在或配置不相同则重新构建

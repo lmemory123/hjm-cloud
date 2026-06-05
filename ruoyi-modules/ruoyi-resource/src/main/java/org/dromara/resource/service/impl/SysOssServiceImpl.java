@@ -244,6 +244,7 @@ public class SysOssServiceImpl implements ISysOssService {
         if (ObjUtil.isNull(bo) || StringUtils.isBlank(bo.getFileName())) {
             throw new ServiceException("文件名不能为空");
         }
+        checkFileSizeAndType(bo.getBizType(), bo.getContentType(), bo.getFileSize());
         OssClient storage = getOssClient(bo.getService());
         String suffix = getSuffix(bo.getFileName());
         String objectKey = buildObjectKey(storage, bo.getBizType(), suffix);
@@ -285,6 +286,7 @@ public class SysOssServiceImpl implements ISysOssService {
         if (ObjUtil.isNull(bo) || StringUtils.isBlank(bo.getFileName())) {
             throw new ServiceException("文件名不能为空");
         }
+        checkFileSizeAndType(bo.getBizType(), bo.getContentType(), null);
         OssClient storage = getOssClient(bo.getService());
         String suffix = getSuffix(bo.getFileName());
         String objectKey = buildObjectKey(storage, bo.getBizType(), suffix);
@@ -444,6 +446,26 @@ public class SysOssServiceImpl implements ISysOssService {
         }
         int idx = fileName.lastIndexOf('.');
         return idx >= 0 ? fileName.substring(idx) : "";
+    }
+
+    private void checkFileSizeAndType(String bizType, String contentType, Long fileSize) {
+        if (fileSize != null) {
+            long maxLimit = 100 * 1024 * 1024L; // default 100MB
+            if ("audio".equals(bizType)) maxLimit = 200 * 1024 * 1024L; // 200MB
+            if ("cover".equals(bizType) || "avatar".equals(bizType)) maxLimit = 5 * 1024 * 1024L; // 5MB
+            if (fileSize > maxLimit) {
+                throw new ServiceException("文件大小超出限制");
+            }
+        }
+        if (StringUtils.isNotBlank(contentType)) {
+            String type = contentType.toLowerCase();
+            if ("audio".equals(bizType) && !type.startsWith("audio/")) {
+                throw new ServiceException("只能上传音频文件");
+            }
+            if (("cover".equals(bizType) || "avatar".equals(bizType)) && !type.startsWith("image/")) {
+                throw new ServiceException("只能上传图片文件");
+            }
+        }
     }
 
     private int resolvePartCount(SysOssMultipartInitBo bo) {
