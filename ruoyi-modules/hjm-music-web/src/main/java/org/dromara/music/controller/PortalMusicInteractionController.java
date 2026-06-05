@@ -17,10 +17,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import cn.dev33.satoken.annotation.SaCheckLogin;
 
 import java.util.List;
 
 @Validated
+@SaCheckLogin
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/portal/song")
@@ -57,6 +59,7 @@ public class PortalMusicInteractionController {
     public R<Boolean> collected(@NotNull(message = "主键不能为空") @PathVariable("id") Long id) {
         return R.ok(musicInteractionService.hasCollected(id, LoginHelper.getUserId()));
     }
+
 
     @GetMapping("/collections")
     public R<List<MusicVo>> collections(@RequestParam(value = "limit", required = false) Integer limit) {

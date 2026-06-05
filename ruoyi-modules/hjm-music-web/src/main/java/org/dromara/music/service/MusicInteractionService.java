@@ -148,6 +148,10 @@ public class MusicInteractionService {
         return hasCollectedInternal(musicId, userId);
     }
 
+    public List<MusicVo> queryLikedSongs(Long userId, Integer limit) {
+        return queryActionSongs(userId, TARGET_TYPE_SONG, ACTION_LIKE, limit);
+    }
+
     public List<MusicVo> queryCollectedSongs(Long userId, Integer limit) {
         return queryActionSongs(userId, TARGET_TYPE_SONG_COLLECT, ACTION_COLLECT, limit);
     }
